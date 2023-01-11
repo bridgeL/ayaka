@@ -1,0 +1,13 @@
+__pycache__
+/dist
+/data
+/ayaka_test
+/ayaka_games
+/error.log
+/record.log
+/plugins/*
+/script
+*.ps1
+
+# 保留示例
+!/plugins/星际旅行.py
