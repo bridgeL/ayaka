@@ -9,9 +9,9 @@ driver.register_adapter(Adapter)
 # 加载插件
 load_plugin("ayaka_games")
 
-# 临时 [-]
-load_plugin("ayaka_test")
-load_plugin("ayaka_test_extension")
+# # 临时 [-]
+# load_plugin("ayaka_test")
+# load_plugin("ayaka_test_extension")
 
 if __name__ == "__main__":
     run(app="__mp_main__:app")

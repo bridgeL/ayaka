@@ -5,9 +5,9 @@ cat = AyakaCat("星际旅行")
 cat.help = "xing ji lv xing"
 
 # 启动猫猫
-cat.set_start_cmds(cmds=["星际旅行", "travel"])
+cat.set_wakeup_cmds(cmds=["星际旅行", "travel"])
 # 关闭猫猫
-cat.set_close_cmds(cmds=["退出", "exit"])
+cat.set_rest_cmds(cmds=["退出", "exit"])
 
 # ---------- 2 ----------
 @cat.on_cmd(cmds="move", states="*")

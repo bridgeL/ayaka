@@ -24,11 +24,10 @@ class AyakaEvent(BaseModel):
     origin: Optional["AyakaEvent"]
 
 
-class User:
-    def __init__(self, id: str, name: str, role: str) -> None:
-        self.id = id
-        self.name = name
-        self.role = role
+class User(BaseModel):
+    id: str
+    name: str
+    role: str
 
 
 class ResItem(BaseModel):

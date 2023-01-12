@@ -8,7 +8,7 @@ from pathlib import Path
 from .model import AyakaSession
 from .helpers import ensure_dir_exists
 
-AYAKA_VERSION = "2.0.0b0"
+AYAKA_VERSION = "0.0.0.0b3"
 logger.opt(colors=True).success(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
 
 data_path = Path("data", "ayaka")

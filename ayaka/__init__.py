@@ -1,5 +1,5 @@
 '''
-    ayaka - cat Cat CAT - 0.0.0.0b2
+    ayaka - cat Cat CAT - 0.0.0.0b3
 '''
 from . import adapters as __adapters
 

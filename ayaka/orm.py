@@ -305,12 +305,12 @@ class AyakaGroupDB(AyakaDB):
     '''继承时要书写`__table_name__`
 
     主键 group_id'''
-    group_id: int = Field(extra=AyakaDB.__primary_key__)
+    group_id: str = Field(extra=AyakaDB.__primary_key__)
 
 
 class AyakaUserDB(AyakaDB):
     '''继承时要书写`__table_name__`
 
     主键 group_id, user_id'''
-    group_id: int = Field(extra=AyakaDB.__primary_key__)
-    user_id: int = Field(extra=AyakaDB.__primary_key__)
+    group_id: str = Field(extra=AyakaDB.__primary_key__)
+    user_id: str = Field(extra=AyakaDB.__primary_key__)

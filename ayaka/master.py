@@ -6,6 +6,11 @@ cat = AyakaCat("猫猫管理器")
 '''猫猫管理器'''
 
 
+@cat.on_cmd(cmds="猫猫管理器", always=True, auto_help=False)
+async def show_self_help():
+    await cat.send_help()
+
+
 @cat.on_cmd(cmds="猫猫列表", always=True)
 async def list_cat():
     '''展示所有猫猫'''
@@ -32,6 +37,19 @@ async def show_relative_cats(name: str):
         await cat.send("你是否是想找猫猫：" + " ".join(possibles))
 
 
+@cat.on_cmd(cmds="帮助", always=True, auto_help=False)
+async def redirect_help():
+    cat.cache.setdefault("redirect", True)
+    if cat.cache["redirect"]:
+        await cat.send("你是在找 [猫猫帮助] 吗\n或者你可以发送 [不要重定向猫猫帮助]，命令我不要回复 [帮助] 指令")
+
+
+@cat.on_cmd(cmds="不要重定向猫猫帮助", always=True, auto_help=False)
+async def set_redirect():
+    cat.cache["redirect"] = False
+    await cat.send("好的，我知道了")
+
+
 @cat.on_cmd(cmds="猫猫帮助", always=True)
 async def show_help():
     '''展示猫猫帮助'''
@@ -40,10 +58,10 @@ async def show_help():
         c = manager.get_cat(name)
         if c:
             await cat.send(c.help)
-            return
         else:
             await cat.send("没有找到对应猫猫")
             await show_relative_cats(name)
+        return
 
     c = cat.current.cat
     if c:
@@ -71,9 +89,9 @@ async def show_state():
     '''展示猫猫状态'''
     c = cat.current.cat
     if c:
-        info = f"正在运行猫猫[{c.name}]\n当前状态[{c.state}]"
+        info = f"当前猫猫[{c.name}]\n当前状态[{c.state}]"
     else:
-        info = "当前没有任何猫猫在运行"
+        info = "当前没有任何猫猫醒着"
     await cat.send(info)
 
 

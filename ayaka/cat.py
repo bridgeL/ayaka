@@ -10,6 +10,7 @@ import asyncio
 from contextvars import ContextVar
 from typing import Awaitable, Callable, TypeVar
 from pydantic import BaseModel
+from loguru import logger
 from .helpers import ensure_list, simple_repr
 from .config import root_config
 from .model import AyakaSession, AyakaEvent
@@ -299,6 +300,17 @@ class AyakaTrigger:
         params = AyakaParams(self)
         _params.set(params)
 
+        # 打印日志
+        items = [f"<y>猫猫</y> {self.cat.name}"]
+        if self.cmd:
+            items.append(f"<y>命令</y> {self.cmd}")
+        else:
+            items.append("<g>文字</g>")
+        if self.state:
+            items.append(f"<c>状态</c> {self.state}")
+        items.append(f"<y>回调</y> {self.func_name}")
+        logger.opt(colors=True).debug(" | ".join(items))
+        
         # 运行函数
         try:
             await self.func()
@@ -406,7 +418,7 @@ class AyakaCat:
             root_config.save()
 
     # ---- on_xxx ----
-    def on_cmd(self, cmds: str | list[str] = "", states: str | list[str] = "", session_types: str | list[str] | None = None, always: bool = False, block: bool = True):
+    def on_cmd(self, cmds: str | list[str] = "", states: str | list[str] = "", session_types: str | list[str] | None = None, always: bool = False, block: bool = True, auto_help: bool = True):
         cmds = ensure_list(cmds)
         states = ensure_list(states)
         if session_types:
@@ -415,7 +427,8 @@ class AyakaCat:
             session_types = self.session_types
 
         def decorator(func: Callable[[], Awaitable]):
-            self._add_help(cmds, states, func)
+            if auto_help:
+                self._add_help(cmds, states, func)
             if always:
                 for cmd in cmds:
                     self.triggers.append(AyakaTrigger(
@@ -432,8 +445,8 @@ class AyakaCat:
             return func
         return decorator
 
-    def on_text(self, states: str | list[str] = "", session_types: str | list[str] | None = None, always: bool = False, block: bool = False):
-        return self.on_cmd(states=states, session_types=session_types, always=always, block=block)
+    def on_text(self, states: str | list[str] = "", session_types: str | list[str] | None = None, always: bool = False, block: bool = False, auto_help: bool = True):
+        return self.on_cmd(states=states, session_types=session_types, always=always, block=block, auto_help=auto_help)
 
     # ---- 添加帮助 ----
     def _add_help(self, cmds: list[str], states: list[str], func: Callable[[], Awaitable]):
@@ -448,7 +461,7 @@ class AyakaCat:
             func: 回调
         '''
         info = "- "
-        if cmds:
+        if cmds and cmds[0]:
             info += "/".join(cmds) + " "
         else:
             info += "<任意文字> "
@@ -566,7 +579,7 @@ class AyakaCat:
         return self.cache[key]
 
     # ---- 快捷命令 ----
-    def set_start_cmds(self, cmds: str | list[str]):
+    def set_wakeup_cmds(self, cmds: str | list[str]):
         '''设置唤醒命令'''
         @self.on_cmd(cmds=cmds)
         async def wakeup():
@@ -575,11 +588,11 @@ class AyakaCat:
             await self.send_help()
         wakeup.__module__ = self.module_name
 
-    def set_close_cmds(self, cmds: str | list[str]):
+    def set_rest_cmds(self, cmds: str | list[str]):
         '''设置休息命令'''
         @self.on_cmd(cmds=cmds, states="*")
         async def rest():
-            '''休息猫猫'''
+            '''猫猫休息'''
             await self.rest()
         rest.__module__ = self.module_name
 
