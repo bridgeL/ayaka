@@ -10,6 +10,14 @@
 - [hoshino](https://github.com/Ice-Cirno/HoshinoBot)
 - [nonebot1](https://github.com/nonebot/nonebot)
 
+## 历史遗留问题
+
+如果你之前安装过`nonebot_plugin_ayaka`，请先确保它卸载干净
+
+```
+pip uninstall nonebot_plugin_ayaka
+```
+
 ## 安装
 
 ```
@@ -18,7 +26,7 @@ pip install ayaka
 
 ## 配置
 
-ayaka使用机器人框架的配置的command_start、command_sep项，且**仅取其第一项的值**
+ayaka使用机器人框架的配置的command_start、command_sep，且**仅取其第一项的值**
 
 ## 其他
 
