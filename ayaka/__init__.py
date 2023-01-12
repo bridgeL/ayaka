@@ -1,8 +1,6 @@
 '''
-    ayaka - cat Cat CAT - 0.0.0.0b3
+    ayaka - cat Cat CAT - 0.0.0.1
 '''
-from . import adapters as __adapters
-
 from .cat import AyakaCat, AyakaEvent
 from .config import AyakaConfig
 from .orm import AyakaDB, AyakaUserDB, AyakaGroupDB
@@ -10,4 +8,5 @@ from .helpers import load_data_from_file, resource_download, resource_download_b
 from .model import ResInfo, ResItem, User, AyakaSession, AyakaEvent
 from .bridge import bridge
 
+from . import adapters as __adapters
 from . import master as __master

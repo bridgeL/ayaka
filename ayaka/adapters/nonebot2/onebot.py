@@ -1,42 +1,61 @@
-'''适配 hoshino机器人'''
+'''适配 nonebot2机器人 onebot v11适配器'''
+import uvicorn
 from math import ceil
-from hoshino import Service, config
-from hoshino.typing import CQEvent
-from ..bridge import bridge
-from ..model import AyakaEvent, AyakaSession, User
-from ..helpers import singleton
-from ..orm import start_loop
+import nonebot
+from nonebot.matcher import current_bot
+from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment, Adapter
+from ...model import AyakaEvent, User, AyakaSession
+from ...cat import bridge
+from ...orm import start_loop
 
 
-def format_msg(message):
-    '''处理消息，保留text、at'''
+app = None
+
+
+def init():
+    '''初始化'''
+    global app
+    nonebot.init()
+    app = nonebot.get_app()
+    driver = nonebot.get_driver()
+    driver.register_adapter(Adapter)
+
+
+def run():
+    '''运行'''
+    uvicorn.run(app=f"{__name__}:app", reload=True)
+
+
+def format_msg(bot: Bot, event: MessageEvent):
+    '''处理消息，保留text、at和to_me'''
     ms: list[str] = []
-    for m in message:
+    for m in event.message:
         if m.type == "text":
             ms.append(str(m))
         elif m.type == "at":
             ms.append(str(m.data["qq"]))
+    if event.to_me:
+        ms.append(bot.self_id)
     return bridge.get_separate().join(ms)
 
 
-async def handle_msg(ev: CQEvent):
-    msg = format_msg(ev.message)
+async def handle_msg(bot: Bot, event: MessageEvent):
+    msg = format_msg(bot, event)
 
     # 组成ayaka事件
-    stype = ev.message_type
-    sid = ev.group_id if stype == "group" else ev.user_id
+    stype = event.message_type
+    sid = event.group_id if stype == "group" else event.user_id
     ayaka_event = AyakaEvent(
         session=AyakaSession(type=stype, id=sid),
         msg=msg,
-        sender_id=ev.sender["user_id"],
-        sender_name=ev.sender.get("card") or ev.sender["nickname"],
+        sender_id=event.sender.user_id,
+        sender_name=event.sender.card or event.sender.nickname,
     )
     await bridge.handle_event(ayaka_event)
 
 
-@singleton
-def get_current_bot():
-    return Service('ayaka').bot
+def get_current_bot() -> Bot:
+    return current_bot.get()
 
 
 async def send(type: str, id: str, msg: str):
@@ -52,13 +71,16 @@ async def send_many(id: str, msgs: list[str]):
     # 分割长消息组（不可超过100条
     div_len = 100
     div_cnt = ceil(len(msgs) / div_len)
-    bot_id = next(bot.get_self_ids())
     for i in range(div_cnt):
         msgs = [
-            {"user_id": bot_id, "nickname": "Ayaka Bot", "content": m}
+            MessageSegment.node_custom(
+                user_id=bot.self_id,
+                nickname="Ayaka Bot",
+                content=m
+            )
             for m in msgs[i*div_len: (i+1)*div_len]
         ]
-        await bot.call_action("send_group_forward_msg", group_id=int(id), messages=msgs)
+        await bot.send_group_forward_msg(group_id=int(id), messages=msgs)
 
 
 async def get_member_info(gid: str, uid: str):
@@ -86,18 +108,19 @@ async def get_member_list(gid: str):
 
 
 def regist():
+    '''注册服务'''
     if bridge.ready:
         return
 
-    prefix = list(config.COMMAND_START)[0]
+    driver = nonebot.get_driver()
+    prefix = list(driver.config.command_start)[0]
+    separate = list(driver.config.command_sep)[0]
 
     def get_prefix():
         return prefix
 
     def get_separate():
-        return " "
-
-    bot = get_current_bot()
+        return separate
 
     # 注册外部服务
     bridge.regist(send)
@@ -106,22 +129,12 @@ def regist():
     bridge.regist(get_separate)
     bridge.regist(get_member_info)
     bridge.regist(get_member_list)
-    bridge.regist(bot.on_startup)
+    bridge.regist(driver.on_startup)
 
     # 内部服务注册到外部
-    bot.on("message")(handle_msg)
+    nonebot.on_message(handlers=[handle_msg])
 
     # 其他初始化
-    bot.on_startup(start_loop)
+    driver.on_startup(start_loop)
 
     bridge.ready = True
-
-
-def init():
-    # [-] 待完成
-    raise
-
-
-def run():
-    # [-] 待完成
-    raise

@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from loguru import logger
 from ..model import AyakaEvent, AyakaSession,  User
 from ..cat import bridge
-from ..orm import init_orm
+from ..orm import start_loop
 from ..helpers import ensure_dir_exists
 
 
@@ -188,7 +188,7 @@ async def console_loop():
         await handler.handle_line(line)
 
 
-def start_console_loop():
+async def start_console_loop():
     asyncio.create_task(console_loop())
 
 
@@ -221,15 +221,15 @@ def regist():
     bridge.regist(send_many)
     bridge.regist(get_prefix)
     bridge.regist(get_separate)
-    bridge.regist(on_startup)
     bridge.regist(get_member_info)
     bridge.regist(get_member_list)
+    bridge.regist(on_startup)
 
     # 内部服务注册到外部
     on_startup(start_console_loop)
 
     # 其他初始化
-    init_orm()
+    (start_loop)
     logger.level("AYAKA", no=27, icon="⚡")
 
     bridge.ready = True

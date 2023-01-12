@@ -146,12 +146,8 @@ async def loop():
         await asyncio.sleep(10)
 
 
-def start_loop():
+async def start_loop():
     asyncio.create_task(loop())
-
-
-def init_orm():
-    bridge.on_startup(start_loop)
 
 
 def commit():

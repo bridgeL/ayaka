@@ -5,7 +5,7 @@
 
     缺点是，你完全不记得自己都在哪里加的这些方法
 '''
-from typing import Callable
+from typing import Awaitable, Callable
 from .model import AyakaEvent, User
 from .exception import NotRegistrationError, DuplicateRegistrationError
 
@@ -24,7 +24,7 @@ class AyakaBridge:
 
     def __getattr__(self, _name: str) -> None:
         '''获得先前注册的方法，通过self._func调用func方法'''
-        name = _name[1:]
+        name = _name.lstrip("_")
         if name not in self.func_dict:
             raise NotRegistrationError(name)
         return self.func_dict[name]
@@ -42,14 +42,14 @@ class AyakaBridge:
     def get_separate(self) -> str:
         return self._get_separate()
 
-    def on_startup(self, func: Callable):
-        return self._on_startup(func)
-
     async def get_member_info(self, gid: str, uid: str) -> User | None:
         return await self._get_member_info(gid, uid)
 
     async def get_member_list(self, gid: str) -> list[User] | None:
         return await self._get_member_list(gid)
+
+    def on_startup(self, func: Callable[..., Awaitable]):
+        return self._on_startup(func)
 
     # ---- ayaka cat 提供服务 ----
     async def handle_event(self, event: "AyakaEvent") -> None:

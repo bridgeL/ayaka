@@ -30,9 +30,19 @@ elif has_been_imported("nonebot"):
     if is_nonebot2:
         # onebot
         if has_been_imported("onebot"):
-            print("智能识别 onebot v11，加载为nonebot2插件")
-            from .onebot import regist
+            print("智能识别 nonebot2 onebot v11，加载为nonebot2插件")
+            from .nonebot2.onebot import regist
             regist()
+        
+        # 其他
+        else:
+            print("暂不支持nonebot2其他适配器")
+    
+    # nonebot1
+    else:
+        print("智能识别 nonebot1，加载为nonebot1插件")
+        from .nonebot1 import regist
+        regist()
 
 # console
 else:

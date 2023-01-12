@@ -310,7 +310,7 @@ class AyakaTrigger:
             items.append(f"<c>状态</c> {self.state}")
         items.append(f"<y>回调</y> {self.func_name}")
         logger.opt(colors=True).debug(" | ".join(items))
-        
+
         # 运行函数
         try:
             await self.func()
@@ -337,7 +337,7 @@ class AyakaCat:
         for i in range(n):
             k = keys[n-i-1]
             v = sys.modules[k]
-            if v.__file__ == self.module_path:
+            if getattr(v, "__file__", "") == self.module_path:
                 self.module_name = k
                 break
         else:

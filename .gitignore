@@ -9,4 +9,4 @@ __pycache__
 /.env
 /bot.py
 /cbot.py
-
+/poetry.lock
