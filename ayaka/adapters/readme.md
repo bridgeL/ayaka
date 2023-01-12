@@ -1,11 +1,5 @@
-使用顺序如下：
+已支持的机器人框架
 
-- adapter.init
-- adapter.regist
-- 加载插件
-- adapter.run
-
-不过，你也可以使用官方的注册加载流程，那么只需在插件加载前使用adapter.regist即可
-
-- adapter.regist
-- 加载插件
+- [nonebot2](https://github.com/nonebot/nonebot2)(使用[onebotv11](https://github.com/nonebot/adapter-onebot)适配器)
+- [hoshino](https://github.com/Ice-Cirno/HoshinoBot)
+- [nonebot1](https://github.com/nonebot/nonebot)

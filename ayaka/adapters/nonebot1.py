@@ -115,13 +115,3 @@ def regist():
     bot.on_startup(start_loop)
 
     bridge.ready = True
-
-
-def init():
-    # [-] 待完成
-    raise
-
-
-def run():
-    # [-] 待完成
-    raise

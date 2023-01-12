@@ -1,5 +1,4 @@
 '''适配 nonebot2机器人 onebot v11适配器'''
-import uvicorn
 from math import ceil
 import nonebot
 from nonebot.matcher import current_bot
@@ -7,23 +6,6 @@ from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment, Adapt
 from ...model import AyakaEvent, User, AyakaSession
 from ...cat import bridge
 from ...orm import start_loop
-
-
-app = None
-
-
-def init():
-    '''初始化'''
-    global app
-    nonebot.init()
-    app = nonebot.get_app()
-    driver = nonebot.get_driver()
-    driver.register_adapter(Adapter)
-
-
-def run():
-    '''运行'''
-    uvicorn.run(app=f"{__name__}:app", reload=True)
 
 
 def format_msg(bot: Bot, event: MessageEvent):
