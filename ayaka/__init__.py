@@ -8,5 +8,8 @@ from .helpers import load_data_from_file, resource_download, resource_download_b
 from .model import ResInfo, ResItem, User, AyakaSession, AyakaEvent
 from .bridge import bridge
 
+# 根据py包的导入情况，猜测当前插件工作在哪个机器人框架下，加载对应的代码
 from . import adapters as __adapters
+
+# 猫猫管理器
 from . import master as __master
