@@ -114,7 +114,7 @@ def regist():
     bridge.regist(driver.on_startup)
 
     # 内部服务注册到外部
-    nonebot.on_message(handlers=[handle_msg])
+    nonebot.on_message(handlers=[handle_msg], block=False, priority=5)
 
     # 其他初始化
     driver.on_startup(start_loop)
