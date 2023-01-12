@@ -3,14 +3,10 @@ __pycache__
 /data
 /ayaka_test
 /ayaka_games
-/error.log
-/record.log
-/plugins/*
 /script
-*.ps1
+/*.log
+/*.ps1
 /.env
 /bot.py
 /cbot.py
 
-# 保留示例
-!/plugins/星际旅行.py
