@@ -1,6 +1,6 @@
 '''适配 hoshino机器人'''
 from math import ceil
-from nonebot import NoneBot
+import nonebot
 from aiocqhttp import Event as CQEvent
 from ..bridge import bridge
 from ..model import AyakaEvent, AyakaSession, User
@@ -21,7 +21,6 @@ def format_msg(message):
 
 async def handle_msg(ev: CQEvent):
     msg = format_msg(ev.message)
-
     # 组成ayaka事件
     stype = ev.message_type
     sid = ev.group_id if stype == "group" else ev.user_id
@@ -36,7 +35,7 @@ async def handle_msg(ev: CQEvent):
 
 @singleton
 def get_current_bot():
-    return NoneBot()
+    return nonebot.get_bot()
 
 
 async def send(type: str, id: str, msg: str):

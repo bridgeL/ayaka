@@ -1,6 +1,6 @@
 <div align="center">
 
-# Ayaka - 猫猫，猫猫！ - 0.0.0.1
+# Ayaka - 猫猫，猫猫！ - 0.0.0.2
 
 </div>
 
@@ -15,6 +15,10 @@
 ```
 pip install ayaka
 ```
+
+## 配置
+
+ayaka使用机器人框架的配置的command_start、command_sep项，且**仅取其第一项的值**
 
 ## 其他
 
