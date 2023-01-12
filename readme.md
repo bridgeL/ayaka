@@ -9,3 +9,7 @@
 ```
 pip install ayaka
 ```
+
+## 其他
+
+本插件的前身：[nonebot_plugin_ayaka](https://github.com/bridgeL/nonebot-plugin-ayaka)
