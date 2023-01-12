@@ -1,5 +1,5 @@
 '''
-    ayaka - cat Cat CAT - 0.0.0.1
+    ayaka - cat Cat CAT - 0.0.0.4
 '''
 from .cat import AyakaCat, AyakaEvent
 from .config import AyakaConfig
