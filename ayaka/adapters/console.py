@@ -179,6 +179,7 @@ async def console_loop():
     clog("已接入 <g>Ayaka Console Adapter</g>")
     clog("<y>g</y> \<gid> \<uid> \<msg> | 模拟群聊消息")
     clog("<y>p</y> \<uid> \<msg> | 模拟私聊消息")
+    clog("<y>d</y> \<n> | 延时n秒")
     clog("<y>s</y> \<name> | 执行自动化脚本 script/\<name>.txt")
     loop = asyncio.get_running_loop()
 
@@ -214,7 +215,7 @@ def regist():
     '''注册服务'''
     if bridge.ready:
         return
-    
+
     # 注册外部服务
     bridge.regist(send)
     bridge.regist(send_many)
@@ -230,5 +231,5 @@ def regist():
     # 其他初始化
     init_orm()
     logger.level("AYAKA", no=27, icon="⚡")
-    
+
     bridge.ready = True
