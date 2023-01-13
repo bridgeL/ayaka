@@ -8,5 +8,5 @@ __pycache__
 /*.ps1
 /.env
 /bot.py
-/cbot.py
+/run.py
 /poetry.lock

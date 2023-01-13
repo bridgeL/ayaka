@@ -1,4 +1,5 @@
 '''适配命令行输入输出'''
+import sys
 from typing import Awaitable, Callable
 import uvicorn
 import asyncio
@@ -91,7 +92,7 @@ async def _(line: str):
     return
 
 
-@handler.on("p")
+@handler.on("p ")
 async def _(line: str):
     uid, msg = safe_split(line, 2)
     session = AyakaSession(type="private", id=uid)
@@ -108,7 +109,7 @@ async def _(line: str):
     await bridge.handle_event(event)
 
 
-@handler.on("g")
+@handler.on("g ")
 async def _(line: str):
     gid, uid, msg = safe_split(line, 3)
     session = AyakaSession(type="group", id=gid)
@@ -125,7 +126,7 @@ async def _(line: str):
     await bridge.handle_event(event)
 
 
-@handler.on("d")
+@handler.on("d ")
 async def _(line: str):
     try:
         n = float(line)
@@ -135,7 +136,7 @@ async def _(line: str):
     print()
 
 
-@handler.on("s")
+@handler.on("s ")
 async def _(line: str):
     path = ensure_dir_exists(f"script/{line}.txt")
     if not path.exists():
@@ -153,6 +154,15 @@ async def _(line: str):
 
         await handler.handle_line(line)
         await handler.handle_line(after)
+
+
+@handler.on("h")
+async def show_help(line: str):
+    clog("<y>g</y> \<gid> \<uid> \<msg> | 模拟群聊消息")
+    clog("<y>p</y> \<uid> \<msg> | 模拟私聊消息")
+    clog("<y>d</y> \<n> | 延时n秒")
+    clog("<y>s</y> \<name> | 执行自动化测试脚本 script/\<name>.txt")
+    clog("<y>h</y> | 查看帮助")
 
 
 @handler.on("")
@@ -177,12 +187,8 @@ async def _(line: str):
 
 async def console_loop():
     clog("已接入 <g>Ayaka Console Adapter</g>")
-    clog("<y>g</y> \<gid> \<uid> \<msg> | 模拟群聊消息")
-    clog("<y>p</y> \<uid> \<msg> | 模拟私聊消息")
-    clog("<y>d</y> \<n> | 延时n秒")
-    clog("<y>s</y> \<name> | 执行自动化脚本 script/\<name>.txt")
+    await show_help("")
     loop = asyncio.get_running_loop()
-
     while True:
         line = await loop.run_in_executor(None, input)
         await handler.handle_line(line)
@@ -230,6 +236,19 @@ def regist():
 
     # 其他初始化
     (start_loop)
+    logger.remove()
     logger.level("AYAKA", no=27, icon="⚡")
+    logger.add(
+        sys.stdout,
+        level=0,
+        diagnose=False,
+        format=(
+            "<g>{time:MM-DD HH:mm:ss}</g> "
+            "[<lvl>{level}</lvl>] "
+            "<c><u>{name}</u></c> | "
+            # "<c>{function}:{line}</c>| "
+            "{message}"
+        ),
+    )
 
     bridge.ready = True
