@@ -26,7 +26,20 @@ pip install ayaka
 
 ## 配置
 
-ayaka使用机器人框架的配置的command_start、command_sep，且**仅取其第一项的值**
+### 必须满足的要求
+
+1. 已配置command_start、command_sep
+2. command_start、command_sep 均只有一项
+3. command_sep 不为空字符串
+
+ayaka仅保证在此限制下正常工作
+
+### 推荐配置
+
+```
+command_start = [""]
+command_sep = [" "]
+```
 
 ## 其他
 
