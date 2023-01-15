@@ -1,4 +1,5 @@
 '''适配 hoshino机器人'''
+from html import unescape
 from math import ceil
 import nonebot
 from aiocqhttp import Event as CQEvent
@@ -13,7 +14,7 @@ def format_msg(message):
     ms: list[str] = []
     for m in message:
         if m.type == "text":
-            ms.append(str(m))
+            ms.append(unescape(str(m)))
         elif m.type == "at":
             ms.append(str(m.data["qq"]))
     return bridge.get_separate().join(ms)

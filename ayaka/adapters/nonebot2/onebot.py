@@ -1,4 +1,5 @@
 '''适配 nonebot2机器人 onebot v11适配器'''
+from html import unescape
 from math import ceil
 import nonebot
 from nonebot.matcher import current_bot
@@ -13,7 +14,7 @@ def format_msg(bot: Bot, event: MessageEvent):
     ms: list[str] = []
     for m in event.message:
         if m.type == "text":
-            ms.append(str(m))
+            ms.append(unescape(str(m)))
         elif m.type == "at":
             ms.append(str(m.data["qq"]))
     if event.to_me:
