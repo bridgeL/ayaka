@@ -17,6 +17,8 @@ def format_msg(message):
             ms.append(unescape(str(m)))
         elif m.type == "at":
             ms.append(str(m.data["qq"]))
+        else:
+            ms.append(str(m))
     return bridge.get_separate().join(ms)
 
 

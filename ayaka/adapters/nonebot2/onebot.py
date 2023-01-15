@@ -17,6 +17,8 @@ def format_msg(bot: Bot, event: MessageEvent):
             ms.append(unescape(str(m)))
         elif m.type == "at":
             ms.append(str(m.data["qq"]))
+        else:
+            ms.append(str(m))
     if event.to_me:
         ms.append(bot.self_id)
     return bridge.get_separate().join(ms)
