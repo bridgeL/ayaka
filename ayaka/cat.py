@@ -9,7 +9,6 @@ import inspect
 import asyncio
 from contextvars import ContextVar
 from typing import Awaitable, Callable, TypeVar
-from pydantic import BaseModel
 from loguru import logger
 from .helpers import ensure_list, simple_repr
 from .config import root_config
@@ -25,6 +24,8 @@ T = TypeVar("T")
 
 
 class AyakaCurrent:
+    '''当前环境中的各种参数'''
+
     def __init__(self) -> None:
         self._cat_dict: dict[str, AyakaCat] = {}
 
@@ -58,6 +59,7 @@ class AyakaCurrent:
         '''当前会话标识'''
         return self.session.mark
 
+    # ---- 【废弃预定 ----
     @property
     def sender_id(self):
         '''当前消息发送者的id'''
@@ -67,6 +69,17 @@ class AyakaCurrent:
     def sender_name(self):
         '''当前消息发送者的name'''
         return self.event.sender_name
+    # ---- 废弃预定】 ----
+
+    @property
+    def user_id(self):
+        '''当前消息发送者的id'''
+        return self.event.sender_id
+
+    @property
+    def user_name(self):
+        '''当前消息发送者的name'''
+        return self.event.sender_name
 
     @property
     def cat(self):
@@ -74,7 +87,7 @@ class AyakaCurrent:
         return self._cat_dict.get(self.session_mark)
 
     @cat.setter
-    def cat(self, cat: "AyakaCat"):
+    def cat(self, cat):
         self._cat_dict[self.session_mark] = cat
 
     @property
@@ -114,12 +127,15 @@ class AyakaCurrent:
 
 
 class AyakaParams:
-    def __init__(self, trigger: "AyakaTrigger") -> None:
+    def __init__(self, trigger: "AyakaTrigger", prefix: str) -> None:
         self.trigger = trigger
         self.cmd = trigger.cmd
 
-        prefix = bridge.get_prefix()
-        separate = bridge.get_separate()
+        separates = bridge.get_separates()
+        if " " in separates:
+            separate = " "
+        else:
+            separates = separates[0]
 
         self.arg = current.msg[len(prefix+self.cmd):].strip(separate)
         self.args = [arg for arg in self.arg.split(separate) if arg]
@@ -132,6 +148,8 @@ class AyakaParams:
 
 
 class AyakaManager:
+    '''分发ayaka event'''
+
     def __init__(self) -> None:
         self.cats: list[AyakaCat] = []
         self.always_triggers: list[AyakaTrigger] = []
@@ -174,33 +192,39 @@ class AyakaManager:
 
     async def _handle_event(self, event: AyakaEvent):
         '''处理消息'''
-        # 设置上下文
+        # 设置上下AyakaTrigger文
         _event.set(event)
+
+        prefixes = bridge.get_prefixes()
 
         # 收集并处理所有cats中的always触发
         for trigger in self.always_triggers:
-            if await trigger.run():
-                return
+            for prefix in prefixes:
+                if await trigger.run(prefix):
+                    return
 
         # if 桌面模式
         if current.desktop_mode:
             # 收集并处理所有cats中的desktop触发
             for trigger in self.desktop_triggers:
-                if await trigger.run():
-                    return
+                for prefix in prefixes:
+                    if await trigger.run(prefix):
+                        return
 
         # else
         else:
             # 收集并处理当前cat中的状态触发
             # 优先处理state = "*"
             for trigger in self.star_state_triggers:
-                if await trigger.run():
-                    return
+                for prefix in prefixes:
+                    if await trigger.run(prefix):
+                        return
 
             # 处理当前状态
             for trigger in self.state_triggers:
-                if await trigger.run():
-                    return
+                for prefix in prefixes:
+                    if await trigger.run(prefix):
+                        return
 
     async def handle_event(self, event: AyakaEvent):
         '''处理消息和转发情况'''
@@ -281,7 +305,7 @@ class AyakaTrigger:
     def module_name(self):
         return self.func.__module__
 
-    async def run(self):
+    async def run(self, prefix):
         # 判断是否被屏蔽
         if not self.cat.valid:
             return False
@@ -290,14 +314,12 @@ class AyakaTrigger:
         if not current.session_type in self.session_types:
             return False
 
-        prefix = bridge.get_prefix()
-
         # if 命令触发，命令是否符合
         if self.cmd and not current.msg.startswith(prefix + self.cmd):
             return False
 
         # 一些预处理，并保存到上下文中
-        params = AyakaParams(self)
+        params = AyakaParams(self, prefix)
         _params.set(params)
 
         # 打印日志
@@ -538,44 +560,33 @@ class AyakaCat:
         await self.send(self.help)
 
     # ---- cache ----
-    def remove_data(self, key_or_obj: str | BaseModel):
-        '''从当前群组的缓存移除指定的键-值对
+    def pop_data(self, factory: Callable[[], T]) -> T:
+        '''从当前群组的缓存弹出指定的键值
 
         参数:
 
-            key: 键名或BaseModel对象，如果是BaseModel对象，则自动取其类的名字作为键名
-
-        异常:
-
-            参数类型错误，必须是字符串或BaseModel对象
+            factory: 任何无参数的制造对象的函数（类也可以）
         '''
-        if isinstance(key_or_obj, str):
-            key = key_or_obj
-        elif isinstance(key_or_obj, BaseModel):
-            key = key_or_obj.__class__.__name__
-        else:
-            raise Exception("参数类型错误，必须是字符串或BaseModel对象")
-        self.cache.pop(key, None)
+        key = factory.__name__
+        if key not in self.cache:
+            return factory()
+        return self.cache.pop(key)
 
-    def get_data(self, factory: Callable[[], T], key: str = None) -> T:
+    def get_data(self, factory: Callable[[], T]) -> T:
         '''从当前缓存中获取数据
 
         参数:
 
             factory: 任何无参数的制造对象的函数（类也可以）
 
-            key: 键名，为空时使用factory.__name__作为键名
-
         返回:
 
             factory生产对象
         '''
-        if key is None:
-            key = factory.__name__
+        key = factory.__name__
         if key not in self.cache:
             data = factory()
             self.cache[key] = data
-            return data
         return self.cache[key]
 
     # ---- 快捷命令 ----

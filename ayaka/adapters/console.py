@@ -209,12 +209,12 @@ async def get_member_list(gid: str):
     ]
 
 
-def get_prefix():
-    return ""
+def get_prefixes():
+    return [""]
 
 
-def get_separate():
-    return " "
+def get_separates():
+    return [" "]
 
 
 def regist():
@@ -225,8 +225,8 @@ def regist():
     # 注册外部服务
     bridge.regist(send)
     bridge.regist(send_many)
-    bridge.regist(get_prefix)
-    bridge.regist(get_separate)
+    bridge.regist(get_prefixes)
+    bridge.regist(get_separates)
     bridge.regist(get_member_info)
     bridge.regist(get_member_list)
     bridge.regist(on_startup)
@@ -235,7 +235,7 @@ def regist():
     on_startup(start_console_loop)
 
     # 其他初始化
-    (start_loop)
+    on_startup(start_loop)
     logger.remove()
     logger.level("AYAKA", no=27, icon="⚡")
     logger.add(

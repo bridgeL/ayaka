@@ -98,20 +98,20 @@ def regist():
         return
 
     driver = nonebot.get_driver()
-    prefix = list(driver.config.command_start)[0]
-    separate = list(driver.config.command_sep)[0]
+    prefixes = list(driver.config.command_start)
+    separates = list(driver.config.command_sep)
 
-    def get_prefix():
-        return prefix
+    def get_prefixes():
+        return prefixes or [""]
 
-    def get_separate():
-        return separate
+    def get_separates():
+        return separates or [" "]
 
     # 注册外部服务
     bridge.regist(send)
     bridge.regist(send_many)
-    bridge.regist(get_prefix)
-    bridge.regist(get_separate)
+    bridge.regist(get_prefixes)
+    bridge.regist(get_separates)
     bridge.regist(get_member_info)
     bridge.regist(get_member_list)
     bridge.regist(driver.on_startup)

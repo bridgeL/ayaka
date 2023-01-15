@@ -92,20 +92,20 @@ def regist():
         return
 
     bot = get_current_bot()
-    prefix = list(bot.config.COMMAND_START)[0]
-    separate = list(bot.config.COMMAND_SEP)[0]
+    prefixes = list(bot.config.COMMAND_START)
+    separates = list(bot.config.COMMAND_SEP)
 
-    def get_prefix():
-        return prefix
+    def get_prefixes():
+        return prefixes
 
-    def get_separate():
-        return separate
+    def get_separates():
+        return separates
 
     # 注册外部服务
     bridge.regist(send)
     bridge.regist(send_many)
-    bridge.regist(get_prefix)
-    bridge.regist(get_separate)
+    bridge.regist(get_prefixes)
+    bridge.regist(get_separates)
     bridge.regist(get_member_info)
     bridge.regist(get_member_list)
     bridge.regist(bot.on_startup)

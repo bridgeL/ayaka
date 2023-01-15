@@ -92,21 +92,22 @@ def regist():
     if bridge.ready:
         return
 
-    prefix = list(config.COMMAND_START)[0]
+    prefixes = list(config.COMMAND_START)
+    separates = list(config.COMMAND_SEP)
 
-    def get_prefix():
-        return prefix
+    def get_prefixes():
+        return prefixes or [""]
 
-    def get_separate():
-        return " "
+    def get_separates():
+        return separates or [" "]
 
     bot = get_current_bot()
 
     # 注册外部服务
     bridge.regist(send)
     bridge.regist(send_many)
-    bridge.regist(get_prefix)
-    bridge.regist(get_separate)
+    bridge.regist(get_prefixes)
+    bridge.regist(get_separates)
     bridge.regist(get_member_info)
     bridge.regist(get_member_list)
     bridge.regist(bot.on_startup)

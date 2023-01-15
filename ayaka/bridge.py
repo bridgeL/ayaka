@@ -36,11 +36,11 @@ class AyakaBridge:
     async def send_many(self, id: str, msgs: list[str]) -> None:
         await self._send_many(id, msgs)
 
-    def get_prefix(self) -> str:
-        return self._get_prefix()
+    def get_prefixes(self) -> list[str]:
+        return self._get_prefixes()
 
-    def get_separate(self) -> str:
-        return self._get_separate()
+    def get_separates(self) -> list[str]:
+        return self._get_separates()
 
     async def get_member_info(self, gid: str, uid: str) -> User | None:
         return await self._get_member_info(gid, uid)
