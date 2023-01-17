@@ -106,8 +106,8 @@ class AyakaManager:
         data.sort(key=lambda t: len(t.cmd), reverse=True)
 
     async def _handle_event(self, event: AyakaEvent):
-        '''处理消息'''
-        # 设置上下AyakaTrigger文
+        '''处理事件'''
+        # 设置上下文
         _event.set(event)
 
         prefixes = bridge.get_prefixes()
@@ -142,13 +142,11 @@ class AyakaManager:
                         return
 
     async def handle_event(self, event: AyakaEvent):
-        '''处理消息和转发情况'''
+        '''处理和转发事件'''
         await self._handle_event(event)
         target = event.session
-        v = self.listen_dict.get(target, [])
-
         ts = []
-        for listener in v:
+        for listener in self.listen_dict.get(target, []):
             data = event.dict()
             data.update(session=listener, origin=event)
             _event = AyakaEvent(**data)
