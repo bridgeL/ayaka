@@ -37,26 +37,18 @@ def on_startup(func):
     app.on_event("startup")(func)
 
 
-def clog(text: str):
-    ayaka_clog(text)
-
-
-def log(text: str):
-    ayaka_log(text)
-
-
 async def send(type: str, id: str, msg: str):
     if type == "group":
-        clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
+        ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
     else:
-        clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
-    log(msg)
+        ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
+    ayaka_log(msg)
 
 
 async def send_many(id: str, msgs: list[str]):
-    clog(f"群聊({id}) 收到<y>合并转发</y>消息")
+    ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
     for m in msgs:
-        log(m)
+        ayaka_log(m)
 
 
 def safe_split(text: str,  n: int, sep: str = " "):
@@ -68,7 +60,7 @@ def safe_split(text: str,  n: int, sep: str = " "):
 
 
 async def console_loop():
-    clog("已接入 <g>Ayaka Console Adapter</g>")
+    ayaka_clog("已接入 <g>Ayaka Console Adapter</g>")
     await show_help("")
     loop = asyncio.get_running_loop()
     while True:
@@ -132,8 +124,8 @@ async def _(line: str):
         session=session, msg=msg,
         sender_id=uid, sender_name=name
     )
-    clog(f"私聊({uid}) <y>{name}</y> 说：")
-    log(msg)
+    ayaka_clog(f"私聊({uid}) <y>{name}</y> 说：")
+    ayaka_log(msg)
     asyncio.create_task(bridge.handle_event(event))
 
 
@@ -149,8 +141,8 @@ async def _(line: str):
         session=session, msg=msg,
         sender_id=uid, sender_name=name
     )
-    clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
-    log(msg)
+    ayaka_clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
+    ayaka_log(msg)
     asyncio.create_task(bridge.handle_event(event))
 
 
@@ -189,11 +181,11 @@ async def _(line: str):
 async def show_help(line: str):
     if line.strip():
         return
-    clog("<y>g</y> \<gid> \<uid> \<msg> | 模拟群聊消息")
-    clog("<y>p</y> \<uid> \<msg> | 模拟私聊消息")
-    clog("<y>d</y> \<n> | 延时n秒")
-    clog("<y>s</y> \<name> | 执行自动化测试脚本 script/\<name>.txt")
-    clog("<y>h</y> | 查看帮助")
+    ayaka_clog("<y>g</y> \<gid> \<uid> \<msg> | 模拟群聊消息")
+    ayaka_clog("<y>p</y> \<uid> \<msg> | 模拟私聊消息")
+    ayaka_clog("<y>d</y> \<n> | 延时n秒")
+    ayaka_clog("<y>s</y> \<name> | 执行自动化测试脚本 script/\<name>.txt")
+    ayaka_clog("<y>h</y> | 查看帮助")
 
 
 @handler.on("")
@@ -208,15 +200,15 @@ async def _(line: str):
         session=session, msg=line,
         sender_id=uid, sender_name=name
     )
-    
+
     if session.type == "group":
         gid = session.id
-        clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
-        log(line)
+        ayaka_clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
+        ayaka_log(line)
     else:
-        clog(f"私聊({uid}) <y>{name}</y> 说：")
-        log(line)
-        
+        ayaka_clog(f"私聊({uid}) <y>{name}</y> 说：")
+        ayaka_log(line)
+
     asyncio.create_task(bridge.handle_event(event))
 
 
