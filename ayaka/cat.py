@@ -337,8 +337,10 @@ class AyakaTrigger:
         try:
             await self.func()
         except BlockException:
+            logger.info("BlockException")
             return True
         except NotBlockException:
+            logger.info("NotBlockException")
             return False
 
         # 返回是否阻断

@@ -15,6 +15,7 @@ async def show_self_help():
 async def list_cat():
     '''展示所有猫猫'''
     infos = ["已加载的猫猫列表"]
+    manager.cats.sort(key=lambda x: x.name)
     for c in manager.cats:
         info = f"- [{c.name}]"
         if not c.valid:

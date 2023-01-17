@@ -11,12 +11,12 @@ from typing import Literal
 from typing_extensions import Self
 from loguru import logger
 from pydantic import Field, BaseModel
-from .config import data_path
-from .cat import bridge
+from .helpers import ensure_dir_exists
 
 PrimaryKey = {"primary": True}
 JsonKey = {"json": True}
 
+data_path = ensure_dir_exists("data/ayaka")
 database_path = data_path / "ayaka.db"
 journal_path = data_path / "ayaka.db-journal"
 old_journal_path = data_path / "ayaka.db-journal-old"

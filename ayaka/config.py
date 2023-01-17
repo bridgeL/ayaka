@@ -4,15 +4,13 @@
 import json
 from pydantic import ValidationError, BaseModel
 from loguru import logger
-from pathlib import Path
 from .model import AyakaSession
 from .helpers import ensure_dir_exists
 
 AYAKA_VERSION = "0.0.0.5b1"
 logger.opt(colors=True).success(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
 
-data_path = Path("data", "ayaka")
-ensure_dir_exists(data_path)
+data_path = ensure_dir_exists("data/ayaka")
 
 
 class AyakaConfig(BaseModel):

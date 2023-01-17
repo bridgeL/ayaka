@@ -4,7 +4,8 @@
 from .cat import AyakaCat, AyakaEvent
 from .config import AyakaConfig
 from .orm import AyakaDB, AyakaUserDB, AyakaGroupDB
-from .helpers import load_data_from_file, resource_download, resource_download_by_res_info, debug_print, simple_repr, get_file_hash
+from .helpers import load_data_from_file, debug_print, simple_repr
+from .download import resource_download, resource_download_by_res_info, get_file_hash
 from .model import ResInfo, ResItem, User, AyakaSession, AyakaEvent
 from .bridge import bridge
 
