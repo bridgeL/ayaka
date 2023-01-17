@@ -26,10 +26,10 @@ pip uninstall nonebot_plugin_ayaka
 pip install ayaka
 ```
 
-## 作为console程序运行
+## 作为console程序离线运行
 
 ```py
-'''使用命令行进行测试'''
+# run.py
 import ayaka.adapters as cat
 
 # 加载插件
@@ -37,6 +37,10 @@ import ayaka.adapters as cat
 
 if __name__ == "__main__":
     cat.run()
+```
+
+```
+python run.py
 ```
 
 ## 其他
