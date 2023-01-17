@@ -134,7 +134,7 @@ async def _(line: str):
     )
     clog(f"私聊({uid}) <y>{name}</y> 说：")
     log(msg)
-    await bridge.handle_event(event)
+    asyncio.create_task(bridge.handle_event(event))
 
 
 @handler.on("g ")
@@ -151,7 +151,7 @@ async def _(line: str):
     )
     clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
     log(msg)
-    await bridge.handle_event(event)
+    asyncio.create_task(bridge.handle_event(event))
 
 
 @handler.on("d ")
@@ -172,6 +172,7 @@ async def _(line: str):
 
     name = path.stem
     lines = path.read_text(encoding="utf8").split("\n")
+    lines = [line.strip() for line in lines if line.strip()]
     after = "d 0.1"
 
     for line in lines:
@@ -197,22 +198,26 @@ async def show_help(line: str):
 
 @handler.on("")
 async def _(line: str):
-    if handler.session and line:
-        uid = handler.uid
-        session = handler.session
-        name = f"测试{uid}号"
-        event = AyakaEvent(
-            session=session, msg=line,
-            sender_id=uid, sender_name=name
-        )
-        if session.type == "group":
-            gid = session.id
-            clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
-            log(line)
-        else:
-            clog(f"私聊({uid}) <y>{name}</y> 说：")
-            log(line)
-        await bridge.handle_event(event)
+    if not handler.session or not line:
+        return
+
+    uid = handler.uid
+    session = handler.session
+    name = f"测试{uid}号"
+    event = AyakaEvent(
+        session=session, msg=line,
+        sender_id=uid, sender_name=name
+    )
+    
+    if session.type == "group":
+        gid = session.id
+        clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
+        log(line)
+    else:
+        clog(f"私聊({uid}) <y>{name}</y> 说：")
+        log(line)
+        
+    asyncio.create_task(bridge.handle_event(event))
 
 
 def run():
