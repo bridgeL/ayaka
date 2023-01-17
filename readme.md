@@ -10,6 +10,8 @@
 - [hoshino](https://github.com/Ice-Cirno/HoshinoBot)
 - [nonebot1](https://github.com/nonebot/nonebot)
 
+也可将其作为console程序离线运行
+
 ## 历史遗留问题
 
 如果你之前安装过`nonebot_plugin_ayaka`，请先确保它卸载干净
@@ -24,21 +26,17 @@ pip uninstall nonebot_plugin_ayaka
 pip install ayaka
 ```
 
-## 配置
+## 作为console程序运行
 
-### 必须满足的要求
+```py
+'''使用命令行进行测试'''
+import ayaka.adapters as cat
 
-1. 已配置command_start、command_sep
-2. command_start、command_sep 均只有一项
-3. command_sep 不为空字符串
+# 加载插件
+# do something
 
-ayaka仅保证在此限制下正常工作
-
-### 推荐配置
-
-```
-command_start = [""]
-command_sep = [" "]
+if __name__ == "__main__":
+    cat.run()
 ```
 
 ## 其他
