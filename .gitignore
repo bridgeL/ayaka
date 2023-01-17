@@ -1,12 +1,3 @@
 __pycache__
 /dist
-/data
-/ayaka_test
-/ayaka_games
-/script
-/*.log
 /*.ps1
-/.env
-/bot.py
-/run.py
-/poetry.lock
