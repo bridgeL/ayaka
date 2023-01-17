@@ -9,9 +9,9 @@ import json
 import sqlite3
 from typing import Literal
 from typing_extensions import Self
-from loguru import logger
 from pydantic import Field, BaseModel
 from .helpers import ensure_dir_exists
+from .logger import logger
 
 PrimaryKey = {"primary": True}
 JsonKey = {"json": True}

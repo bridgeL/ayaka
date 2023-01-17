@@ -1,6 +1,10 @@
 '''
     ayaka - cat Cat CAT - 0.0.0.5b3
 '''
+# logger
+from . import logger as __logger
+
+# 有用的类
 from .cat import AyakaCat, AyakaEvent
 from .config import AyakaConfig
 from .orm import AyakaDB, AyakaUserDB, AyakaGroupDB

@@ -3,12 +3,12 @@
 '''
 import json
 from pydantic import ValidationError, BaseModel
-from loguru import logger
+from .logger import logger, clogger
 from .model import AyakaSession
 from .helpers import ensure_dir_exists
 
 AYAKA_VERSION = "0.0.0.5b3"
-logger.opt(colors=True).success(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
+clogger.success(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
 
 data_path = ensure_dir_exists("data/ayaka")
 
@@ -48,14 +48,13 @@ class AyakaConfig(BaseModel):
 
         # 强制更新（更新默认值）
         self.save()
-        logger.opt(colors=True).debug(f"已载入配置文件 <g>{name}</g>")
+        clogger.debug(f"已载入配置文件 <g>{name}</g>")
 
     def __setattr__(self, name, value):
         if getattr(self, name) != value:
             super().__setattr__(name, value)
             self.save()
-            logger.opt(colors=True).debug(
-                f"已自动写入配置更改 {self.__config_name__}.<c>{name}</c>")
+            clogger.debug(f"已自动写入配置更改 {self.__config_name__}.<c>{name}</c>")
 
     def save(self):
         '''修改可变成员变量后，需要使用该方法才能保存其值到文件'''

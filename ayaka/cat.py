@@ -9,7 +9,7 @@ import inspect
 import asyncio
 from contextvars import ContextVar
 from typing import Awaitable, Callable, TypeVar
-from loguru import logger
+from .logger import logger, clogger
 from .helpers import ensure_list, simple_repr
 from .config import root_config
 from .model import AyakaSession, AyakaEvent
@@ -331,7 +331,7 @@ class AyakaTrigger:
         if self.state:
             items.append(f"<c>状态</c> {self.state}")
         items.append(f"<y>回调</y> {self.func_name}")
-        logger.opt(colors=True).debug(" | ".join(items))
+        clogger.debug(" | ".join(items))
 
         # 运行函数
         try:

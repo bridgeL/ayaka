@@ -1,10 +1,9 @@
 '''适配命令行输入输出'''
-import sys
 from typing import Awaitable, Callable
 import uvicorn
 import asyncio
 from fastapi import FastAPI
-from loguru import logger
+from ..logger import ayaka_log, ayaka_clog
 from ..model import AyakaEvent, AyakaSession, User
 from ..cat import bridge
 from ..orm import start_loop
@@ -18,34 +17,20 @@ class Handler:
         self.func_dict: dict[str, Callable[[str], Awaitable]] = {}
 
     async def handle_line(self, line: str):
-        for k, v in self.func_dict.items():
-            if line.startswith(k):
-                await v(line[len(k):].strip())
+        for cmd, func in self.func_dict.items():
+            if line.startswith(cmd):
+                await func(line[len(cmd):].strip())
                 break
-
-    # def sort_func_dict(self):
-    #     items = list(self.func_dict.items())
-    #     items.sort(key=lambda x: len(x[0]), reverse=True)
-    #     self.func_dict = {k: v for k, v in items}
 
     def on(self, cmd: str):
         def decorator(func: Callable[[str], Awaitable]):
             self.func_dict[cmd] = func
-            # self.sort_func_dict()
             return func
         return decorator
 
 
 handler = Handler()
 app = FastAPI()
-logger.remove()
-logger.level("AYAKA", no=27, icon="⚡", color="<blue>")
-logger.add(
-    sys.stdout,
-    level=0,
-    diagnose=False,
-    format="<g>{time:MM-DD HH:mm:ss}</g> [<lvl>{level}</lvl>] <c><u>{name}</u></c> | {message}",
-)
 
 
 def on_startup(func):
@@ -53,11 +38,11 @@ def on_startup(func):
 
 
 def clog(text: str):
-    logger.opt(colors=True).log("AYAKA", text)
+    ayaka_clog(text)
 
 
 def log(text: str):
-    logger.log("AYAKA", text)
+    ayaka_log(text)
 
 
 async def send(type: str, id: str, msg: str):
