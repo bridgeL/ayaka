@@ -3,7 +3,8 @@ from html import unescape
 from math import ceil
 import nonebot
 from nonebot.matcher import current_bot
-from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment, Adapter
+from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment
+from nonebot.exception import ActionFailed
 from ...model import AyakaEvent, User, AyakaSession
 from ...cat import bridge
 from ...orm import start_loop
@@ -21,7 +22,7 @@ def format_msg(bot: Bot, event: MessageEvent):
             ms.append(str(m))
     if event.to_me:
         ms.append(bot.self_id)
-    return bridge.get_separate().join(ms)
+    return bridge.get_separates()[0].join(ms)
 
 
 async def handle_msg(bot: Bot, event: MessageEvent):
@@ -46,9 +47,15 @@ def get_current_bot() -> Bot:
 async def send(type: str, id: str, msg: str):
     bot = get_current_bot()
     if type == "group":
-        await bot.send_group_msg(group_id=int(id), message=msg)
+        try:
+            await bot.send_group_msg(group_id=int(id), message=msg)
+        except ActionFailed:
+            await bot.send_group_msg(group_id=int(id), message="[WARNING]: 群聊消息发送失败")
     else:
-        await bot.send_private_msg(user_id=int(id), message=msg)
+        try:
+            await bot.send_private_msg(user_id=int(id), message=msg)
+        except ActionFailed:
+            await bot.send_group_msg(group_id=int(id), message="[WARNING]: 私聊消息发送失败")
 
 
 async def send_many(id: str, msgs: list[str]):
@@ -56,16 +63,19 @@ async def send_many(id: str, msgs: list[str]):
     # 分割长消息组（不可超过100条
     div_len = 100
     div_cnt = ceil(len(msgs) / div_len)
-    for i in range(div_cnt):
-        msgs = [
-            MessageSegment.node_custom(
-                user_id=bot.self_id,
-                nickname="Ayaka Bot",
-                content=m
-            )
-            for m in msgs[i*div_len: (i+1)*div_len]
-        ]
-        await bot.send_group_forward_msg(group_id=int(id), messages=msgs)
+    try:
+        for i in range(div_cnt):
+            msgs = [
+                MessageSegment.node_custom(
+                    user_id=bot.self_id,
+                    nickname="Ayaka Bot",
+                    content=m
+                )
+                for m in msgs[i*div_len: (i+1)*div_len]
+            ]
+            await bot.send_group_forward_msg(group_id=int(id), messages=msgs)
+    except ActionFailed:
+        await bot.send_group_msg(group_id=int(id), message="[WARNING]: 合并转发消息发送失败")
 
 
 async def get_member_info(gid: str, uid: str):

@@ -5,7 +5,7 @@ import uvicorn
 import asyncio
 from fastapi import FastAPI
 from loguru import logger
-from ..model import AyakaEvent, AyakaSession,  User
+from ..model import AyakaEvent, AyakaSession, User
 from ..cat import bridge
 from ..orm import start_loop
 from ..helpers import ensure_dir_exists

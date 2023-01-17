@@ -19,7 +19,7 @@ def format_msg(message):
             ms.append(str(m.data["qq"]))
         else:
             ms.append(str(m))
-    return bridge.get_separate().join(ms)
+    return bridge.get_separates()[0].join(ms)
 
 
 async def handle_msg(ev: CQEvent):
