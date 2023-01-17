@@ -34,7 +34,7 @@ class ResItem(BaseModel):
     '''资源项'''
     path: str
     '''下载地址的相对地址尾'''
-    hash: str
+    hash: str = ""
     '''资源的哈希值'''
 
 
@@ -42,5 +42,5 @@ class ResInfo(BaseModel):
     '''资源信息'''
     base: str
     '''下载地址的绝对地址头'''
-    items: list[ResItem]
+    items: list[ResItem] = []
     '''资源项'''
