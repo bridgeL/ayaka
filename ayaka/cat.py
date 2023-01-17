@@ -443,6 +443,22 @@ class AyakaCat:
 
     # ---- on_xxx ----
     def on_cmd(self, cmds: str | list[str] = "", states: str | list[str] = "", session_types: str | list[str] | None = None, always: bool = False, block: bool = True, auto_help: bool = True):
+        '''注册命令回调
+        
+        参数：
+
+            cmds：命令或命令数组
+            
+            states：状态或状态数组
+            
+            session_types：该命令生效的范围，默认使用cat.session_types的值
+            
+            always：总是第一个触发，不受ayaka的状态约束控制
+            
+            block：触发后阻断事件继续传播
+            
+            auto_help：不要自动生成猫猫帮助
+        '''
         cmds = ensure_list(cmds)
         states = ensure_list(states)
         if session_types:
@@ -470,6 +486,20 @@ class AyakaCat:
         return decorator
 
     def on_text(self, states: str | list[str] = "", session_types: str | list[str] | None = None, always: bool = False, block: bool = False, auto_help: bool = True):
+        '''注册文字回调
+        
+        参数：
+
+            states：状态或状态数组
+            
+            session_types：该命令生效的范围，默认使用cat.session_types的值
+            
+            always：总是第一个触发，不受ayaka的状态约束控制
+            
+            block：触发后阻断事件继续传播
+            
+            auto_help：不要自动生成猫猫帮助
+        '''
         return self.on_cmd(states=states, session_types=session_types, always=always, block=block, auto_help=auto_help)
 
     # ---- 添加帮助 ----

@@ -11,6 +11,19 @@ async def show_self_help():
     await cat.send_help()
 
 
+@cat.on_cmd(cmds="帮助", always=True, auto_help=False)
+async def redirect_help():
+    cat.cache.setdefault("redirect", True)
+    if cat.cache["redirect"]:
+        await cat.send("你是在找 [猫猫帮助] 吗\n或者你可以发送 [不要重定向猫猫帮助]，命令我不要回复 [帮助] 指令")
+
+
+@cat.on_cmd(cmds="不要重定向猫猫帮助", always=True, auto_help=False)
+async def set_redirect():
+    cat.cache["redirect"] = False
+    await cat.send("好的，我知道了")
+
+
 @cat.on_cmd(cmds="猫猫列表", always=True)
 async def list_cat():
     '''展示所有猫猫'''
@@ -36,19 +49,6 @@ async def show_relative_cats(name: str):
             possibles.append(c.name)
     if possibles:
         await cat.send("你是否是想找猫猫：" + " ".join(possibles))
-
-
-@cat.on_cmd(cmds="帮助", always=True, auto_help=False)
-async def redirect_help():
-    cat.cache.setdefault("redirect", True)
-    if cat.cache["redirect"]:
-        await cat.send("你是在找 [猫猫帮助] 吗\n或者你可以发送 [不要重定向猫猫帮助]，命令我不要回复 [帮助] 指令")
-
-
-@cat.on_cmd(cmds="不要重定向猫猫帮助", always=True, auto_help=False)
-async def set_redirect():
-    cat.cache["redirect"] = False
-    await cat.send("好的，我知道了")
 
 
 @cat.on_cmd(cmds="猫猫帮助", always=True)
