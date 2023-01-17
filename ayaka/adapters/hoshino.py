@@ -4,12 +4,12 @@ from math import ceil
 from hoshino import Service, config
 from hoshino.typing import CQEvent
 from ..bridge import bridge
-from ..model import AyakaEvent, AyakaSession, User
+from ..model import AyakaEvent, AyakaSession, AyakaSender, User
 from ..helpers import singleton
 from ..orm import start_loop
 
 
-def format_msg(message):
+def get_ayaka_msg(message):
     '''处理消息，保留text、at'''
     ms: list[str] = []
     for m in message:
@@ -23,16 +23,18 @@ def format_msg(message):
 
 
 async def handle_msg(ev: CQEvent):
-    msg = format_msg(ev.message)
+    msg = get_ayaka_msg(ev.message)
 
     # 组成ayaka事件
     stype = ev.message_type
     sid = ev.group_id if stype == "group" else ev.user_id
     ayaka_event = AyakaEvent(
         session=AyakaSession(type=stype, id=sid),
-        msg=msg,
-        sender_id=ev.sender["user_id"],
-        sender_name=ev.sender.get("card") or ev.sender["nickname"],
+        message=msg,
+        sender=AyakaSender(
+            id=ev.sender["user_id"],
+            name=ev.sender.get("card") or ev.sender["nickname"]
+        ),
     )
     await bridge.handle_event(ayaka_event)
 
@@ -87,35 +89,31 @@ async def get_member_list(gid: str):
     except:
         pass
 
+prefixes = list(config.COMMAND_START)
+separates = list(config.COMMAND_SEP)
 
-def regist():
-    if bridge.ready:
-        return
 
-    prefixes = list(config.COMMAND_START)
-    separates = list(config.COMMAND_SEP)
+def get_prefixes():
+    return prefixes or [""]
 
-    def get_prefixes():
-        return prefixes or [""]
 
-    def get_separates():
-        return separates or [" "]
+def get_separates():
+    return separates or [" "]
 
-    bot = get_current_bot()
 
-    # 注册外部服务
-    bridge.regist(send)
-    bridge.regist(send_many)
-    bridge.regist(get_prefixes)
-    bridge.regist(get_separates)
-    bridge.regist(get_member_info)
-    bridge.regist(get_member_list)
-    bridge.regist(bot.on_startup)
+bot = get_current_bot()
 
-    # 内部服务注册到外部
-    bot.on("message")(handle_msg)
+# 注册外部服务
+bridge.regist(send)
+bridge.regist(send_many)
+bridge.regist(get_prefixes)
+bridge.regist(get_separates)
+bridge.regist(get_member_info)
+bridge.regist(get_member_list)
+bridge.regist(bot.on_startup)
 
-    # 其他初始化
-    bot.on_startup(start_loop)
+# 内部服务注册到外部
+bot.on("message")(handle_msg)
 
-    bridge.ready = True
+# 其他初始化
+bot.on_startup(start_loop)

@@ -13,7 +13,6 @@ from .exception import NotRegistrationError, DuplicateRegistrationError
 class AyakaBridge:
     def __init__(self) -> None:
         self.func_dict: dict[str, Callable] = {}
-        self.ready = False
 
     def regist(self, func: Callable, name: str = ""):
         '''注册一个方法到bridge中，以供其他人调用，默认调用名称为该方法的名字'''

@@ -4,7 +4,7 @@ import uvicorn
 import asyncio
 from fastapi import FastAPI
 from ..logger import ayaka_log, ayaka_clog
-from ..model import AyakaEvent, AyakaSession, User
+from ..model import AyakaEvent, AyakaSession, AyakaSender, User
 from ..cat import bridge
 from ..orm import start_loop
 from ..helpers import ensure_dir_exists
@@ -13,7 +13,7 @@ from ..helpers import ensure_dir_exists
 class Handler:
     def __init__(self) -> None:
         self.session: AyakaSession = None
-        self.uid = 0
+        self.sender: AyakaSender = None
         self.func_dict: dict[str, Callable[[str], Awaitable]] = {}
 
     async def handle_line(self, line: str):
@@ -27,6 +27,24 @@ class Handler:
             self.func_dict[cmd] = func
             return func
         return decorator
+
+    def handle_msg(self, msg: str):
+        name = self.sender.name
+        uid = self.sender.id
+
+        if self.session.type == "group":
+            gid = self.session.id
+            ayaka_clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
+        else:
+            ayaka_clog(f"私聊({uid}) <y>{name}</y> 说：")
+
+        ayaka_log(msg)
+
+        asyncio.create_task(bridge.handle_event(AyakaEvent(
+            session=self.session,
+            message=msg,
+            sender=self.sender,
+        )))
 
 
 handler = Handler()
@@ -115,35 +133,17 @@ async def _(line: str):
 @handler.on("p ")
 async def _(line: str):
     uid, msg = safe_split(line, 2)
-    session = AyakaSession(type="private", id=uid)
-
-    handler.uid = uid
-    handler.session = session
-    name = f"测试{uid}号"
-    event = AyakaEvent(
-        session=session, msg=msg,
-        sender_id=uid, sender_name=name
-    )
-    ayaka_clog(f"私聊({uid}) <y>{name}</y> 说：")
-    ayaka_log(msg)
-    asyncio.create_task(bridge.handle_event(event))
+    handler.sender = AyakaSender(id=uid, name=f"测试{uid}号")
+    handler.session = AyakaSession(type="private", id=uid)
+    handler.handle_msg(msg)
 
 
 @handler.on("g ")
 async def _(line: str):
     gid, uid, msg = safe_split(line, 3)
-    session = AyakaSession(type="group", id=gid)
-
-    handler.uid = uid
-    handler.session = session
-    name = f"测试{uid}号"
-    event = AyakaEvent(
-        session=session, msg=msg,
-        sender_id=uid, sender_name=name
-    )
-    ayaka_clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
-    ayaka_log(msg)
-    asyncio.create_task(bridge.handle_event(event))
+    handler.sender = AyakaSender(id=uid, name=f"测试{uid}号")
+    handler.session = AyakaSession(type="group", id=gid)
+    handler.handle_msg(msg)
 
 
 @handler.on("d ")
@@ -189,27 +189,10 @@ async def show_help(line: str):
 
 
 @handler.on("")
-async def _(line: str):
-    if not handler.session or not line:
+async def _(msg: str):
+    if not (handler.session and handler.sender and msg):
         return
-
-    uid = handler.uid
-    session = handler.session
-    name = f"测试{uid}号"
-    event = AyakaEvent(
-        session=session, msg=line,
-        sender_id=uid, sender_name=name
-    )
-
-    if session.type == "group":
-        gid = session.id
-        ayaka_clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
-        ayaka_log(line)
-    else:
-        ayaka_clog(f"私聊({uid}) <y>{name}</y> 说：")
-        ayaka_log(line)
-
-    asyncio.create_task(bridge.handle_event(event))
+    handler.handle_msg(msg)
 
 
 def run():

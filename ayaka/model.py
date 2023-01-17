@@ -15,12 +15,16 @@ class AyakaSession(BaseModel):
         return hash(self.mark)
 
 
+class AyakaSender(BaseModel):
+    id: str
+    name: str
+
+
 class AyakaEvent(BaseModel):
     '''外部只要实例化AyakaEvent对象，就可以使用bridge.handle_event(event)来传递消息事件给AyakaCat'''
     session: AyakaSession
-    msg: str
-    sender_id: str
-    sender_name: str
+    sender: AyakaSender
+    message: str
     origin: Optional["AyakaEvent"]
 
 

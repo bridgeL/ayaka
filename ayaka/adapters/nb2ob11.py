@@ -5,12 +5,12 @@ import nonebot
 from nonebot.matcher import current_bot
 from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment
 from nonebot.exception import ActionFailed
-from ..model import AyakaEvent, User, AyakaSession
+from ..model import AyakaEvent, User, AyakaSession, AyakaSender
 from ..cat import bridge
 from ..orm import start_loop
 
 
-def format_msg(bot: Bot, event: MessageEvent):
+def get_ayaka_msg(bot: Bot, event: MessageEvent):
     '''处理消息，保留text、at和to_me'''
     ms: list[str] = []
     for m in event.message:
@@ -26,16 +26,18 @@ def format_msg(bot: Bot, event: MessageEvent):
 
 
 async def handle_msg(bot: Bot, event: MessageEvent):
-    msg = format_msg(bot, event)
+    msg = get_ayaka_msg(bot, event)
 
     # 组成ayaka事件
     stype = event.message_type
     sid = event.group_id if stype == "group" else event.user_id
     ayaka_event = AyakaEvent(
         session=AyakaSession(type=stype, id=sid),
-        msg=msg,
-        sender_id=event.sender.user_id,
-        sender_name=event.sender.card or event.sender.nickname,
+        message=msg,
+        sender=AyakaSender(
+            id=event.sender.user_id,
+            name=event.sender.card or event.sender.nickname,
+        ),
     )
     await bridge.handle_event(ayaka_event)
 
@@ -101,35 +103,30 @@ async def get_member_list(gid: str):
     except:
         pass
 
+driver = nonebot.get_driver()
+prefixes = list(driver.config.command_start)
+separates = list(driver.config.command_sep)
 
-def regist():
-    '''注册服务'''
-    if bridge.ready:
-        return
 
-    driver = nonebot.get_driver()
-    prefixes = list(driver.config.command_start)
-    separates = list(driver.config.command_sep)
+def get_prefixes():
+    return prefixes or [""]
 
-    def get_prefixes():
-        return prefixes or [""]
 
-    def get_separates():
-        return separates or [" "]
+def get_separates():
+    return separates or [" "]
 
-    # 注册外部服务
-    bridge.regist(send)
-    bridge.regist(send_many)
-    bridge.regist(get_prefixes)
-    bridge.regist(get_separates)
-    bridge.regist(get_member_info)
-    bridge.regist(get_member_list)
-    bridge.regist(driver.on_startup)
 
-    # 内部服务注册到外部
-    nonebot.on_message(handlers=[handle_msg], block=False, priority=5)
+# 注册外部服务
+bridge.regist(send)
+bridge.regist(send_many)
+bridge.regist(get_prefixes)
+bridge.regist(get_separates)
+bridge.regist(get_member_info)
+bridge.regist(get_member_list)
+bridge.regist(driver.on_startup)
 
-    # 其他初始化
-    driver.on_startup(start_loop)
+# 内部服务注册到外部
+nonebot.on_message(handlers=[handle_msg], block=False, priority=5)
 
-    bridge.ready = True
+# 其他初始化
+driver.on_startup(start_loop)

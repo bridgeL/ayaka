@@ -23,18 +23,15 @@ def is_nb2ob11():
 
 # hoshino
 if is_hoshino():
-    from .hoshino import regist
-    regist()
+    from . import hoshino as __hoshino
 
 # nonebot1
 elif is_nb1():
-    from .nb1 import regist
-    regist()
+    from . import nb1 as __nb1
 
 # nonebot2 onebot11
 elif is_nb2ob11():
-    from .nb2ob11 import regist
-    regist()
+    from . import nb2ob11 as __nb2ob11
 
 # console
 else:
