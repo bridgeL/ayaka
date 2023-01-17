@@ -1,6 +1,6 @@
 '''仍然是旧版的自定义sql orm
 
-未来计划2.1.0 替换为sqlmodel
+未来计划0.0.1.0 替换为sqlmodel
 
 不建议其他人用，以后会大改'''
 import asyncio

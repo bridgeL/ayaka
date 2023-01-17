@@ -1,50 +1,42 @@
 import sys
-keys = list(sys.modules.keys())
+from loguru import logger
 
 
-def has_been_imported(module_name: str):
-    for k in keys:
-        ks = k.split(".")
-        if module_name in ks:
+def is_hoshino():
+    if "hoshino" in sys.modules:
+        logger.opt(colors=True).success("识别到 <y>hoshino</y>，加载为hoshino插件")
+        return True
+
+
+def is_nb1():
+    if "nonebot" in sys.modules:
+        if hasattr(sys.modules["nonebot"], "NoneBot"):
+            logger.opt(colors=True).success("识别到 <y>nonebot1</y>，加载为nonebot1插件")
             return True
-    return False
+
+
+def is_nb2ob11():
+    if "nonebot.adapters.onebot.v11" in sys.modules:
+        logger.opt(colors=True).success("识别到 <y>nonebot2 onebot11</y>，加载为nonebot2插件")
+        return True
+
 
 # hoshino
-if has_been_imported("hoshino"):
-    print("智能识别 hoshino，加载为hoshino插件")
+if is_hoshino():
     from .hoshino import regist
     regist()
-    
-# nonebot
-elif has_been_imported("nonebot"):
-    is_nonebot2 = False
-    try:
-        from nonebot import NoneBot
-    except:
-        is_nonebot2 = True
-    else:
-        # nonebot1
-        pass
 
-    # nonebot2
-    if is_nonebot2:
-        # onebot
-        if has_been_imported("onebot"):
-            print("智能识别 nonebot2 onebot v11，加载为nonebot2插件")
-            from .nonebot2.onebot import regist
-            regist()
-        
-        # 其他
-        else:
-            print("暂不支持nonebot2其他适配器")
-    
-    # nonebot1
-    else:
-        print("智能识别 nonebot1，加载为nonebot1插件")
-        from .nonebot1 import regist
-        regist()
+# nonebot1
+elif is_nb1():
+    from .nb1 import regist
+    regist()
+
+# nonebot2 onebot11
+elif is_nb2ob11():
+    from .nb2ob11 import regist
+    regist()
 
 # console
 else:
-    print("智能识别 console，请手动执行init、regist、run函数")
-    from .console import init, regist, run
+    logger.opt(colors=True).success("<w>未检测到环境信息，加载为<y>console</y>程序</w>")
+    from .console import run

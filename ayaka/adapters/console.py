@@ -11,22 +11,45 @@ from ..orm import start_loop
 from ..helpers import ensure_dir_exists
 
 
-app: FastAPI = None
+class Handler:
+    def __init__(self) -> None:
+        self.session: AyakaSession = None
+        self.uid = 0
+        self.func_dict: dict[str, Callable[[str], Awaitable]] = {}
+
+    async def handle_line(self, line: str):
+        for k, v in self.func_dict.items():
+            if line.startswith(k):
+                await v(line[len(k):].strip())
+                break
+
+    # def sort_func_dict(self):
+    #     items = list(self.func_dict.items())
+    #     items.sort(key=lambda x: len(x[0]), reverse=True)
+    #     self.func_dict = {k: v for k, v in items}
+
+    def on(self, cmd: str):
+        def decorator(func: Callable[[str], Awaitable]):
+            self.func_dict[cmd] = func
+            # self.sort_func_dict()
+            return func
+        return decorator
+
+
+handler = Handler()
+app = FastAPI()
+logger.remove()
+logger.level("AYAKA", no=27, icon="⚡", color="<blue>")
+logger.add(
+    sys.stdout,
+    level=0,
+    diagnose=False,
+    format="<g>{time:MM-DD HH:mm:ss}</g> [<lvl>{level}</lvl>] <c><u>{name}</u></c> | {message}",
+)
 
 
 def on_startup(func):
     app.on_event("startup")(func)
-
-
-def init():
-    '''初始化'''
-    global app
-    app = FastAPI()
-
-
-def run():
-    '''运行'''
-    uvicorn.run(app=f"{__name__}:app", reload=True)
 
 
 def clog(text: str):
@@ -59,32 +82,52 @@ def safe_split(text: str,  n: int, sep: str = " "):
     return text.split(sep, maxsplit=n-1)
 
 
-class Handler:
-    def __init__(self) -> None:
-        self.session: AyakaSession = None
-        self.uid = 0
-        self.func_dict: dict[str, Callable[[str], Awaitable]] = {}
-
-    async def handle_line(self, line: str):
-        for k, v in self.func_dict.items():
-            if line.startswith(k):
-                await v(line[len(k):].strip())
-                break
-
-    # def sort_func_dict(self):
-    #     items = list(self.func_dict.items())
-    #     items.sort(key=lambda x: len(x[0]), reverse=True)
-    #     self.func_dict = {k: v for k, v in items}
-
-    def on(self, cmd: str):
-        def decorator(func: Callable[[str], Awaitable]):
-            self.func_dict[cmd] = func
-            # self.sort_func_dict()
-            return func
-        return decorator
+async def console_loop():
+    clog("已接入 <g>Ayaka Console Adapter</g>")
+    await show_help("")
+    loop = asyncio.get_running_loop()
+    while True:
+        line = await loop.run_in_executor(None, input)
+        await handler.handle_line(line)
 
 
-handler = Handler()
+async def start_console_loop():
+    asyncio.create_task(console_loop())
+
+
+async def get_member_info(gid: str, uid: str):
+    return User(id=uid, name=f"测试{uid}号", role="admin")
+
+
+async def get_member_list(gid: str):
+    return [
+        User(id=uid, name=f"测试{uid}号", role="admin")
+        for uid in [i+1 for i in range(100)]
+    ]
+
+
+def get_prefixes():
+    return [""]
+
+
+def get_separates():
+    return [" "]
+
+
+# 注册外部服务
+bridge.regist(send)
+bridge.regist(send_many)
+bridge.regist(get_prefixes)
+bridge.regist(get_separates)
+bridge.regist(get_member_info)
+bridge.regist(get_member_list)
+bridge.regist(on_startup)
+
+# 内部服务注册到外部
+on_startup(start_console_loop)
+
+# 其他初始化
+on_startup(start_loop)
 
 
 @handler.on("#")
@@ -158,6 +201,8 @@ async def _(line: str):
 
 @handler.on("h")
 async def show_help(line: str):
+    if line.strip():
+        return
     clog("<y>g</y> \<gid> \<uid> \<msg> | 模拟群聊消息")
     clog("<y>p</y> \<uid> \<msg> | 模拟私聊消息")
     clog("<y>d</y> \<n> | 延时n秒")
@@ -185,70 +230,6 @@ async def _(line: str):
         await bridge.handle_event(event)
 
 
-async def console_loop():
-    clog("已接入 <g>Ayaka Console Adapter</g>")
-    await show_help("")
-    loop = asyncio.get_running_loop()
-    while True:
-        line = await loop.run_in_executor(None, input)
-        await handler.handle_line(line)
-
-
-async def start_console_loop():
-    asyncio.create_task(console_loop())
-
-
-async def get_member_info(gid: str, uid: str):
-    return User(id=uid, name=f"测试{uid}号", role="admin")
-
-
-async def get_member_list(gid: str):
-    return [
-        User(id=uid, name=f"测试{uid}号", role="admin")
-        for uid in [i+1 for i in range(100)]
-    ]
-
-
-def get_prefixes():
-    return [""]
-
-
-def get_separates():
-    return [" "]
-
-
-def regist():
-    '''注册服务'''
-    if bridge.ready:
-        return
-
-    # 注册外部服务
-    bridge.regist(send)
-    bridge.regist(send_many)
-    bridge.regist(get_prefixes)
-    bridge.regist(get_separates)
-    bridge.regist(get_member_info)
-    bridge.regist(get_member_list)
-    bridge.regist(on_startup)
-
-    # 内部服务注册到外部
-    on_startup(start_console_loop)
-
-    # 其他初始化
-    on_startup(start_loop)
-    logger.remove()
-    logger.level("AYAKA", no=27, icon="⚡")
-    logger.add(
-        sys.stdout,
-        level=0,
-        diagnose=False,
-        format=(
-            "<g>{time:MM-DD HH:mm:ss}</g> "
-            "[<lvl>{level}</lvl>] "
-            "<c><u>{name}</u></c> | "
-            # "<c>{function}:{line}</c>| "
-            "{message}"
-        ),
-    )
-
-    bridge.ready = True
+def run():
+    '''运行'''
+    uvicorn.run(app=f"{__name__}:app", reload=True)

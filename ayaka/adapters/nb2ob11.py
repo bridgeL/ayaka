@@ -5,9 +5,9 @@ import nonebot
 from nonebot.matcher import current_bot
 from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment
 from nonebot.exception import ActionFailed
-from ...model import AyakaEvent, User, AyakaSession
-from ...cat import bridge
-from ...orm import start_loop
+from ..model import AyakaEvent, User, AyakaSession
+from ..cat import bridge
+from ..orm import start_loop
 
 
 def format_msg(bot: Bot, event: MessageEvent):
