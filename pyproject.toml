@@ -14,7 +14,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pydantic = "^1.10.4"
+pydantic = "^1.10.0"
 loguru = "^0.6.0"
 
 [build-system]
