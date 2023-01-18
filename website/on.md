@@ -145,17 +145,27 @@ async def handle():
 
 ## 高级
 
-always（必定触发，不受ayaka各类状态规则的约束，并且执行优先级最高）
+### always
 
-channel_types（可能会留到新章节介绍）
+默认为False
+
+设置为True，则该回调必定触发，不受ayaka各类状态规则的约束，并且执行优先级最高
+
+### channel_types
+
+留到新章节介绍
+
+### auto_help
+
+默认为True
+
+设置为False，则禁止对该回调生成猫猫帮助
 
 ### block
 
 是否阻断消息传播
 
-命令回调默认阻断
-
-文字回调默认不阻断
+命令回调默认阻断，文字回调默认不阻断
 
 ### 处理顺序
 
@@ -163,7 +173,7 @@ channel_types（可能会留到新章节介绍）
 
 - always 命令回调
 - always 文字回调
-- 唤醒命令/状态命令回调
+- 命令回调
 - 文字回调
 
 期间任意回调block为True或抛出`BlockException`都会导致消息传播的结束
