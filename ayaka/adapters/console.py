@@ -166,8 +166,10 @@ async def _(line: str):
 async def _(line: str):
     path = ensure_dir_exists(f"script/{line}.txt")
     if not path.exists():
+        ayaka_log(f"脚本不存在 {path}")
         return
-
+    ayaka_log(f"执行脚本 {path}")
+    
     name = path.stem
     lines = path.read_text(encoding="utf8").split("\n")
     lines = [line.strip() for line in lines if line.strip()]
