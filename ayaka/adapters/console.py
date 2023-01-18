@@ -133,7 +133,7 @@ on_startup(start_console_loop)
 
 @handler.on("#")
 async def _(line: str):
-    return
+    pass
 
 
 @handler.on("p ")
@@ -141,7 +141,8 @@ async def _(line: str):
     uid, msg = safe_split(line, 2)
     handler.sender = AyakaSender(id=uid, name=f"测试{uid}号")
     handler.channel = AyakaChannel(type="private", id=uid)
-    handler.handle_msg(msg)
+    if msg:
+        handler.handle_msg(msg)
 
 
 @handler.on("g ")
@@ -149,7 +150,8 @@ async def _(line: str):
     gid, uid, msg = safe_split(line, 3)
     handler.sender = AyakaSender(id=uid, name=f"测试{uid}号")
     handler.channel = AyakaChannel(type="group", id=gid)
-    handler.handle_msg(msg)
+    if msg:
+        handler.handle_msg(msg)
 
 
 @handler.on("d ")
@@ -166,10 +168,9 @@ async def _(line: str):
 async def _(line: str):
     path = ensure_dir_exists(f"script/{line}.txt")
     if not path.exists():
-        ayaka_log(f"脚本不存在 {path}")
-        return
+        return ayaka_log(f"脚本不存在 {path}")
     ayaka_log(f"执行脚本 {path}")
-    
+
     name = path.stem
     lines = path.read_text(encoding="utf8").split("\n")
     lines = [line.strip() for line in lines if line.strip()]
@@ -188,7 +189,7 @@ async def _(line: str):
 @handler.on("h")
 async def show_help(line: str):
     if line.strip():
-        return
+        return await deal_line(f"h{line}")
     ayaka_clog("<y>g</y> \<gid> \<uid> \<msg> | 模拟群聊消息")
     ayaka_clog("<y>p</y> \<uid> \<msg> | 模拟私聊消息")
     ayaka_clog("<y>d</y> \<n> | 延时n秒")
@@ -197,9 +198,9 @@ async def show_help(line: str):
 
 
 @handler.on("")
-async def _(msg: str):
+async def deal_line(msg: str):
     if not (handler.channel and handler.sender and msg):
-        return
+        return ayaka_log("请先设置默认角色（发出第一条模拟消息后自动设置）")
     handler.handle_msg(msg)
 
 
