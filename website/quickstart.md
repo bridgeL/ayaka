@@ -49,19 +49,17 @@ class Muyu(BaseModel):
     users: list[User] = []
     step: int = 1
 
-    def get(self, user_id: str):
+    def get(self, user_id: str, user_name: str):
         for user in self.users:
             if user.id == user_id:
-                return user.cnt
-        return 0
-
-    def hit(self, user_id: str, user_name: str):
-        for user in self.users:
-            if user.id == user_id:
-                break
+                return user
         else:
             user = User(id=user_id, name=user_name)
             self.users.append(user)
+        return user
+
+    def hit(self, user_id: str, user_name: str):
+        user = self.get(user_id, user_name)
         user.cnt += self.step
 ```
 
@@ -77,8 +75,8 @@ async def hit():
 @cat.on_cmd(cmds=["查询功德", "query"], states="idle")
 async def query():
     muyu = cat.get_data(Muyu)
-    virtue = muyu.get(cat.user.id)
-    await cat.send(f"[{cat.user.name}] 现在的功德是 {virtue}")
+    user = muyu.get(cat.user.id, cat.user.name)
+    await cat.send(f"[{user.name}] 现在的功德是 {user.cnt}")
 
 
 @cat.on_cmd(cmds=["调整步进", "set step"], states="idle")
