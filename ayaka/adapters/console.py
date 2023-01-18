@@ -1,18 +1,20 @@
 '''适配命令行输入输出'''
+import re
 from typing import Awaitable, Callable
 import uvicorn
 import asyncio
 from fastapi import FastAPI
 from ..logger import ayaka_log, ayaka_clog
-from ..model import AyakaEvent, AyakaSession, AyakaSender, User
+from ..model import AyakaEvent, AyakaChannel, AyakaSender, User
 from ..cat import bridge
-from ..orm import start_loop
 from ..helpers import ensure_dir_exists
+
+pt = re.compile(r"@([^ ]+?)(?= |$)")
 
 
 class Handler:
     def __init__(self) -> None:
-        self.session: AyakaSession = None
+        self.channel: AyakaChannel = None
         self.sender: AyakaSender = None
         self.func_dict: dict[str, Callable[[str], Awaitable]] = {}
 
@@ -32,18 +34,25 @@ class Handler:
         name = self.sender.name
         uid = self.sender.id
 
-        if self.session.type == "group":
-            gid = self.session.id
+        if self.channel.type == "group":
+            gid = self.channel.id
             ayaka_clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
         else:
             ayaka_clog(f"私聊({uid}) <y>{name}</y> 说：")
 
         ayaka_log(msg)
 
+        at = None
+        for r in pt.finditer(msg):
+            at = r.group(1)
+            msg = msg[:r.start()]+msg[r.end():]
+            break
+
         asyncio.create_task(bridge.handle_event(AyakaEvent(
-            session=self.session,
-            message=msg,
+            channel=self.channel,
             sender=self.sender,
+            message=msg,
+            at=at,
         )))
 
 
@@ -121,9 +130,6 @@ bridge.regist(on_startup)
 # 内部服务注册到外部
 on_startup(start_console_loop)
 
-# 其他初始化
-on_startup(start_loop)
-
 
 @handler.on("#")
 async def _(line: str):
@@ -134,7 +140,7 @@ async def _(line: str):
 async def _(line: str):
     uid, msg = safe_split(line, 2)
     handler.sender = AyakaSender(id=uid, name=f"测试{uid}号")
-    handler.session = AyakaSession(type="private", id=uid)
+    handler.channel = AyakaChannel(type="private", id=uid)
     handler.handle_msg(msg)
 
 
@@ -142,7 +148,7 @@ async def _(line: str):
 async def _(line: str):
     gid, uid, msg = safe_split(line, 3)
     handler.sender = AyakaSender(id=uid, name=f"测试{uid}号")
-    handler.session = AyakaSession(type="group", id=gid)
+    handler.channel = AyakaChannel(type="group", id=gid)
     handler.handle_msg(msg)
 
 
@@ -190,7 +196,7 @@ async def show_help(line: str):
 
 @handler.on("")
 async def _(msg: str):
-    if not (handler.session and handler.sender and msg):
+    if not (handler.channel and handler.sender and msg):
         return
     handler.handle_msg(msg)
 

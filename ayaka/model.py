@@ -3,7 +3,8 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class AyakaSession(BaseModel):
+class AyakaChannel(BaseModel):
+    '''会话'''
     type: str
     id: str
 
@@ -16,16 +17,19 @@ class AyakaSession(BaseModel):
 
 
 class AyakaSender(BaseModel):
+    '''消息发送者'''
     id: str
     name: str
 
 
 class AyakaEvent(BaseModel):
-    '''外部只要实例化AyakaEvent对象，就可以使用bridge.handle_event(event)来传递消息事件给AyakaCat'''
-    session: AyakaSession
+    '''ayaka消息事件'''
+    channel: AyakaChannel
     sender: AyakaSender
     message: str
-    origin: Optional["AyakaEvent"]
+    reply: Optional[str]
+    at: Optional[str]
+    origin_channel: Optional[AyakaChannel]
 
 
 class User(BaseModel):

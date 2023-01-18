@@ -12,7 +12,7 @@ from typing import Awaitable, Callable, TypeVar
 from .logger import logger, clogger
 from .helpers import ensure_list, simple_repr
 from .config import root_config
-from .model import AyakaSession, AyakaEvent
+from .model import AyakaChannel, AyakaEvent
 from .exception import BlockException, NotBlockException, DuplicateCatNameError, CannotFindModuleError
 from .bridge import bridge
 
@@ -32,7 +32,7 @@ class AyakaParams:
         if " " in separates:
             separate = " "
         else:
-            separates = separates[0]
+            separate = separates[0]
 
         self.arg = manager.event.message[len(prefix+self.cmd):].strip(separate)
         self.args = [arg for arg in self.arg.split(separate) if arg]
@@ -52,7 +52,7 @@ class AyakaManager:
         self.always_triggers: list[AyakaTrigger] = []
         self.desktop_triggers: list[AyakaTrigger] = []
         self.state_trigger_dict: dict[str, dict[str, list[AyakaTrigger]]] = {}
-        self.listen_dict: dict[AyakaSession, list[AyakaSession]] = {}
+        self.listen_dict: dict[AyakaChannel, list[AyakaChannel]] = {}
         '''key为被监听者，value为监听者数组'''
         self._cat_dict: dict[str, AyakaCat] = {}
         '''所有会话的猫猫'''
@@ -63,15 +63,19 @@ class AyakaManager:
 
     @property
     def current_cat(self):
-        return self._cat_dict.get(self.event.session.mark)
+        return self._cat_dict.get(self.event.channel.mark)
 
     @current_cat.setter
-    def current_cat(self, cat):
-        self._cat_dict[self.event.session.mark] = cat
+    def current_cat(self, value):
+        self._cat_dict[self.event.channel.mark] = value
 
     @property
     def params(self):
         return _params.get()
+
+    @params.setter
+    def params(self, value):
+        return _params.set(value)
 
     @property
     def state_triggers(self):
@@ -144,11 +148,11 @@ class AyakaManager:
     async def handle_event(self, event: AyakaEvent):
         '''处理和转发事件'''
         await self._handle_event(event)
-        target = event.session
+        target = event.channel
         ts = []
         for listener in self.listen_dict.get(target, []):
             data = event.dict()
-            data.update(session=listener, origin=event)
+            data.update(channel=listener, origin_channel=target)
             _event = AyakaEvent(**data)
             ts.append(asyncio.create_task(self._handle_event(_event)))
         await asyncio.gather(*ts)
@@ -164,11 +168,11 @@ class AyakaManager:
             if c.name == name:
                 return c
 
-    def add_listener(self, listener: AyakaSession, target: AyakaSession):
+    def add_listener(self, listener: AyakaChannel, target: AyakaChannel):
         self.listen_dict.setdefault(target, [])
         self.listen_dict[target].append(listener)
 
-    def remove_listener(self, listener: AyakaSession, target: AyakaSession | None = None):
+    def remove_listener(self, listener: AyakaChannel, target: AyakaChannel | None = None):
         if not target:
             ks = []
             for k, v in self.listen_dict.items():
@@ -188,8 +192,8 @@ class AyakaManager:
 
 
 class AyakaTrigger:
-    def __init__(self, func: Callable[[], Awaitable], cat: "AyakaCat", session_types: list[str] = ["group"], cmd: str = "", state: str = "", always: bool = False, block: bool = False) -> None:
-        self.session_types = session_types
+    def __init__(self, func: Callable[[], Awaitable], cat: "AyakaCat", channel_types: list[str] = ["group"], cmd: str = "", state: str = "", always: bool = False, block: bool = False) -> None:
+        self.channel_types = channel_types
         self.cmd = cmd
         '''顺便可以区分命令触发和文本触发'''
         self.state = state
@@ -220,7 +224,7 @@ class AyakaTrigger:
             return False
 
         # 范围是否符合
-        if not manager.event.session.type in self.session_types:
+        if not manager.event.channel.type in self.channel_types:
             return False
 
         # if 命令触发，命令是否符合
@@ -228,8 +232,7 @@ class AyakaTrigger:
             return False
 
         # 一些预处理，并保存到上下文中
-        params = AyakaParams(self, prefix)
-        _params.set(params)
+        manager.params = AyakaParams(self, prefix)
 
         # 打印日志
         items = [f"<y>猫猫</y> {self.cat.name}"]
@@ -256,11 +259,29 @@ class AyakaTrigger:
         return self.block
 
     def __repr__(self) -> str:
-        return simple_repr(self, cat=self.cat.name, func=self.func_name, module=self.module_name, exclude={"session_types"})
+        return simple_repr(
+            self,
+            exclude={"channel_types"},
+            cat=self.cat.name,
+            func=self.func_name,
+            module=self.module_name
+        )
 
 
 class AyakaCat:
-    def __init__(self, name: str, session_types: str | list[str] = "group") -> None:
+    def __init__(
+        self,
+        name: str,
+        channel_types: str | list[str] = "group"
+    ) -> None:
+        '''创建猫猫
+
+        参数：
+
+            name：猫猫名字
+
+            channel_types：猫猫生效范围
+        '''
         self.name = name
         manager.add_cat(self)
 
@@ -276,7 +297,7 @@ class AyakaCat:
         else:
             raise CannotFindModuleError(self.module_path)
 
-        self.session_types = ensure_list(session_types)
+        self.channel_types = ensure_list(channel_types)
         self._state_dict: dict[str, str] = {}
         self._cache_dict: dict[str, dict] = {}
         self.triggers: list[AyakaTrigger] = []
@@ -288,8 +309,8 @@ class AyakaCat:
     @property
     def state(self):
         '''猫猫状态'''
-        self._state_dict.setdefault(self.session.mark, "idle")
-        return self._state_dict[self.session.mark]
+        self._state_dict.setdefault(self.channel.mark, "idle")
+        return self._state_dict[self.channel.mark]
 
     @state.setter
     def state(self, value: str):
@@ -298,8 +319,8 @@ class AyakaCat:
     @property
     def cache(self):
         '''猫猫缓存'''
-        self._cache_dict.setdefault(self.session.mark, {})
-        return self._cache_dict[self.session.mark]
+        self._cache_dict.setdefault(self.channel.mark, {})
+        return self._cache_dict[self.channel.mark]
 
     @property
     def help(self):
@@ -324,18 +345,18 @@ class AyakaCat:
     @property
     def valid(self):
         '''当前猫猫是否可用'''
-        return self.session not in self._invalid_list
+        return self.channel not in self._invalid_list
 
     @valid.setter
     def valid(self, value: bool):
         '''设置当前猫猫是否可用'''
         change_flag = False
         if value and not self.valid:
-            self._invalid_list.remove(self.session)
+            self._invalid_list.remove(self.channel)
             change_flag = True
 
         elif not value and self.valid:
-            self._invalid_list.append(self.session)
+            self._invalid_list.append(self.channel)
             change_flag = True
 
         if change_flag:
@@ -351,9 +372,9 @@ class AyakaCat:
         return _event.get()
 
     @property
-    def session(self):
+    def channel(self):
         '''当前会话'''
-        return self.event.session
+        return self.event.channel
 
     @property
     def user(self):
@@ -364,11 +385,6 @@ class AyakaCat:
     def message(self):
         '''当前消息'''
         return self.event.message
-
-    @property
-    def current_cat(self):
-        '''当前cat'''
-        return manager.current_cat
 
     @property
     def trigger(self):
@@ -396,7 +412,15 @@ class AyakaCat:
         return manager.params.nums
 
     # ---- on_xxx ----
-    def on_cmd(self, cmds: str | list[str] = "", states: str | list[str] = "", session_types: str | list[str] | None = None, always: bool = False, block: bool = True, auto_help: bool = True):
+    def on_cmd(
+        self,
+        cmds: str | list[str] = "",
+        states: str | list[str] = "",
+        channel_types: str | list[str] | None = None,
+        always: bool = False,
+        block: bool = True,
+        auto_help: bool = True
+    ):
         '''注册命令回调
 
         参数：
@@ -405,7 +429,7 @@ class AyakaCat:
 
             states：状态或状态数组
 
-            session_types：该命令生效的范围，默认使用cat.session_types的值
+            channel_types：该命令生效的范围，默认使用cat.channel_types的值
 
             always：总是第一个触发，不受ayaka的状态约束控制
 
@@ -415,10 +439,10 @@ class AyakaCat:
         '''
         cmds = ensure_list(cmds)
         states = ensure_list(states)
-        if session_types:
-            session_types = ensure_list(session_types)
+        if channel_types:
+            channel_types = ensure_list(channel_types)
         else:
-            session_types = self.session_types
+            channel_types = self.channel_types
 
         def decorator(func: Callable[[], Awaitable]):
             if auto_help:
@@ -426,27 +450,44 @@ class AyakaCat:
             if always:
                 for cmd in cmds:
                     self.triggers.append(AyakaTrigger(
-                        func=func, cat=self, session_types=session_types,
-                        cmd=cmd, always=True, block=block
+                        func=func,
+                        cat=self,
+                        channel_types=channel_types,
+                        cmd=cmd,
+                        always=True,
+                        block=block
                     ))
             else:
                 for cmd in cmds:
                     for state in states:
                         self.triggers.append(AyakaTrigger(
-                            func=func, cat=self, session_types=session_types,
-                            cmd=cmd, state=state, block=block
+                            func=func,
+                            cat=self,
+                            channel_types=channel_types,
+                            cmd=cmd,
+                            state=state,
+                            block=block
                         ))
+            clogger.trace(
+                f"<y>猫猫</y> {self.name} | <y>命令</y> {cmds} | <y>状态</y> {states} | <y>回调</y> {func.__name__}")
             return func
         return decorator
 
-    def on_text(self, states: str | list[str] = "", session_types: str | list[str] | None = None, always: bool = False, block: bool = False, auto_help: bool = True):
+    def on_text(
+        self,
+        states: str | list[str] = "",
+        channel_types: str | list[str] | None = None,
+        always: bool = False,
+        block: bool = False,
+        auto_help: bool = True
+    ):
         '''注册文字回调
 
         参数：
 
             states：状态或状态数组
 
-            session_types：该命令生效的范围，默认使用cat.session_types的值
+            channel_types：该命令生效的范围，默认使用cat.channel_types的值
 
             always：总是第一个触发，不受ayaka的状态约束控制
 
@@ -454,7 +495,7 @@ class AyakaCat:
 
             auto_help：不要自动生成猫猫帮助
         '''
-        return self.on_cmd(states=states, session_types=session_types, always=always, block=block, auto_help=auto_help)
+        return self.on_cmd(states=states, channel_types=channel_types, always=always, block=block, auto_help=auto_help)
 
     # ---- 添加帮助 ----
     def _add_help(self, cmds: list[str], states: list[str], func: Callable[[], Awaitable]):
@@ -495,7 +536,7 @@ class AyakaCat:
         '''
         if state in ["", "*"]:
             raise Exception("state不可为空字符串或*")
-        self._state_dict[self.session.mark] = state
+        self._state_dict[self.channel.mark] = state
 
     async def start(self, state: str = "idle"):
         '''留给古板的老学究用'''
@@ -528,18 +569,18 @@ class AyakaCat:
             await self.send(f"[{self.name}]猫猫休息了")
 
     # ---- 发送 ----
-    async def base_send(self, session: AyakaSession, msg: str):
-        await bridge.send(session.type, session.id, msg)
+    async def base_send(self, channel: AyakaChannel, msg: str):
+        await bridge.send(channel.type, channel.id, msg)
 
-    async def base_send_many(self, session: AyakaSession,  msgs: list[str]):
-        await bridge.send_many(session.id, msgs)
+    async def base_send_many(self, channel: AyakaChannel,  msgs: list[str]):
+        await bridge.send_many(channel.id, msgs)
 
     # ---- 快捷发送 ----
     async def send(self, msg: str):
-        await self.base_send(self.session, msg)
+        await self.base_send(self.channel, msg)
 
     async def send_many(self, msgs: list[str]):
-        await self.base_send_many(self.session, msgs)
+        await self.base_send_many(self.channel, msgs)
 
     async def send_help(self):
         '''发送自身帮助'''
@@ -594,18 +635,20 @@ class AyakaCat:
         rest.__module__ = self.module_name
 
     # ---- 消息监听 ----
-    def add_listener(self, target: AyakaSession):
-        manager.add_listener(self.session, target)
+    def add_listener(self, target: AyakaChannel):
+        manager.add_listener(self.channel, target)
 
-    def remove_listener(self, target: AyakaSession | None = None):
-        manager.remove_listener(self.session, target)
+    def remove_listener(self, target: AyakaChannel | None = None):
+        manager.remove_listener(self.channel, target)
 
     # ---- 其他 ----
     async def get_user(self, uid: str):
-        return await bridge.get_member_info(self.session.id, uid)
+        if not uid:
+            return
+        return await bridge.get_member_info(self.channel.id, uid)
 
     async def get_users(self):
-        return await bridge.get_member_list(self.session.id)
+        return await bridge.get_member_list(self.channel.id)
 
 
 manager = AyakaManager()

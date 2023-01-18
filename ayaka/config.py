@@ -4,12 +4,11 @@
 import json
 from pydantic import ValidationError, BaseModel
 from .logger import logger, clogger
-from .model import AyakaSession
+from .model import AyakaChannel
 from .helpers import ensure_dir_exists
 
 AYAKA_VERSION = "0.0.1.0b0"
 clogger.success(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
-
 data_path = ensure_dir_exists("data/ayaka")
 
 
@@ -43,7 +42,7 @@ class AyakaConfig(BaseModel):
 
         except ValidationError as e:
             logger.error(
-                f"导入配置失败，请检查{name}的配置是否正确；如果不确定出错的原因，可以尝试更新插件-删除配置-重启bot")
+                f"导入配置失败，请检查{name}的配置是否正确；如果不确定出错的原因，可以尝试更新插件，删除旧配置并重启bot")
             raise e
 
         # 强制更新（更新默认值）
@@ -54,7 +53,6 @@ class AyakaConfig(BaseModel):
         if getattr(self, name) != value:
             super().__setattr__(name, value)
             self.save()
-            clogger.debug(f"已自动写入配置更改 {self.__config_name__}.<c>{name}</c>")
 
     def save(self):
         '''修改可变成员变量后，需要使用该方法才能保存其值到文件'''
@@ -73,7 +71,7 @@ class RootConfig(AyakaConfig):
     version: str = AYAKA_VERSION
     '''版本号'''
 
-    block_cat_dict: dict[str, list["AyakaSession"]] = {}
+    block_cat_dict: dict[str, list[AyakaChannel]] = {}
     '''屏蔽列表'''
 
 

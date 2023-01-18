@@ -54,8 +54,8 @@ async def show_relative_cats(name: str):
 @cat.on_cmd(cmds="猫猫帮助", always=True)
 async def show_help():
     '''展示猫猫帮助'''
-    if cat.params.arg:
-        name = cat.params.arg
+    if cat.arg:
+        name = cat.arg
         c = manager.get_cat(name)
         if c:
             await cat.send(c.help)
@@ -64,7 +64,7 @@ async def show_help():
             await show_relative_cats(name)
         return
 
-    c = cat.current.cat
+    c = manager.current_cat
     if c:
         await cat.send(c.help)
         return
@@ -88,7 +88,7 @@ async def show_all_help():
 @cat.on_cmd(cmds="猫猫状态", always=True)
 async def show_state():
     '''展示猫猫状态'''
-    c = cat.current.cat
+    c = manager.current_cat
     if c:
         info = f"当前猫猫[{c.name}]\n当前状态[{c.state}]"
     else:
@@ -99,7 +99,7 @@ async def show_state():
 @cat.on_cmd(cmds="强制退出", always=True)
 async def force_exit():
     '''强制让当前猫猫休息'''
-    c = cat.current.cat
+    c = manager.current_cat
     if c:
         await c.rest()
 
@@ -107,11 +107,11 @@ async def force_exit():
 @cat.on_cmd(cmds="屏蔽猫猫", always=True)
 async def block_cat():
     '''<猫猫名> 屏蔽猫猫'''
-    if not cat.params.arg:
+    if not cat.arg:
         await cat.send("请使用 屏蔽猫猫 <猫猫名>")
         return
 
-    name = cat.params.arg
+    name = cat.arg
     c = manager.get_cat(name)
     if not c:
         await cat.send("没有找到对应猫猫")
@@ -126,11 +126,11 @@ async def block_cat():
 @cat.on_cmd(cmds="取消屏蔽猫猫", always=True)
 async def unblock_cat():
     '''<猫猫名> 取消屏蔽猫猫'''
-    if not cat.params.arg:
+    if not cat.arg:
         await cat.send("请使用 取消屏蔽猫猫 <猫猫名>")
         return
 
-    name = cat.params.arg
+    name = cat.arg
     if name == cat.name:
         await cat.send("不可屏蔽猫猫管理器")
         return

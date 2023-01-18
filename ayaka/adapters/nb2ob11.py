@@ -5,40 +5,47 @@ import nonebot
 from nonebot.matcher import current_bot
 from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment
 from nonebot.exception import ActionFailed
-from ..model import AyakaEvent, User, AyakaSession, AyakaSender
+from ..model import AyakaEvent, User, AyakaChannel, AyakaSender
 from ..cat import bridge
-from ..orm import start_loop
-
-
-def get_ayaka_msg(bot: Bot, event: MessageEvent):
-    '''处理消息，保留text、at和to_me'''
-    ms: list[str] = []
-    for m in event.message:
-        if m.type == "text":
-            ms.append(unescape(str(m)))
-        elif m.type == "at":
-            ms.append(str(m.data["qq"]))
-        else:
-            ms.append(str(m))
-    if event.to_me:
-        ms.append(bot.self_id)
-    return bridge.get_separates()[0].join(ms)
 
 
 async def handle_msg(bot: Bot, event: MessageEvent):
-    msg = get_ayaka_msg(bot, event)
+    separate = separates[0]
+
+    # 处理消息事件，保留text，reply，to_me或第一个at
+    at = None
+    reply = None
+    if event.reply:
+        reply = str(event.reply.message)
+        at = str(event.reply.sender.user_id)
+    if not at and event.to_me:
+        at = bot.self_id
+
+    args: list[str] = []
+    for m in event.message:
+        if m.type == "text":
+            args.append(unescape(str(m)))
+        elif not at and m.type == "at":
+            at = str(m.data["qq"])
+        else:
+            args.append(str(m))
+
+    msg = separate.join(args)
 
     # 组成ayaka事件
     stype = event.message_type
     sid = event.group_id if stype == "group" else event.user_id
     ayaka_event = AyakaEvent(
-        session=AyakaSession(type=stype, id=sid),
-        message=msg,
+        channel=AyakaChannel(type=stype, id=sid),
         sender=AyakaSender(
             id=event.sender.user_id,
             name=event.sender.card or event.sender.nickname,
         ),
+        message=msg,
+        at=at,
+        reply=reply,
     )
+
     await bridge.handle_event(ayaka_event)
 
 
@@ -57,7 +64,7 @@ async def send(type: str, id: str, msg: str):
         try:
             await bot.send_private_msg(user_id=int(id), message=msg)
         except ActionFailed:
-            await bot.send_group_msg(group_id=int(id), message="[WARNING]: 私聊消息发送失败")
+            await bot.send_private_msg(user_id=int(id), message="[WARNING]: 私聊消息发送失败")
 
 
 async def send_many(id: str, msgs: list[str]):
@@ -104,16 +111,16 @@ async def get_member_list(gid: str):
         pass
 
 driver = nonebot.get_driver()
-prefixes = list(driver.config.command_start)
-separates = list(driver.config.command_sep)
+prefixes = list(driver.config.command_start) or [""]
+separates = list(driver.config.command_sep) or [" "]
 
 
 def get_prefixes():
-    return prefixes or [""]
+    return prefixes
 
 
 def get_separates():
-    return separates or [" "]
+    return separates
 
 
 # 注册外部服务
@@ -127,6 +134,3 @@ bridge.regist(driver.on_startup)
 
 # 内部服务注册到外部
 nonebot.on_message(handlers=[handle_msg], block=False, priority=5)
-
-# 其他初始化
-driver.on_startup(start_loop)
