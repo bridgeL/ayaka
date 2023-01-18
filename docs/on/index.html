@@ -221,6 +221,18 @@
   
 
       
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../list/" class="md-tabs__link">
+      相关链接
+    </a>
+  </li>
+
+      
     </ul>
   </div>
 </nav>
@@ -534,6 +546,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#always" class="md-nav__link">
+    always
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#channel_types" class="md-nav__link">
+    channel_types
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto_help" class="md-nav__link">
+    auto_help
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#block" class="md-nav__link">
     block
   </a>
@@ -640,6 +673,21 @@
           
         </ul>
       </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../list/" class="md-nav__link">
+        相关链接
+      </a>
     </li>
   
 
@@ -752,18 +800,23 @@
     <span class="o">...</span>
 </code></pre></div>
 <h2 id="_11">高级<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
-<p>always（必定触发，不受ayaka各类状态规则的约束，并且执行优先级最高）</p>
-<p>channel_types（可能会留到新章节介绍）</p>
+<h3 id="always">always<a class="headerlink" href="#always" title="Permanent link">&para;</a></h3>
+<p>默认为False</p>
+<p>设置为True，则该回调必定触发，不受ayaka各类状态规则的约束，并且执行优先级最高</p>
+<h3 id="channel_types">channel_types<a class="headerlink" href="#channel_types" title="Permanent link">&para;</a></h3>
+<p>留到新章节介绍</p>
+<h3 id="auto_help">auto_help<a class="headerlink" href="#auto_help" title="Permanent link">&para;</a></h3>
+<p>默认为True</p>
+<p>设置为False，则禁止对该回调生成猫猫帮助</p>
 <h3 id="block">block<a class="headerlink" href="#block" title="Permanent link">&para;</a></h3>
 <p>是否阻断消息传播</p>
-<p>命令回调默认阻断</p>
-<p>文字回调默认不阻断</p>
+<p>命令回调默认阻断，文字回调默认不阻断</p>
 <h3 id="_12">处理顺序<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
 <p>消息传播依次经过</p>
 <ul>
 <li>always 命令回调</li>
 <li>always 文字回调</li>
-<li>唤醒命令/状态命令回调</li>
+<li>命令回调</li>
 <li>文字回调</li>
 </ul>
 <p>期间任意回调block为True或抛出<code>BlockException</code>都会导致消息传播的结束</p>

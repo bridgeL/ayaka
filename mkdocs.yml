@@ -46,6 +46,7 @@ nav:
   - 配置: config.md
   - 数据库: database.md
   - 脚本测试: test.md
+- 相关链接: list.md
 
 markdown_extensions:
 - pymdownx.superfences

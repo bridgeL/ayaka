@@ -15,6 +15,8 @@ async def _():
 
 ## get_data（推荐）
 
+使用[pydantic](https://docs.pydantic.dev/)的`BaseModel`，真香
+
 ```py
 from pydantic import BaseModel
 

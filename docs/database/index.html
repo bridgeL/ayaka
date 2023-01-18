@@ -70,6 +70,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -214,6 +219,18 @@
       </a>
     </li>
   
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../list/" class="md-tabs__link">
+      相关链接
+    </a>
+  </li>
 
       
     </ul>
@@ -470,9 +487,75 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          数据库
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         数据库
       </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="本页索引">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      本页索引
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    创建表
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#insert" class="md-nav__link">
+    增 insert
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delete" class="md-nav__link">
+    删 delete
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#select" class="md-nav__link">
+    查 select
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update" class="md-nav__link">
+    改 update
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    下一步
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -499,6 +582,21 @@
   
 
     
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../list/" class="md-nav__link">
+        相关链接
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -518,8 +616,73 @@
 
 
 
-<p>数据库，使用SQLModel，真香</p>
-<p>另一种持久化数据的方法</p>
+  <h1>数据库</h1>
+
+<p>使用<a href="https://sqlmodel.tiangolo.com/">SQLModel</a>实现数据持久化，真香</p>
+<h2 id="_1">创建表<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sqlmodel</span> <span class="kn">import</span> <span class="n">SQLModel</span><span class="p">,</span> <span class="n">Field</span>
+
+<span class="k">class</span> <span class="nc">Money</span><span class="p">(</span><span class="n">SQLModel</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="c1"># __tablename__可以用于自定义表名，当然你可以不写，使用类名作为默认值</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;my_money&quot;</span>
+    <span class="c1"># 设置为主键</span>
+    <span class="n">group_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># money</span>
+    <span class="n">money</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span>
+</code></pre></div>
+<h2 id="insert">增 insert<a class="headerlink" href="#insert" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">get_session</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
+    <span class="c1"># ...</span>
+    <span class="k">with</span> <span class="n">get_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="n">money</span> <span class="o">=</span> <span class="n">Money</span><span class="p">(</span><span class="n">group_id</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">money</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="c1"># ...</span>
+</code></pre></div>
+<h2 id="delete">删 delete<a class="headerlink" href="#delete" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">get_session</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
+    <span class="c1"># ...</span>
+    <span class="k">with</span> <span class="n">get_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="n">money</span> <span class="o">=</span> <span class="n">Money</span><span class="p">(</span><span class="n">group_id</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">money</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="c1"># ...</span>
+</code></pre></div>
+<h2 id="select">查 select<a class="headerlink" href="#select" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">get_session</span>
+<span class="kn">from</span> <span class="nn">sqlmodel</span> <span class="kn">import</span> <span class="n">select</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
+    <span class="c1"># ...</span>
+    <span class="k">with</span> <span class="n">get_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">(</span><span class="n">Money</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">group_id</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+        <span class="n">money</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+    <span class="c1"># ...</span>
+</code></pre></div>
+<h2 id="update">改 update<a class="headerlink" href="#update" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">get_session</span>
+<span class="kn">from</span> <span class="nn">sqlmodel</span> <span class="kn">import</span> <span class="n">select</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
+    <span class="c1"># ...</span>
+    <span class="k">with</span> <span class="n">get_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">(</span><span class="n">Money</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">group_id</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+        <span class="n">money</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+        <span class="n">money</span><span class="o">.</span><span class="n">money</span> <span class="o">+=</span> <span class="mi">1000</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="c1"># ...</span>
+</code></pre></div>
+<h2 id="_2">下一步<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<div align="right">
+    在这里~ ↘
+</div>
 
 
 

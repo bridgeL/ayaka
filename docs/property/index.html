@@ -70,6 +70,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -214,6 +219,18 @@
       </a>
     </li>
   
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../list/" class="md-tabs__link">
+      相关链接
+    </a>
+  </li>
 
       
     </ul>
@@ -428,9 +445,47 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          属性
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         属性
       </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="本页索引">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      本页索引
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    一览表
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    下一步
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -499,6 +554,21 @@
   
 
     
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../list/" class="md-nav__link">
+        相关链接
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -518,7 +588,103 @@
 
 
 
-<p>很多快速访问的属性</p>
+  <h1>属性</h1>
+
+<h2 id="_1">一览表<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>意义</th>
+<th>备注</th>
+<th>读写性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>state</td>
+<td>猫猫状态</td>
+<td>-</td>
+<td>rw</td>
+</tr>
+<tr>
+<td>cache</td>
+<td>猫猫缓存</td>
+<td>-</td>
+<td>rw</td>
+</tr>
+<tr>
+<td>help</td>
+<td>猫猫帮助</td>
+<td>-</td>
+<td>rw</td>
+</tr>
+<tr>
+<td>valid</td>
+<td>当前猫猫是否可用</td>
+<td>通过猫猫管理器控制各个群组中各个猫猫的启用与禁用</td>
+<td>rw</td>
+</tr>
+<tr>
+<td>event</td>
+<td>当前事件</td>
+<td>event.sender, event.channel, event.message, event.at, event.reply</td>
+<td>r</td>
+</tr>
+<tr>
+<td>channel</td>
+<td>当前会话</td>
+<td>channel.id, channel.type</td>
+<td>r</td>
+</tr>
+<tr>
+<td>user</td>
+<td>当前用户</td>
+<td>user.id, user.name</td>
+<td>r</td>
+</tr>
+<tr>
+<td>message</td>
+<td>当前消息</td>
+<td>-</td>
+<td>r</td>
+</tr>
+<tr>
+<td>trigger</td>
+<td>当前触发器</td>
+<td>-</td>
+<td>r</td>
+</tr>
+<tr>
+<td>cmd</td>
+<td>当前触发命令</td>
+<td>-</td>
+<td>r</td>
+</tr>
+<tr>
+<td>arg</td>
+<td>当前消息移除命令后的内容</td>
+<td>-</td>
+<td>r</td>
+</tr>
+<tr>
+<td>args</td>
+<td>当前消息移除命令后的内容进一步分割</td>
+<td>-</td>
+<td>r</td>
+</tr>
+<tr>
+<td>nums</td>
+<td>当前消息中的的整数数字</td>
+<td>-</td>
+<td>r</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_2">下一步<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<div align="right">
+    在这里~ ↘
+</div>
 
 
 

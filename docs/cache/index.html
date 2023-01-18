@@ -70,6 +70,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -214,6 +219,18 @@
       </a>
     </li>
   
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../list/" class="md-tabs__link">
+      相关链接
+    </a>
+  </li>
 
       
     </ul>
@@ -442,9 +459,68 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          缓存
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         缓存
       </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="本页索引">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      本页索引
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    直接读写（不推荐）
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get_data" class="md-nav__link">
+    get_data（推荐）
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pop_data" class="md-nav__link">
+    pop_data
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bot" class="md-nav__link">
+    bot重启后数据丢失
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    下一步
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -499,6 +575,21 @@
   
 
     
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../list/" class="md-nav__link">
+        相关链接
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -518,9 +609,62 @@
 
 
 
-<p>缓存</p>
-<p>get_data</p>
-<p>pop_data</p>
+  <h1>缓存</h1>
+
+<h2 id="_1">直接读写（不推荐）<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
+    <span class="n">cat</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">arg</span>
+
+<span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;show&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
+    <span class="n">arg</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;默认值&quot;</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+</code></pre></div>
+<p>缺乏类型提示，而且当需要缓存的参数过多时，代码体验尤其地狱</p>
+<h2 id="get_data">get_data（推荐）<a class="headerlink" href="#get_data" title="Permanent link">&para;</a></h2>
+<p>使用<a href="https://docs.pydantic.dev/">pydantic</a>的<code>BaseModel</code>，真香</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+
+<span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">test</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;默认值&quot;</span>
+
+<span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">Model</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">arg</span>
+
+<span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;show&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">Model</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">test</span><span class="p">)</span>
+</code></pre></div>
+<p>其保存位置 <code>model &lt;-&gt; cat.cache["Model"]</code>，可以使用<code>print(cat.cache)</code>来验证</p>
+<p>使用<code>get_data</code>时，若<code>cat.cache["Model"]</code>不存在，则自动通过<code>Model()</code>初始化并存入cache（保证一定有返回值）</p>
+<h2 id="pop_data">pop_data<a class="headerlink" href="#pop_data" title="Permanent link">&para;</a></h2>
+<p>从<code>cat.cache</code>中释放指定数据</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+
+<span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">test</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;默认值&quot;</span>
+
+<span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">Model</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">arg</span>
+
+<span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;pop&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">pop_data</span><span class="p">(</span><span class="n">Model</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">test</span><span class="p">)</span>
+</code></pre></div>
+<p>使用<code>pop_data</code>时，若<code>cat.cache["Model"]</code>不存在，则自动通过<code>Model()</code>初始化但不存入cache（保证一定有返回值）</p>
+<h2 id="bot">bot重启后数据丢失<a class="headerlink" href="#bot" title="Permanent link">&para;</a></h2>
+<p>咱只是缓存喵</p>
+<h2 id="_2">下一步<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<div align="right">
+    在这里~ ↘
+</div>
 
 
 
