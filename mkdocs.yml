@@ -41,6 +41,7 @@ nav:
 - 深入: 
   - 局限: disable.md
   - 回调: on.md
+  - 属性: property.md
   - 缓存: cache.md
   - 配置: config.md
   - 数据库: database.md

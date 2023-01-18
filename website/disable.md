@@ -21,3 +21,9 @@ ayaka无意关心定时发送消息等问题
 ayaka能较为顺利地将使用ayaka的插件变为nb1、nb2、hoshino等机器人框架的**通用插件**
 
 可以通过console离线地、全面地进行调试，无需gocq
+
+## 下一步
+
+<div align="right">
+    在这里~ ↘
+</div>
