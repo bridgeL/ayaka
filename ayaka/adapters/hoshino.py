@@ -5,7 +5,7 @@ from hoshino import Service, config
 from aiocqhttp import Event as CQEvent
 from aiocqhttp.exceptions import ActionFailed
 from ..bridge import bridge
-from ..model import AyakaEvent, AyakaChannel, AyakaSender, User
+from ..model import AyakaEvent, AyakaChannel, AyakaSender, GroupMember
 from ..helpers import singleton
 
 
@@ -101,7 +101,7 @@ async def get_member_info(gid: str, uid: str):
     bot = get_current_bot()
     try:
         user = await bot.get_group_member_info(group_id=int(gid), user_id=int(uid))
-        return User(id=user["user_id"], name=user["card"] or user["nickname"], role=user["role"])
+        return GroupMember(id=user["user_id"], name=user["card"] or user["nickname"], role=user["role"])
     except:
         pass
 
@@ -111,7 +111,7 @@ async def get_member_list(gid: str):
     try:
         users = await bot.get_group_member_list(group_id=int(gid))
         return [
-            User(
+            GroupMember(
                 id=user["user_id"],  role="admin",
                 name=user["card"] or user["nickname"],
             )

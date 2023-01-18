@@ -25,17 +25,24 @@ class AyakaSender(BaseModel):
 class AyakaEvent(BaseModel):
     '''ayaka消息事件'''
     channel: AyakaChannel
+    '''消息来自哪个频道/群聊/私聊'''
     sender: AyakaSender
+    '''消息发送者'''
     message: str
+    '''当前消息'''
     reply: Optional[str]
+    '''回复消息，如果gocq获取不到则为空字符串'''
     at: Optional[str]
+    '''消息中的第一个at'''
     origin_channel: Optional[AyakaChannel]
+    '''最初的频道（针对监听转发功能设置）'''
 
 
-class User(BaseModel):
+class GroupMember(BaseModel):
     id: str
     name: str
-    role: str
+    role: Optional[str]
+    '''群身份'''
 
 
 class ResItem(BaseModel):

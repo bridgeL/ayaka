@@ -570,16 +570,20 @@ class AyakaCat:
 
     # ---- 发送 ----
     async def base_send(self, channel: AyakaChannel, msg: str):
+        '''发送消息至指定频道'''
         await bridge.send(channel.type, channel.id, msg)
 
     async def base_send_many(self, channel: AyakaChannel,  msgs: list[str]):
+        '''发送消息组至指定频道'''
         await bridge.send_many(channel.id, msgs)
 
     # ---- 快捷发送 ----
     async def send(self, msg: str):
+        '''发送消息至当前频道'''
         await self.base_send(self.channel, msg)
 
     async def send_many(self, msgs: list[str]):
+        '''发送消息组至当前频道'''
         await self.base_send_many(self.channel, msgs)
 
     async def send_help(self):
@@ -636,18 +640,22 @@ class AyakaCat:
 
     # ---- 消息监听 ----
     def add_listener(self, target: AyakaChannel):
+        '''添加当前频道A对指定频道B的监听，当B收到消息后，会转发一份副本给A处理'''
         manager.add_listener(self.channel, target)
 
     def remove_listener(self, target: AyakaChannel | None = None):
+        '''移除当前频道A对 指定频道B或全部频道 的监听'''
         manager.remove_listener(self.channel, target)
 
     # ---- 其他 ----
     async def get_user(self, uid: str):
+        '''获取当前群组中指定uid的成员信息'''
         if not uid:
             return
         return await bridge.get_member_info(self.channel.id, uid)
 
     async def get_users(self):
+        '''获取当前群组中所有成员信息'''
         return await bridge.get_member_list(self.channel.id)
 
 

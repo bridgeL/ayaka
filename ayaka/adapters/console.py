@@ -5,7 +5,7 @@ import uvicorn
 import asyncio
 from fastapi import FastAPI
 from ..logger import ayaka_log, ayaka_clog
-from ..model import AyakaEvent, AyakaChannel, AyakaSender, User
+from ..model import AyakaEvent, AyakaChannel, AyakaSender, GroupMember
 from ..cat import bridge
 from ..helpers import ensure_dir_exists
 
@@ -100,12 +100,12 @@ async def start_console_loop():
 
 
 async def get_member_info(gid: str, uid: str):
-    return User(id=uid, name=f"测试{uid}号", role="admin")
+    return GroupMember(id=uid, name=f"测试{uid}号", role="admin")
 
 
 async def get_member_list(gid: str):
     return [
-        User(id=uid, name=f"测试{uid}号", role="admin")
+        GroupMember(id=uid, name=f"测试{uid}号", role="admin")
         for uid in [i+1 for i in range(100)]
     ]
 

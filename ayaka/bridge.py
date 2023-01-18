@@ -6,7 +6,7 @@
     缺点是，你完全不记得自己都在哪里加的这些方法
 '''
 from typing import Awaitable, Callable
-from .model import AyakaEvent, User
+from .model import AyakaEvent, GroupMember
 from .exception import NotRegistrationError, DuplicateRegistrationError
 
 
@@ -41,10 +41,10 @@ class AyakaBridge:
     def get_separates(self) -> list[str]:
         return self._get_separates()
 
-    async def get_member_info(self, gid: str, uid: str) -> User | None:
+    async def get_member_info(self, gid: str, uid: str) -> GroupMember | None:
         return await self._get_member_info(gid, uid)
 
-    async def get_member_list(self, gid: str) -> list[User] | None:
+    async def get_member_list(self, gid: str) -> list[GroupMember] | None:
         return await self._get_member_list(gid)
 
     def on_startup(self, func: Callable[..., Awaitable]):

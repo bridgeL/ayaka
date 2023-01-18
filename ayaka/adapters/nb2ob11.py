@@ -5,7 +5,7 @@ import nonebot
 from nonebot.matcher import current_bot
 from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment
 from nonebot.exception import ActionFailed
-from ..model import AyakaEvent, User, AyakaChannel, AyakaSender
+from ..model import AyakaEvent, GroupMember, AyakaChannel, AyakaSender
 from ..cat import bridge
 
 
@@ -91,7 +91,7 @@ async def get_member_info(gid: str, uid: str):
     bot = get_current_bot()
     try:
         user = await bot.get_group_member_info(group_id=int(gid), user_id=int(uid))
-        return User(id=user["user_id"], name=user["card"] or user["nickname"], role=user["role"])
+        return GroupMember(id=user["user_id"], name=user["card"] or user["nickname"], role=user["role"])
     except:
         pass
 
@@ -101,7 +101,7 @@ async def get_member_list(gid: str):
     try:
         users = await bot.get_group_member_list(group_id=int(gid))
         return [
-            User(
+            GroupMember(
                 id=user["user_id"],  role="admin",
                 name=user["card"] or user["nickname"],
             )
