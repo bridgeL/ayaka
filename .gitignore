@@ -2,3 +2,4 @@ __pycache__
 /dist
 /*.ps1
 /poetry.lock
+/data

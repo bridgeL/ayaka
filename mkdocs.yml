@@ -1,0 +1,67 @@
+# Project information
+site_name: Ayaka 猫猫，猫猫 😸
+site_url: https://bridgel.github.io/ayaka/
+
+# Repository
+repo_name: ayaka
+repo_url: https://github.com/bridgeL/ayaka/
+
+# Copyright
+copyright: Copyright &copy; 2023 - 2023 bridgeL
+
+# dir setting
+docs_dir: website
+site_dir: docs
+
+# Configuration
+theme:
+  name: material
+  palette:
+    primary: teal
+    accent: deep orange
+  features:
+  - content.code.copy
+  - content.tabs.link
+  - navigation.tabs
+  - navigation.indexes
+  - navigation.sections
+  - navigation.tracking
+  - navigation.top
+  - navigation.footer
+  - toc.integrate
+  - search.highlight
+  - search.suggest
+  hide:
+    - toc
+nav:
+- 主页:
+  - 介绍: index.md
+  - 安装: install.md
+- 快速开始: quickstart.md
+- 深入: 
+  - 局限: disable.md
+  - 回调: on.md
+  - 缓存: cache.md
+  - 配置: config.md
+  - 数据库: database.md
+  - 脚本测试: test.md
+
+markdown_extensions:
+- pymdownx.superfences
+- pymdownx.tabbed:
+    alternate_style: true
+- toc:
+    title: 本页索引
+    permalink: true
+
+plugins:
+- search:
+    lang:
+    - en
+    - ja
+    separator: '[\s\-\.]+'
+
+extra_javascript:
+- js/demo.js
+extra_css:
+- css/demo.css

@@ -1,6 +1,6 @@
 <div align="center">
 
-# Ayaka - 猫猫，猫猫！ - 0.0.1.0b1
+# Ayaka - 猫猫，猫猫！ - 0.0.1.0b2
 
 </div>
 
@@ -11,6 +11,10 @@
 - [nonebot1](https://github.com/nonebot/nonebot)
 
 也可将其作为console程序离线运行
+
+## 文档
+
+https://bridgel.github.io/ayaka/
 
 ## 历史遗留问题
 

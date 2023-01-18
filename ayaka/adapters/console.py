@@ -193,7 +193,7 @@ async def show_help(line: str):
     ayaka_clog("<y>g</y> \<gid> \<uid> \<msg> | 模拟群聊消息")
     ayaka_clog("<y>p</y> \<uid> \<msg> | 模拟私聊消息")
     ayaka_clog("<y>d</y> \<n> | 延时n秒")
-    ayaka_clog("<y>s</y> \<name> | 执行自动化测试脚本 script/\<name>.txt")
+    ayaka_clog("<y>s</y> \<name> | 执行测试脚本 script/\<name>.txt")
     ayaka_clog("<y>h</y> | 查看帮助")
 
 
