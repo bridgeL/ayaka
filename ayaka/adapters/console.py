@@ -69,13 +69,12 @@ async def send(type: str, id: str, msg: str):
         ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
     else:
         ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
-    ayaka_log(msg)
+    print(msg)
 
 
 async def send_many(id: str, msgs: list[str]):
     ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
-    for m in msgs:
-        ayaka_log(m)
+    print("\n\n".join(msgs))
 
 
 def safe_split(text: str,  n: int, sep: str = " "):
