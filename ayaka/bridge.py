@@ -29,11 +29,11 @@ class AyakaBridge:
         return self.func_dict[name]
 
     # ---- ayaka cat 调用服务 ----
-    async def send(self, type: str, id: str, msg: str) -> None:
-        await self._send(type, id, msg)
+    async def send(self, type: str, id: str, msg: str) -> bool:
+        return await self._send(type, id, msg)
 
-    async def send_many(self, id: str, msgs: list[str]) -> None:
-        await self._send_many(id, msgs)
+    async def send_many(self, id: str, msgs: list[str]) -> bool:
+        return await self._send_many(id, msgs)
 
     def get_prefixes(self) -> list[str]:
         return self._get_prefixes()

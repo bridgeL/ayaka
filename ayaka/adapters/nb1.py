@@ -71,12 +71,16 @@ async def send(type: str, id: str, msg: str):
         try:
             await bot.send_group_msg(group_id=int(id), message=msg)
         except ActionFailed:
-            await bot.send_group_msg(group_id=int(id), message="[WARNING]: 群聊消息发送失败")
+            await bot.send_group_msg(group_id=int(id), message="群聊消息发送失败")
+        else:
+            return True
     else:
         try:
             await bot.send_private_msg(user_id=int(id), message=msg)
         except ActionFailed:
-            await bot.send_private_msg(user_id=int(id), message="[WARNING]: 私聊消息发送失败")
+            await bot.send_private_msg(user_id=int(id), message="私聊消息发送失败")
+        else:
+            return True
 
 
 async def send_many(id: str, msgs: list[str]):
@@ -93,8 +97,9 @@ async def send_many(id: str, msgs: list[str]):
             ]
             await bot.call_action("send_group_forward_msg", group_id=int(id), messages=msgs)
     except ActionFailed:
-        await bot.send_group_msg(group_id=int(id), message="[WARNING]: 合并转发消息发送失败")
-
+        await bot.send_group_msg(group_id=int(id), message="合并转发消息发送失败")
+    else:
+        return True
 
 async def get_member_info(gid: str, uid: str):
     bot = get_current_bot()

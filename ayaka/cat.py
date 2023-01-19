@@ -571,20 +571,20 @@ class AyakaCat:
     # ---- 发送 ----
     async def base_send(self, channel: AyakaChannel, msg: str):
         '''发送消息至指定频道'''
-        await bridge.send(channel.type, channel.id, msg)
+        return await bridge.send(channel.type, channel.id, msg)
 
     async def base_send_many(self, channel: AyakaChannel,  msgs: list[str]):
         '''发送消息组至指定频道'''
-        await bridge.send_many(channel.id, msgs)
+        return await bridge.send_many(channel.id, msgs)
 
     # ---- 快捷发送 ----
     async def send(self, msg: str):
         '''发送消息至当前频道'''
-        await self.base_send(self.channel, msg)
+        return await self.base_send(self.channel, msg)
 
     async def send_many(self, msgs: list[str]):
         '''发送消息组至当前频道'''
-        await self.base_send_many(self.channel, msgs)
+        return await self.base_send_many(self.channel, msgs)
 
     async def send_help(self):
         '''发送自身帮助'''
