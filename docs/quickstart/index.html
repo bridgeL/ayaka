@@ -384,6 +384,13 @@
       
         <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
+    准备工作
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
     示例插件
   </a>
   
@@ -391,14 +398,14 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     赌石
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     敲木鱼
   </a>
   
@@ -410,7 +417,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     离线调试
   </a>
   
@@ -425,7 +432,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     调用测试脚本
   </a>
   
@@ -437,14 +444,14 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
     猫猫帮助
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#_8" class="md-nav__link">
     避免命令碰撞
   </a>
   
@@ -452,28 +459,28 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#_9" class="md-nav__link">
     赌石
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
+  <a href="#_10" class="md-nav__link">
     木鱼
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
+  <a href="#_11" class="md-nav__link">
     唤醒命令
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
+  <a href="#_12" class="md-nav__link">
     状态命令
   </a>
   
@@ -492,14 +499,14 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
+  <a href="#_13" class="md-nav__link">
     便利的数据缓存
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_13" class="md-nav__link">
+  <a href="#_14" class="md-nav__link">
     下一步
   </a>
   
@@ -697,8 +704,17 @@
 
   <h1>快速开始</h1>
 
-<h2 id="_1">示例插件<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<h3 id="_2">赌石<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<h2 id="_1">准备工作<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>下载本仓库</p>
+<div class="highlight"><pre><span></span><code>git clone https://github.com/bridgeL/ayaka/
+</code></pre></div>
+<p>使用<a href="https://python-poetry.org/docs/">poetry</a>安装依赖</p>
+<div class="highlight"><pre><span></span><code>poetry shell
+poetry install
+</code></pre></div>
+<p>本页的示例均可在其中找到</p>
+<h2 id="_2">示例插件<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="_3">赌石<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># example/stone.py</span>
 <span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
 <span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">AyakaCat</span>
@@ -717,7 +733,7 @@
         <span class="k">return</span> <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;运气真好，开出了和田玉&quot;</span><span class="p">)</span>
     <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;只是一块破石头&quot;</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="_3">敲木鱼<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<h3 id="_4">敲木鱼<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># example/muyu.py</span>
 <span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">AyakaCat</span>
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
@@ -775,7 +791,7 @@
     <span class="n">muyu</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">Muyu</span><span class="p">)</span>
     <span class="n">muyu</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </code></pre></div>
-<h2 id="_4">离线调试<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_5">离线调试<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <h3 id="console">作为console程序运行<a class="headerlink" href="#console" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># run.py</span>
 <span class="kn">import</span> <span class="nn">ayaka.adapters</span> <span class="k">as</span> <span class="nn">cat</span>
@@ -789,7 +805,7 @@
 </code></pre></div>
 <div class="highlight"><pre><span></span><code>python run.py
 </code></pre></div>
-<h3 id="_5">调用测试脚本<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<h3 id="_6">调用测试脚本<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code># 执行全部测试
 s 0
 
@@ -799,7 +815,7 @@ s muyu
 # 测试赌石
 s stone
 </code></pre></div>
-<h2 id="_6">猫猫帮助<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_7">猫猫帮助<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <p>ayaka自动为以上两个插件生成了帮助</p>
 <div class="demo">
 "user" 说：猫猫帮助
@@ -834,10 +850,10 @@ s stone
 - 调整步进/set step
 </div>
 
-<h2 id="_7">避免命令碰撞<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<h2 id="_8">避免命令碰撞<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <p>以上两个插件可以同时工作，无需担心<code>敲/hit</code>、<code>退出/exit</code>命令发生碰撞</p>
 <p>这是因为它们从属于不同的猫猫，位于不同的碰撞域中，不会发生碰撞冲突</p>
-<h3 id="_8">赌石<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<h3 id="_9">赌石<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -860,7 +876,7 @@ s stone
 </tr>
 </tbody>
 </table>
-<h3 id="_9">木鱼<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<h3 id="_10">木鱼<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -891,10 +907,10 @@ s stone
 </tr>
 </tbody>
 </table>
-<h3 id="_10">唤醒命令<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<h3 id="_11">唤醒命令<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
 <p><strong>所有的唤醒命令都位于同一碰撞域</strong>，它们之间需要注意相互的唯一性</p>
 <p>也就是说，需要保证<code>赌石/stone</code>与<code>木鱼/muyu</code>不重复</p>
-<h3 id="_11">状态命令<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<h3 id="_12">状态命令<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
 <p>状态命令从属于各个猫猫，而不同猫猫的状态命令间不会发生碰撞</p>
 <p>因为当一只猫猫被唤醒后，所有其他猫猫的唤醒命令和状态命令都将被ayaka拒绝</p>
 <p>ayaka此时仅接受当前猫猫的状态命令</p>
@@ -902,7 +918,7 @@ s stone
 <p>猫猫被唤醒后，默认进入idle状态</p>
 <p>此时ayaka将拒绝所有其他状态下的命令</p>
 <p>但是有一种特殊命令除外，那就是<code>*</code>（通用状态命令），它匹配所有状态，在任意状态下均不会被ayaka拒绝</p>
-<h2 id="_12">便利的数据缓存<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
+<h2 id="_13">便利的数据缓存<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h2>
 <p>ayaka为每个群聊均设置了一份字典</p>
 <p>各个插件中的猫猫均可以通过<code>cat.cache</code>访问到该字典中的一部分空间：</p>
 <div class="highlight"><pre><span></span><code>cat.cache &lt;-&gt; total_dict[group_id][cat.name]
@@ -911,7 +927,7 @@ s stone
 <p>同时，ayaka还设计了<code>cat.get_data</code>、<code>cat.pop_data</code>方法读写<code>cat.cache</code></p>
 <p>可以将<code>BaseModel</code>放入其中使用，解决了直接读写字典时缺乏类型提示的问题</p>
 <p>注意：缓存数据会在bot重启后丢失</p>
-<h2 id="_13">下一步<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h2>
+<h2 id="_14">下一步<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h2>
 <div align="right">
     在这里~ ↘
 </div>

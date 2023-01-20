@@ -1,3 +1,20 @@
+## 准备工作
+
+下载本仓库
+
+```
+git clone https://github.com/bridgeL/ayaka/
+```
+
+使用[poetry](https://python-poetry.org/docs/)安装依赖
+
+```
+poetry shell
+poetry install
+```
+
+本页的示例均可在其中找到
+
 ## 示例插件
 
 ### 赌石
