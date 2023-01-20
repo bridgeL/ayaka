@@ -1,5 +1,5 @@
 '''
-    ayaka - cat Cat CAT - 0.0.1.2
+    ayaka - cat Cat CAT - 0.0.1.3b0
 '''
 # logger
 from . import logger as __logger
