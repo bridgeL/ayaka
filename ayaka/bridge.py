@@ -6,8 +6,10 @@
     缺点是，你完全不记得自己都在哪里加的这些方法
 '''
 from typing import Awaitable, Callable
+from .logger import logger
 from .model import AyakaEvent, GroupMember
 from .exception import NotRegistrationError, DuplicateRegistrationError
+from .config import root_config
 
 
 class AyakaBridge:
@@ -52,7 +54,13 @@ class AyakaBridge:
 
     # ---- ayaka cat 提供服务 ----
     async def handle_event(self, event: "AyakaEvent") -> None:
-        await self._handle_event(event)
+        if root_config.error_report:
+            try:
+                await self._handle_event(event)
+            except Exception as e:
+                logger.exception("ayaka 处理事务时发生错误")
+        else:
+            await self._handle_event(event)
 
 
 bridge = AyakaBridge()
