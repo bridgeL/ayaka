@@ -523,8 +523,8 @@ class AyakaCat:
                 self._helps[state].append(info)
 
     # ---- 设置状态 ----
-    def set_state(self, state: str):
-        '''修改猫猫状态
+    def set_state(self, state: str, channel: AyakaChannel | None = None):
+        '''设置指定频道的状态
 
         参数: 
 
@@ -536,7 +536,9 @@ class AyakaCat:
         '''
         if state in ["", "*"]:
             raise Exception("state不可为空字符串或*")
-        self._state_dict[self.channel.mark] = state
+        if not channel:
+            channel = self.channel
+        self._state_dict[channel.mark] = state
 
     async def start(self, state: str = "idle"):
         '''留给古板的老学究用'''
@@ -664,10 +666,6 @@ class AyakaCat:
     async def handle_event(self, event: AyakaEvent):
         '''令manager处理一个事件'''
         return await manager.handle_event(event)
-
-    def set_state(self, channel: AyakaChannel, state: str):
-        '''设置指定频道的状态'''
-        self._state_dict[channel.mark] = state
 
 
 manager = AyakaManager()
