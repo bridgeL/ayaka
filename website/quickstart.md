@@ -3,7 +3,7 @@
 下载本仓库
 
 ```
-git clone https://github.com/bridgeL/ayaka/
+git clone https://github.com/bridgeL/ayaka.git
 ```
 
 使用[poetry](https://python-poetry.org/docs/)安装依赖
