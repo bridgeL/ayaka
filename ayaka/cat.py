@@ -109,7 +109,7 @@ class AyakaManager:
         data.append(trigger)
         data.sort(key=lambda t: len(t.cmd), reverse=True)
 
-    async def _handle_event(self, event: AyakaEvent):
+    async def base_handle_event(self, event: AyakaEvent):
         '''处理事件'''
         # 设置上下文
         _event.set(event)
@@ -145,17 +145,28 @@ class AyakaManager:
                     if await trigger.run(prefix):
                         return
 
-    async def handle_event(self, event: AyakaEvent):
+    async def _handle_event(self, event: AyakaEvent):
         '''处理和转发事件'''
-        await self._handle_event(event)
+        await self.base_handle_event(event)
         target = event.channel
         ts = []
         for listener in self.listen_dict.get(target, []):
             data = event.dict()
             data.update(channel=listener, origin_channel=target)
             _event = AyakaEvent(**data)
-            ts.append(asyncio.create_task(self._handle_event(_event)))
+            ts.append(asyncio.create_task(self.base_handle_event(_event)))
         await asyncio.gather(*ts)
+
+    async def handle_event(self, event: AyakaEvent):
+        '''处理和转发事件'''
+        if root_config.error_report:
+            try:
+                await self._handle_event(event)
+            except Exception as e:
+                logger.exception("处理事务时发生错误")
+                raise e
+        else:
+            await self._handle_event(event)
 
     def add_cat(self, cat: "AyakaCat"):
         for c in self.cats:

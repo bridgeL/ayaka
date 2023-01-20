@@ -9,6 +9,7 @@ from ..model import AyakaEvent, AyakaChannel, AyakaSender, GroupMember
 from ..cat import bridge
 from ..helpers import ensure_dir_exists
 
+
 pt = re.compile(r"@([^ ]+?)(?= |$)")
 
 
