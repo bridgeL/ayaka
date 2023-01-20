@@ -7,7 +7,7 @@ from .logger import logger, clogger, logger_format
 from .model import AyakaChannel
 from .helpers import ensure_dir_exists
 
-AYAKA_VERSION = "0.0.1.3b1"
+AYAKA_VERSION = "0.0.1.3b2"
 clogger.success(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
 data_path = ensure_dir_exists("data/ayaka")
 

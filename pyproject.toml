@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ayaka"
-version = "0.0.1.3b1"
+version = "0.0.1.3b2"
 description = "猫猫，猫猫！"
 authors = ["Su <wxlxy316@163.com>"]
 license = "MIT"
@@ -17,6 +17,10 @@ python = "^3.10"
 pydantic = "^1.10.0"
 loguru = "^0.6.0"
 sqlmodel = "^0.0.8"
+fastapi = { version = ">=0.87.0,!=0.89.0,<1.0.0", optional = true }
+httpx = { version = ">=0.20.0,<1.0.0", extras = ["http2"], optional = true }
+uvicorn = { version = ">=0.20.0,<1.0.0", extras = ["standard"], optional = true }
+
 
 [build-system]
 requires = ["poetry-core"]
