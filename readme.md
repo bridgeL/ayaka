@@ -1,6 +1,6 @@
 <div align="center">
 
-# Ayaka - 猫猫，猫猫！ - 0.0.1.3b2
+# Ayaka - 猫猫，猫猫！ - 0.0.1.3
 
 </div>
 
