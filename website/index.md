@@ -5,6 +5,8 @@
 ![PyPI - License](https://img.shields.io/pypi/l/ayaka)
 ![PyPI](https://img.shields.io/pypi/v/ayaka)
 
+专注群聊、多人互动的插件开发
+
 使用ayaka，不再担心：
 
 - 命令碰撞

@@ -851,8 +851,9 @@ s stone
 </div>
 
 <h2 id="_8">避免命令碰撞<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
-<p>以上两个插件可以同时工作，无需担心<code>敲/hit</code>、<code>退出/exit</code>命令发生碰撞</p>
+<p>以上两个插件可以同时加载，无需担心<code>敲/hit</code>、<code>退出/exit</code>命令发生碰撞</p>
 <p>这是因为它们从属于不同的猫猫，位于不同的碰撞域中，不会发生碰撞冲突</p>
+<p>ayaka规定同一时间只有一只猫猫可被唤醒，此时其他猫猫的命令都会被ayaka拒绝</p>
 <h3 id="_9">赌石<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -917,7 +918,7 @@ s stone
 <h3 id="idle">idle状态<a class="headerlink" href="#idle" title="Permanent link">&para;</a></h3>
 <p>猫猫被唤醒后，默认进入idle状态</p>
 <p>此时ayaka将拒绝所有其他状态下的命令</p>
-<p>但是有一种特殊命令除外，那就是<code>*</code>（通用状态命令），它匹配所有状态，在任意状态下均不会被ayaka拒绝</p>
+<p>但是有一种特殊状态除外，那就是<code>*</code>（通用状态），它匹配所有状态，在任意状态下均被ayaka接受</p>
 <h2 id="_13">便利的数据缓存<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h2>
 <p>ayaka为每个群聊均设置了一份字典</p>
 <p>各个插件中的猫猫均可以通过<code>cat.cache</code>访问到该字典中的一部分空间：</p>

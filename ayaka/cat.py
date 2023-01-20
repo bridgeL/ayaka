@@ -192,8 +192,7 @@ class AyakaManager:
 
 
 class AyakaTrigger:
-    def __init__(self, func: Callable[[], Awaitable], cat: "AyakaCat", channel_types: list[str] = ["group"], cmd: str = "", state: str = "", always: bool = False, block: bool = False) -> None:
-        self.channel_types = channel_types
+    def __init__(self, func: Callable[[], Awaitable], cat: "AyakaCat", cmd: str = "", state: str = "", always: bool = False, block: bool = False) -> None:
         self.cmd = cmd
         '''顺便可以区分命令触发和文本触发'''
         self.state = state
@@ -221,10 +220,6 @@ class AyakaTrigger:
     async def run(self, prefix):
         # 判断是否被屏蔽
         if not self.cat.valid:
-            return False
-
-        # 范围是否符合
-        if not manager.event.channel.type in self.channel_types:
             return False
 
         # if 命令触发，命令是否符合
@@ -261,7 +256,6 @@ class AyakaTrigger:
     def __repr__(self) -> str:
         return simple_repr(
             self,
-            exclude={"channel_types"},
             cat=self.cat.name,
             func=self.func_name,
             module=self.module_name
@@ -272,15 +266,12 @@ class AyakaCat:
     def __init__(
         self,
         name: str,
-        channel_types: str | list[str] = "group"
     ) -> None:
         '''创建猫猫
 
         参数：
 
             name：猫猫名字
-
-            channel_types：猫猫生效范围
         '''
         self.name = name
         manager.add_cat(self)
@@ -297,7 +288,6 @@ class AyakaCat:
         else:
             raise CannotFindModuleError(self.module_path)
 
-        self.channel_types = ensure_list(channel_types)
         self._state_dict: dict[str, str] = {}
         self._cache_dict: dict[str, dict] = {}
         self.triggers: list[AyakaTrigger] = []
@@ -416,7 +406,6 @@ class AyakaCat:
         self,
         cmds: str | list[str] = "",
         states: str | list[str] = "",
-        channel_types: str | list[str] | None = None,
         always: bool = False,
         block: bool = True,
         auto_help: bool = True
@@ -429,8 +418,6 @@ class AyakaCat:
 
             states：状态或状态数组
 
-            channel_types：该命令生效的范围，默认使用cat.channel_types的值
-
             always：总是第一个触发，不受ayaka的状态约束控制
 
             block：触发后阻断事件继续传播
@@ -439,10 +426,6 @@ class AyakaCat:
         '''
         cmds = ensure_list(cmds)
         states = ensure_list(states)
-        if channel_types:
-            channel_types = ensure_list(channel_types)
-        else:
-            channel_types = self.channel_types
 
         def decorator(func: Callable[[], Awaitable]):
             if auto_help:
@@ -452,7 +435,6 @@ class AyakaCat:
                     self.triggers.append(AyakaTrigger(
                         func=func,
                         cat=self,
-                        channel_types=channel_types,
                         cmd=cmd,
                         always=True,
                         block=block
@@ -463,7 +445,6 @@ class AyakaCat:
                         self.triggers.append(AyakaTrigger(
                             func=func,
                             cat=self,
-                            channel_types=channel_types,
                             cmd=cmd,
                             state=state,
                             block=block
@@ -476,7 +457,6 @@ class AyakaCat:
     def on_text(
         self,
         states: str | list[str] = "",
-        channel_types: str | list[str] | None = None,
         always: bool = False,
         block: bool = False,
         auto_help: bool = True
@@ -487,15 +467,13 @@ class AyakaCat:
 
             states：状态或状态数组
 
-            channel_types：该命令生效的范围，默认使用cat.channel_types的值
-
             always：总是第一个触发，不受ayaka的状态约束控制
 
             block：触发后阻断事件继续传播
 
             auto_help：不要自动生成猫猫帮助
         '''
-        return self.on_cmd(states=states, channel_types=channel_types, always=always, block=block, auto_help=auto_help)
+        return self.on_cmd(states=states, always=always, block=block, auto_help=auto_help)
 
     # ---- 添加帮助 ----
     def _add_help(self, cmds: list[str], states: list[str], func: Callable[[], Awaitable]):

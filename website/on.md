@@ -24,7 +24,7 @@ async def handle():
 
 ### 注册通用状态命令回调
 
-通用状态命令匹配所有状态，在任意状态下均不会被ayaka拒绝
+通用状态命令匹配所有状态，在任意状态下均被ayaka接受并响应
 
 ```py
 @cat.on_cmd(cmds="命令A", states="*")
@@ -147,17 +147,13 @@ async def handle():
 
 ### always
 
-默认为False
+默认值 False
 
 设置为True，则该回调必定触发，不受ayaka各类状态规则的约束，并且执行优先级最高
 
-### channel_types
-
-留到新章节介绍
-
 ### auto_help
 
-默认为True
+默认值 True
 
 设置为False，则禁止对该回调生成猫猫帮助
 
@@ -165,7 +161,7 @@ async def handle():
 
 是否阻断消息传播
 
-命令回调默认阻断，文字回调默认不阻断
+默认值：命令回调 阻断，文字回调 不阻断
 
 ### 处理顺序
 

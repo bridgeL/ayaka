@@ -553,13 +553,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#channel_types" class="md-nav__link">
-    channel_types
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#auto_help" class="md-nav__link">
     auto_help
   </a>
@@ -728,7 +721,7 @@
     <span class="o">...</span>
 </code></pre></div>
 <h3 id="_3">注册通用状态命令回调<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>通用状态命令匹配所有状态，在任意状态下均不会被ayaka拒绝</p>
+<p>通用状态命令匹配所有状态，在任意状态下均被ayaka接受并响应</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;命令A&quot;</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">():</span>
     <span class="o">...</span>
@@ -801,16 +794,14 @@
 </code></pre></div>
 <h2 id="_11">高级<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
 <h3 id="always">always<a class="headerlink" href="#always" title="Permanent link">&para;</a></h3>
-<p>默认为False</p>
+<p>默认值 False</p>
 <p>设置为True，则该回调必定触发，不受ayaka各类状态规则的约束，并且执行优先级最高</p>
-<h3 id="channel_types">channel_types<a class="headerlink" href="#channel_types" title="Permanent link">&para;</a></h3>
-<p>留到新章节介绍</p>
 <h3 id="auto_help">auto_help<a class="headerlink" href="#auto_help" title="Permanent link">&para;</a></h3>
-<p>默认为True</p>
+<p>默认值 True</p>
 <p>设置为False，则禁止对该回调生成猫猫帮助</p>
 <h3 id="block">block<a class="headerlink" href="#block" title="Permanent link">&para;</a></h3>
 <p>是否阻断消息传播</p>
-<p>命令回调默认阻断，文字回调默认不阻断</p>
+<p>默认值：命令回调 阻断，文字回调 不阻断</p>
 <h3 id="_12">处理顺序<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
 <p>消息传播依次经过</p>
 <ul>
