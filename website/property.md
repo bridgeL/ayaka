@@ -7,7 +7,7 @@
 | help    | 猫猫帮助                           | -                                                                 | rw     |
 | valid   | 当前猫猫是否可用                   | 通过猫猫管理器控制各个群组中各个猫猫的启用与禁用                  | rw     |
 | event   | 当前事件                           | event.sender, event.channel, event.message, event.at, event.reply | r      |
-| channel | 当前会话                           | channel.id, channel.type                                          | r      |
+| channel | 当前频道                           | channel.id, channel.type                                          | r      |
 | user    | 当前用户                           | user.id, user.name                                                | r      |
 | message | 当前消息                           | -                                                                 | r      |
 | trigger | 当前触发器                         | -                                                                 | r      |

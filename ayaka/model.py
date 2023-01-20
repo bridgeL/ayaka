@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class AyakaChannel(BaseModel):
-    '''会话'''
+    '''频道'''
     type: str
     id: str
 

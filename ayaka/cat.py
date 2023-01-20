@@ -55,7 +55,7 @@ class AyakaManager:
         self.listen_dict: dict[AyakaChannel, list[AyakaChannel]] = {}
         '''key为被监听者，value为监听者数组'''
         self._cat_dict: dict[str, AyakaCat] = {}
-        '''所有会话的猫猫'''
+        '''所有频道的猫猫'''
 
     @property
     def event(self):
@@ -373,7 +373,7 @@ class AyakaCat:
 
     @property
     def channel(self):
-        '''当前会话'''
+        '''当前频道'''
         return self.event.channel
 
     @property
@@ -575,7 +575,10 @@ class AyakaCat:
 
     async def base_send_many(self, channel: AyakaChannel,  msgs: list[str]):
         '''发送消息组至指定频道'''
-        return await bridge.send_many(channel.id, msgs)
+        if channel.type == "group":
+            return await bridge.send_many(channel.id, msgs)
+        # 其他类型的频道不支持合并转发
+        return await self.base_send(channel, "\n".join(msgs))
 
     # ---- 快捷发送 ----
     async def send(self, msg: str):
@@ -657,6 +660,14 @@ class AyakaCat:
     async def get_users(self):
         '''获取当前群组中所有成员信息'''
         return await bridge.get_member_list(self.channel.id)
+
+    async def handle_event(self, event: AyakaEvent):
+        '''令manager处理一个事件'''
+        return await manager.handle_event(event)
+
+    def set_state(self, channel: AyakaChannel, state: str):
+        '''设置指定频道的状态'''
+        self._state_dict[channel.mark] = state
 
 
 manager = AyakaManager()

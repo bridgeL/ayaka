@@ -11,7 +11,7 @@ async def show_self_help():
     await cat.send_help()
 
 
-@cat.on_cmd(cmds="帮助", always=True, auto_help=False)
+@cat.on_cmd(cmds="帮助", always=True, auto_help=False, block=False)
 async def redirect_help():
     cat.cache.setdefault("redirect", True)
     if cat.cache["redirect"]:
