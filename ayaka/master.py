@@ -102,6 +102,7 @@ async def force_exit():
     c = manager.current_cat
     if c:
         await c.rest()
+        c.remove_listener()
 
 
 @cat.on_cmd(cmds="屏蔽猫猫", always=True)

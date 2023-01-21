@@ -173,22 +173,35 @@ class AyakaManager:
         self.listen_dict[target].append(listener)
 
     def remove_listener(self, listener: AyakaChannel, target: AyakaChannel | None = None):
+        # 移除所有监听
         if not target:
-            ks = []
-            for k, v in self.listen_dict.items():
-                if listener in v:
-                    v.remove(listener)
-                if not v:
-                    ks.append(k)
-            for k in ks:
-                self.listen_dict.pop(k)
+            empty_targets = []
+
+            # 遍历监听表
+            for target, listeners in self.listen_dict.items():
+                # 移除监听
+                if listener in listeners:
+                    listeners.remove(listener)
+
+                # 统计所有无监听者的目标
+                if not listeners:
+                    empty_targets.append(target)
+
+            # 移除这些无监听者的目标
+            for target in empty_targets:
+                self.listen_dict.pop(target)
+
+        # 移除指定监听
         else:
-            k = target
-            v = self.listen_dict.get(k, [])
-            if listener in v:
-                v.remove(listener)
-            if not v:
-                self.listen_dict.pop(k)
+            listeners = self.listen_dict.get(target, [])
+
+            # 移除监听
+            if listener in listeners:
+                listeners.remove(listener)
+
+            # 移除无监听者的目标
+            if not listeners:
+                self.listen_dict.pop(target)
 
 
 class AyakaTrigger:
@@ -218,6 +231,10 @@ class AyakaTrigger:
         return self.func.__module__
 
     async def run(self, prefix):
+        # 判定范围
+        if manager.event.channel.type not in self.cat.channel_types:
+            return False
+
         # 判断是否被屏蔽
         if not self.cat.valid:
             return False
@@ -225,6 +242,9 @@ class AyakaTrigger:
         # if 命令触发，命令是否符合
         if self.cmd and not manager.event.message.startswith(prefix + self.cmd):
             return False
+
+        # 重设超时定时器
+        self.cat._start_overtime_timer()
 
         # 一些预处理，并保存到上下文中
         manager.params = AyakaParams(self, prefix)
@@ -266,12 +286,18 @@ class AyakaCat:
     def __init__(
         self,
         name: str,
+        overtime: int = 600,
+        channel_types: str | list[str] = "group",
     ) -> None:
         '''创建猫猫
 
         参数：
 
             name：猫猫名字
+
+            overtime：超时未收到指令则自动关闭，单位：秒
+
+            channel_types：默认为群聊插件（不建议更改）
         '''
         self.name = name
         manager.add_cat(self)
@@ -288,18 +314,60 @@ class AyakaCat:
         else:
             raise CannotFindModuleError(self.module_path)
 
+        self.overtime = overtime
+        self.channel_types = ensure_list(channel_types)
         self._state_dict: dict[str, str] = {}
         self._cache_dict: dict[str, dict] = {}
+        self._fut_dict: dict[str, asyncio.Future] = {}
         self.triggers: list[AyakaTrigger] = []
         self._intro = ""
         self._helps: dict[str, list] = {}
         self._invalid_list = root_config.block_cat_dict.get(name, [])
 
+    # ---- 超时控制 ----
+    def _start_overtime_timer(self):
+        if not self.overtime:
+            return
+
+        if manager.current_cat != self:
+            return
+
+        self._stop_overtime_timer()
+
+        loop = asyncio.get_event_loop()
+        self.fut = loop.create_future()
+        loop.create_task(self._overtime_handle())
+
+    async def _overtime_handle(self):
+        try:
+            await asyncio.wait_for(self.fut, self.overtime)
+        except asyncio.exceptions.TimeoutError:
+            await self.send("猫猫超时")
+            await self.rest()
+
+    def _stop_overtime_timer(self):
+        if not self.fut:
+            return
+        if self.fut.done():
+            return
+        if self.fut.cancelled():
+            return
+
+        self.fut.set_result(True)
+
     # ---- 便捷属性 ----
+    @property
+    def fut(self):
+        '''猫猫超时记录'''
+        return self._fut_dict.get(self.channel.mark)
+
+    @fut.setter
+    def fut(self, value: asyncio.Future):
+        self._fut_dict[self.channel.mark] = value
+
     @property
     def state(self):
         '''猫猫状态'''
-        self._state_dict.setdefault(self.channel.mark, "idle")
         return self._state_dict[self.channel.mark]
 
     @state.setter
@@ -501,7 +569,7 @@ class AyakaCat:
                 self._helps[state].append(info)
 
     # ---- 设置状态 ----
-    def set_state(self, state: str, channel: AyakaChannel | None = None):
+    def set_state(self, value: str):
         '''设置指定频道的状态
 
         参数: 
@@ -512,11 +580,12 @@ class AyakaCat:
 
             state不可为空字符串或*
         '''
-        if state in ["", "*"]:
+        if value in ["", "*"]:
             raise Exception("state不可为空字符串或*")
-        if not channel:
-            channel = self.channel
-        self._state_dict[channel.mark] = state
+        self._state_dict[self.channel.mark] = value
+
+        # 重设超时定时器
+        self._start_overtime_timer()
 
     async def start(self, state: str = "idle"):
         '''留给古板的老学究用'''
@@ -541,20 +610,28 @@ class AyakaCat:
             manager.current_cat = self
             self.state = state
             await self.send(f"已唤醒猫猫[{self.name}]")
+            self._start_overtime_timer()
 
     async def rest(self):
         '''猫猫休息'''
         if manager.current_cat == self:
             manager.current_cat = None
             await self.send(f"[{self.name}]猫猫休息了")
+            self._stop_overtime_timer()
 
     # ---- 发送 ----
     async def base_send(self, channel: AyakaChannel, msg: str):
         '''发送消息至指定频道'''
+        # 重设超时定时器
+        self._start_overtime_timer()
+        # 发送消息
         return await bridge.send(channel.type, channel.id, msg)
 
     async def base_send_many(self, channel: AyakaChannel,  msgs: list[str]):
         '''发送消息组至指定频道'''
+        # 重设超时定时器
+        self._start_overtime_timer()
+        # 发送消息
         if channel.type == "group":
             return await bridge.send_many(channel.id, msgs)
         # 其他类型的频道不支持合并转发
