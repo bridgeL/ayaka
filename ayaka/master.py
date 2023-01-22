@@ -2,7 +2,7 @@
 from .cat import AyakaCat, manager
 
 
-cat = AyakaCat("猫猫管理器")
+cat = AyakaCat("猫猫管理器", overtime=-1)
 '''猫猫管理器'''
 
 

@@ -260,7 +260,7 @@ class AyakaTrigger:
             return False
 
         # 重设超时定时器
-        self.cat._start_overtime_timer()
+        self.cat._refresh_overtime_timer()
 
         # 一些预处理，并保存到上下文中
         manager.params = AyakaParams(self, prefix)
@@ -311,7 +311,7 @@ class AyakaCat:
 
             name：猫猫名字
 
-            overtime：超时未收到指令则自动关闭，单位：秒
+            overtime：超时未收到指令则自动关闭，单位：秒，<=0则禁止该特性
 
             channel_types：默认为群聊插件（不建议更改）
         '''
@@ -342,15 +342,24 @@ class AyakaCat:
 
     # ---- 超时控制 ----
     def _start_overtime_timer(self):
-        '''启动或重置超时定时器'''
-        if not self.overtime:
+        '''启动超时定时器'''
+        if self.overtime <= 0:
             return
 
-        if manager.current_cat != self:
+        loop = asyncio.get_event_loop()
+        self._fut = loop.create_future()
+        loop.create_task(self._overtime_handle())
+
+    def _refresh_overtime_timer(self):
+        '''重置超时定时器'''
+        if not self._fut:
+            return
+        if self._fut.done():
+            return
+        if self._fut.cancelled():
             return
 
-        self._stop_overtime_timer()
-
+        self._fut.set_result(True)
         loop = asyncio.get_event_loop()
         self._fut = loop.create_future()
         loop.create_task(self._overtime_handle())
@@ -603,7 +612,7 @@ class AyakaCat:
         self._state_dict[self.channel.mark] = value
 
         # 重设超时定时器
-        self._start_overtime_timer()
+        self._refresh_overtime_timer()
 
     async def start(self, state: str = "idle"):
         '''留给古板的老学究用'''
@@ -642,17 +651,13 @@ class AyakaCat:
         '''发送消息至指定频道
 
         待废弃'''
-        # 重设超时定时器
-        self._start_overtime_timer()
-        # 发送消息
+        self._refresh_overtime_timer()
         return await bridge.send(channel.type, channel.id, msg)
 
     async def base_send_many(self, channel: AyakaChannel,  msgs: list[str]):
         '''发送消息组至指定频道
 
         待废弃'''
-
-        # 发送消息
         if channel.type == "group":
             return await bridge.send_many(channel.id, msgs)
         # 其他类型的频道不支持合并转发
@@ -660,15 +665,15 @@ class AyakaCat:
 
     # ---- 基本发送 ----
     async def base_send_group(self, id: str, msg: str):
-        self._start_overtime_timer()
+        self._refresh_overtime_timer()
         return await bridge.send_group(id, msg)
 
     async def base_send_private(self, id: str, msg: str):
-        self._start_overtime_timer()
+        self._refresh_overtime_timer()
         return await bridge.send_private(id, msg)
 
     async def base_send_group_many(self, id: str, msgs: list[str]):
-        self._start_overtime_timer()
+        self._refresh_overtime_timer()
         return await bridge.send_group_many(id, msgs)
 
     # ---- 快捷发送 ----
