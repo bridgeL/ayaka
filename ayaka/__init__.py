@@ -11,7 +11,7 @@ from . import master as __master
 # 有用的类
 from .cat import AyakaCat, AyakaEvent
 from .config import AyakaConfig
-from .helpers import load_data_from_file, debug_print, simple_repr
+from .helpers import load_data_from_file, debug_print, simple_repr, ensure_dir_exists
 from .download import resource_download, resource_download_by_res_info, get_file_hash
 from .model import ResInfo, ResItem, GroupMember, AyakaChannel, AyakaEvent
 from .bridge import bridge

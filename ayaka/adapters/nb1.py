@@ -11,7 +11,7 @@ from ..helpers import singleton
 
 async def handle_msg(ev: CQEvent):
     separate = separates[0]
-    
+
     # 处理消息，保留text、at、reply
     ms = ev.message
     at = None
@@ -26,7 +26,7 @@ async def handle_msg(ev: CQEvent):
         else:
             at = ms[1].data["qq"]
             ms = ms[2:]
-        
+
     args: list[str] = []
     for m in ms:
         if m.type == "text":
@@ -40,7 +40,7 @@ async def handle_msg(ev: CQEvent):
             at = str(m.data["qq"])
         else:
             args.append(str(m))
-            
+
     msg = separate.join(args)
 
     # 组成ayaka事件
@@ -56,7 +56,7 @@ async def handle_msg(ev: CQEvent):
         at=at,
         reply=reply,
     )
-    
+
     await bridge.handle_event(ayaka_event)
 
 
@@ -66,6 +66,7 @@ def get_current_bot():
 
 
 async def send(type: str, id: str, msg: str):
+    '''待废弃'''
     bot = get_current_bot()
     if type == "group":
         try:
@@ -84,6 +85,7 @@ async def send(type: str, id: str, msg: str):
 
 
 async def send_many(id: str, msgs: list[str]):
+    '''待废弃'''
     bot = get_current_bot()
     # 分割长消息组（不可超过100条
     div_len = 100
@@ -100,6 +102,46 @@ async def send_many(id: str, msgs: list[str]):
         await bot.send_group_msg(group_id=int(id), message="合并转发消息发送失败")
     else:
         return True
+
+
+async def send_group(id: str, msg: str) -> bool:
+    bot = get_current_bot()
+    try:
+        await bot.send_group_msg(group_id=int(id), message=msg)
+    except ActionFailed:
+        await bot.send_group_msg(group_id=int(id), message="群聊消息发送失败")
+    else:
+        return True
+
+
+async def send_private(id: str, msg: str) -> bool:
+    bot = get_current_bot()
+    try:
+        await bot.send_private_msg(user_id=int(id), message=msg)
+    except ActionFailed:
+        await bot.send_private_msg(user_id=int(id), message="私聊消息发送失败")
+    else:
+        return True
+
+
+async def send_group_many(id: str, msgs: list[str]) -> bool:
+    bot = get_current_bot()
+    # 分割长消息组（不可超过100条
+    div_len = 100
+    div_cnt = ceil(len(msgs) / div_len)
+    bot_id = next(bot.get_self_ids())
+    try:
+        for i in range(div_cnt):
+            msgs = [
+                {"user_id": bot_id, "nickname": "Ayaka Bot", "content": m}
+                for m in msgs[i*div_len: (i+1)*div_len]
+            ]
+            await bot.call_action("send_group_forward_msg", group_id=int(id), messages=msgs)
+    except ActionFailed:
+        await bot.send_group_msg(group_id=int(id), message="合并转发消息发送失败")
+    else:
+        return True
+
 
 async def get_member_info(gid: str, uid: str):
     bot = get_current_bot()
@@ -137,9 +179,14 @@ def get_separates():
     return separates
 
 
-# 注册外部服务
+# 注册外部服务 待废弃
 bridge.regist(send)
 bridge.regist(send_many)
+
+# 注册外部服务
+bridge.regist(send_group)
+bridge.regist(send_private)
+bridge.regist(send_group_many)
 bridge.regist(get_prefixes)
 bridge.regist(get_separates)
 bridge.regist(get_member_info)

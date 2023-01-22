@@ -91,7 +91,7 @@ def load_data_from_file(path: str | Path):
 
     参数:
 
-        path: 文件路径
+        path: 文件路径（ayaka会自动确保路径存在）
 
         若文件类型为json，按照json格式读取
 

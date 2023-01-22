@@ -52,8 +52,8 @@ class AyakaManager:
         self.always_triggers: list[AyakaTrigger] = []
         self.desktop_triggers: list[AyakaTrigger] = []
         self.state_trigger_dict: dict[str, dict[str, list[AyakaTrigger]]] = {}
-        self.listen_dict: dict[AyakaChannel, list[AyakaChannel]] = {}
-        '''key为被监听者，value为监听者数组'''
+        self.private_redirect_dict: dict[str, list[str]] = {}
+        '''将私聊消息转发至群聊'''
         self._cat_dict: dict[str, AyakaCat] = {}
         '''所有频道的猫猫'''
 
@@ -148,14 +148,18 @@ class AyakaManager:
     async def handle_event(self, event: AyakaEvent):
         '''处理和转发事件'''
         await self.base_handle_event(event)
-        target = event.channel
-        ts = []
-        for listener in self.listen_dict.get(target, []):
-            data = event.dict()
-            data.update(channel=listener, origin_channel=target)
-            _event = AyakaEvent(**data)
-            ts.append(asyncio.create_task(self.base_handle_event(_event)))
-        await asyncio.gather(*ts)
+
+        # 转发私聊消息到群聊
+        if event.channel.type == "private":
+            tasks = []
+            group_ids = self.private_redirect_dict.get(event.channel.id, [])
+            for group_id in group_ids:
+                _event = event.copy()
+                _event.channel = AyakaChannel(type="group", id=group_id)
+                _event.origin_channel = event.channel
+                tasks.append(asyncio.create_task(
+                    self.base_handle_event(_event)))
+            await asyncio.gather(*tasks)
 
     def add_cat(self, cat: "AyakaCat"):
         for c in self.cats:
@@ -168,40 +172,52 @@ class AyakaManager:
             if c.name == name:
                 return c
 
+    # ---- 监听 待废弃 ----
     def add_listener(self, listener: AyakaChannel, target: AyakaChannel):
-        self.listen_dict.setdefault(target, [])
-        self.listen_dict[target].append(listener)
+        '''待废弃'''
+        self.add_private_redirect(listener.id, target.id)
 
     def remove_listener(self, listener: AyakaChannel, target: AyakaChannel | None = None):
+        '''待废弃'''
+        self.remove_private_redirect(listener.id, target and target.id)
+
+    # ---- 监听 ----
+    def add_private_redirect(self, group_id: str, private_id: str):
+        if private_id not in self.private_redirect_dict:
+            self.private_redirect_dict[private_id] = [group_id]
+        elif group_id not in self.private_redirect_dict[private_id]:
+            self.private_redirect_dict[private_id].append(group_id)
+
+    def remove_private_redirect(self, group_id: str, private_id: str = ""):
         # 移除所有监听
-        if not target:
-            empty_targets = []
+        if not private_id:
+            empty_private_ids = []
 
             # 遍历监听表
-            for target, listeners in self.listen_dict.items():
+            for private_id, group_ids in self.private_redirect_dict.items():
                 # 移除监听
-                if listener in listeners:
-                    listeners.remove(listener)
+                if group_id in group_ids:
+                    group_ids.remove(group_id)
 
                 # 统计所有无监听者的目标
-                if not listeners:
-                    empty_targets.append(target)
+                if not group_ids:
+                    empty_private_ids.append(private_id)
 
             # 移除这些无监听者的目标
-            for target in empty_targets:
-                self.listen_dict.pop(target)
+            for private_id in empty_private_ids:
+                self.private_redirect_dict.pop(private_id)
 
         # 移除指定监听
         else:
-            listeners = self.listen_dict.get(target, [])
+            group_ids = self.private_redirect_dict.get(private_id, [])
 
             # 移除监听
-            if listener in listeners:
-                listeners.remove(listener)
+            if group_id in group_ids:
+                group_ids.remove(group_id)
 
             # 移除无监听者的目标
-            if not listeners:
-                self.listen_dict.pop(target)
+            if not group_ids:
+                self.private_redirect_dict.pop(private_id)
 
 
 class AyakaTrigger:
@@ -326,6 +342,7 @@ class AyakaCat:
 
     # ---- 超时控制 ----
     def _start_overtime_timer(self):
+        '''启动或重置超时定时器'''
         if not self.overtime:
             return
 
@@ -335,34 +352,35 @@ class AyakaCat:
         self._stop_overtime_timer()
 
         loop = asyncio.get_event_loop()
-        self.fut = loop.create_future()
+        self._fut = loop.create_future()
         loop.create_task(self._overtime_handle())
 
     async def _overtime_handle(self):
         try:
-            await asyncio.wait_for(self.fut, self.overtime)
+            await asyncio.wait_for(self._fut, self.overtime)
         except asyncio.exceptions.TimeoutError:
             await self.send("猫猫超时")
             await self.rest()
 
     def _stop_overtime_timer(self):
-        if not self.fut:
+        '''停止超时定时器'''
+        if not self._fut:
             return
-        if self.fut.done():
+        if self._fut.done():
             return
-        if self.fut.cancelled():
+        if self._fut.cancelled():
             return
 
-        self.fut.set_result(True)
+        self._fut.set_result(True)
 
     # ---- 便捷属性 ----
     @property
-    def fut(self):
+    def _fut(self):
         '''猫猫超时记录'''
         return self._fut_dict.get(self.channel.mark)
 
-    @fut.setter
-    def fut(self, value: asyncio.Future):
+    @_fut.setter
+    def _fut(self, value: asyncio.Future):
         self._fut_dict[self.channel.mark] = value
 
     @property
@@ -619,32 +637,52 @@ class AyakaCat:
             await self.send(f"[{self.name}]猫猫休息了")
             self._stop_overtime_timer()
 
-    # ---- 发送 ----
+    # ---- 基本发送 待废弃----
     async def base_send(self, channel: AyakaChannel, msg: str):
-        '''发送消息至指定频道'''
+        '''发送消息至指定频道
+
+        待废弃'''
         # 重设超时定时器
         self._start_overtime_timer()
         # 发送消息
         return await bridge.send(channel.type, channel.id, msg)
 
     async def base_send_many(self, channel: AyakaChannel,  msgs: list[str]):
-        '''发送消息组至指定频道'''
-        # 重设超时定时器
-        self._start_overtime_timer()
+        '''发送消息组至指定频道
+
+        待废弃'''
+
         # 发送消息
         if channel.type == "group":
             return await bridge.send_many(channel.id, msgs)
         # 其他类型的频道不支持合并转发
         return await self.base_send(channel, "\n".join(msgs))
 
+    # ---- 基本发送 ----
+    async def base_send_group(self, id: str, msg: str):
+        self._start_overtime_timer()
+        return await bridge.send_group(id, msg)
+
+    async def base_send_private(self, id: str, msg: str):
+        self._start_overtime_timer()
+        return await bridge.send_private(id, msg)
+
+    async def base_send_group_many(self, id: str, msgs: list[str]):
+        self._start_overtime_timer()
+        return await bridge.send_group_many(id, msgs)
+
     # ---- 快捷发送 ----
     async def send(self, msg: str):
         '''发送消息至当前频道'''
-        return await self.base_send(self.channel, msg)
+        if self.channel.type == "group":
+            return await self.base_send_group(self.channel.id, msg)
+        return await self.base_send_private(self.channel.id, msg)
 
     async def send_many(self, msgs: list[str]):
         '''发送消息组至当前频道'''
-        return await self.base_send_many(self.channel, msgs)
+        if self.channel.type == "group":
+            return await self.base_send_group_many(self.channel.id, msgs)
+        return await self.base_send_private(self.channel.id, "\n".join(msgs))
 
     async def send_help(self):
         '''发送自身帮助'''
@@ -698,14 +736,29 @@ class AyakaCat:
             await self.rest()
         rest.__module__ = self.module_name
 
-    # ---- 消息监听 ----
+    # ---- 消息监听 待废弃----
     def add_listener(self, target: AyakaChannel):
-        '''添加当前频道A对指定频道B的监听，当B收到消息后，会转发一份副本给A处理'''
+        '''待废弃
+
+        添加当前频道A对指定频道B的监听，当B收到消息后，会转发一份副本给A处理'''
         manager.add_listener(self.channel, target)
 
     def remove_listener(self, target: AyakaChannel | None = None):
-        '''移除当前频道A对 指定频道B或全部频道 的监听'''
+        '''待废弃
+
+        移除当前频道A对 指定频道B或全部频道 的监听'''
         manager.remove_listener(self.channel, target)
+
+    # ---- 私聊消息监听 ----
+    def add_private_redirect(self, private_id: str):
+        '''添加当前群聊A对指定私聊B的监听，当B收到消息后，会转发一份副本给A处理'''
+        if self.channel.type == "group":
+            manager.add_private_redirect(self.channel.id, private_id)
+
+    def remove_private_redirect(self,  private_id: str = ""):
+        '''移除当前群聊A对 指定私聊B或全部私聊 的监听'''
+        if self.channel.type == "group":
+            manager.remove_private_redirect(self.channel.id, private_id)
 
     # ---- 其他 ----
     async def get_user(self, uid: str):

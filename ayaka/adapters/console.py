@@ -66,16 +66,38 @@ def on_startup(func):
 
 
 async def send(type: str, id: str, msg: str):
+    '''待废弃'''
     if type == "group":
         ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
     else:
         ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
     print(msg)
+    return True
 
 
 async def send_many(id: str, msgs: list[str]):
+    '''待废弃'''
     ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
     print("\n\n".join(msgs))
+    return True
+
+
+async def send_group(id: str, msg: str) -> bool:
+    ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
+    print(msg)
+    return True
+
+
+async def send_private(id: str, msg: str) -> bool:
+    ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
+    print(msg)
+    return True
+
+
+async def send_group_many(id: str, msgs: list[str]) -> bool:
+    ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
+    print("\n\n".join(msgs))
+    return True
 
 
 def safe_split(text: str,  n: int, sep: str = " "):
@@ -118,9 +140,14 @@ def get_separates():
     return [" "]
 
 
-# 注册外部服务
+# 注册外部服务 待废弃
 bridge.regist(send)
 bridge.regist(send_many)
+
+# 注册外部服务
+bridge.regist(send_group)
+bridge.regist(send_private)
+bridge.regist(send_group_many)
 bridge.regist(get_prefixes)
 bridge.regist(get_separates)
 bridge.regist(get_member_info)
