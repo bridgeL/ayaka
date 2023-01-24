@@ -3,7 +3,7 @@ from random import randint
 from ayaka import AyakaCat
 
 # 创建一只猫猫
-cat = AyakaCat("赌石")
+cat = AyakaCat("赌石", overtime=0)
 
 # 设置唤醒和休息命令
 cat.set_wakeup_cmds(cmds=["赌石", "stone"])

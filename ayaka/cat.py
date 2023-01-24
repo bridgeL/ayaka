@@ -356,6 +356,7 @@ class AyakaCat:
     @state.setter
     def state(self, v):
         self.session.state = v
+        self._refresh_overtime_timer()
 
     @property
     def sub_state(self):
@@ -364,6 +365,7 @@ class AyakaCat:
     @sub_state.setter
     def sub_state(self, v):
         self.user.state = v
+        self._refresh_overtime_timer()
 
     async def wakeup(self, state: str = "idle"):
         '''唤醒猫猫，唤醒后猫猫状态默认为idle
@@ -373,6 +375,7 @@ class AyakaCat:
             state: 新状态
         '''
         if not self.state:
+            self._start_overtime_timer()
             self.state = state
             await self.send(f"已唤醒猫猫[{self.name}]")
 
@@ -381,6 +384,7 @@ class AyakaCat:
         if self.state:
             self.state = ""
             await self.send(f"[{self.name}]猫猫休息了")
+            self._stop_overtime_timer()
 
     # ---- 基本发送 ----
     async def send_group(self, id: str, msg: str):

@@ -3,7 +3,7 @@ from ayaka import AyakaCat
 from pydantic import BaseModel
 
 # 创建一只猫猫
-cat = AyakaCat("木鱼")
+cat = AyakaCat("木鱼", overtime=30)
 
 # 设置唤醒和休息命令
 cat.set_wakeup_cmds(cmds=["木鱼", "muyu"])
