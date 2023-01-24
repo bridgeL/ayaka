@@ -39,7 +39,7 @@ class AyakaManager:
                 _event.session_id = group_id
                 _event.private_forward_id = private_id
 
-                self.handle_event(_event)
+                await self.handle_event(_event)
 
     def add_cat(self, cat: "AyakaCat"):
         for c in self.cats:

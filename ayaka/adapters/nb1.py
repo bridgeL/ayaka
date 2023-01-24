@@ -1,6 +1,7 @@
 '''适配 hoshino机器人'''
 from html import unescape
 from math import ceil
+from loguru import logger
 import nonebot
 from aiocqhttp import Event as CQEvent
 from aiocqhttp.exceptions import ActionFailed
@@ -55,8 +56,11 @@ async def handle_msg(ev: CQEvent):
         at=at,
         reply=reply,
     )
-
-    await bridge.handle_event(ayaka_event)
+    
+    try:
+        await bridge.handle_event(ayaka_event)
+    except:
+        logger.exception(f"ayaka 处理事件（{ayaka_event}）时发生错误")
 
 
 @singleton

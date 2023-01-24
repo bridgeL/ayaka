@@ -494,7 +494,7 @@ class AyakaCat:
         std[state][sub_state].append(trigger)
         std[state][sub_state].sort(key=lambda t: len(t.cmd), reverse=True)
 
-    async def _handle_event(self, event: AyakaEvent):
+    async def handle_event(self, event: AyakaEvent):
         '''处理事件'''
 
         # 设置上下文
@@ -521,13 +521,6 @@ class AyakaCat:
             for prefix in prefixes:
                 if await t.run(prefix):
                     return
-
-    async def handle_event(self, event: AyakaEvent):
-        '''处理事件并记录'''
-        try:
-            await self._handle_event(event)
-        except:
-            logger.exception(f"ayaka 处理事件（{event}）时发生错误")
 
     # ---- 其他 ----
     async def get_user(self, uid: str):

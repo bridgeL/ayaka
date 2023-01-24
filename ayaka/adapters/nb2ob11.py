@@ -1,6 +1,7 @@
 '''适配 nonebot2机器人 onebot v11适配器'''
 from html import unescape
 from math import ceil
+from loguru import logger
 import nonebot
 from nonebot.matcher import current_bot
 from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment
@@ -45,7 +46,10 @@ async def handle_msg(bot: Bot, event: MessageEvent):
         reply=reply,
     )
 
-    await bridge.handle_event(ayaka_event)
+    try:
+        await bridge.handle_event(ayaka_event)
+    except:
+        logger.exception(f"ayaka 处理事件（{ayaka_event}）时发生错误")
 
 
 def get_current_bot() -> Bot:

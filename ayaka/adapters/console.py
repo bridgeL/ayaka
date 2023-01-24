@@ -2,6 +2,7 @@
 import re
 import uvicorn
 import asyncio
+from loguru import logger
 from fastapi import FastAPI
 from typing import Awaitable, Callable
 from ..logger import ayaka_log, ayaka_clog
@@ -11,6 +12,13 @@ from ..helpers import ensure_dir_exists
 
 
 pt = re.compile(r"@([^ ]+?)(?= |$)")
+
+
+async def handle_event(ayaka_event: AyakaEvent) -> None:
+    try:
+        await bridge.handle_event(ayaka_event)
+    except:
+        logger.exception(f"ayaka 处理事件（{ayaka_event}）时发生错误")
 
 
 class Handler:
@@ -51,14 +59,16 @@ class Handler:
             msg = msg[:r.start()]+msg[r.end():]
             break
 
-        asyncio.create_task(bridge.handle_event(AyakaEvent(
+        ayaka_event = AyakaEvent(
             session_type=self.session_type,
             session_id=self.session_id,
             sender_id=uid,
             sender_name=name,
             message=msg,
             at=at
-        )))
+        )
+
+        asyncio.create_task(handle_event(ayaka_event))
 
 
 handler = Handler()
@@ -141,12 +151,12 @@ bridge.regist(on_startup)
 on_startup(start_console_loop)
 
 
-@handler.on("#")
+@ handler.on("#")
 async def _(line: str):
     pass
 
 
-@handler.on("p ")
+@ handler.on("p ")
 async def _(line: str):
     uid, msg = safe_split(line, 2)
     handler.sender_id = uid
@@ -157,7 +167,7 @@ async def _(line: str):
         handler.handle_msg(msg)
 
 
-@handler.on("g ")
+@ handler.on("g ")
 async def _(line: str):
     gid, uid, msg = safe_split(line, 3)
     handler.sender_id = uid
@@ -168,7 +178,7 @@ async def _(line: str):
         handler.handle_msg(msg)
 
 
-@handler.on("d ")
+@ handler.on("d ")
 async def _(line: str):
     try:
         n = float(line)
@@ -178,7 +188,7 @@ async def _(line: str):
     print()
 
 
-@handler.on("s ")
+@ handler.on("s ")
 async def _(line: str):
     path = ensure_dir_exists(f"script/{line}.txt")
     if not path.exists():
@@ -200,7 +210,7 @@ async def _(line: str):
         await handler.handle_line(after)
 
 
-@handler.on("h")
+@ handler.on("h")
 async def show_help(line: str):
     if line.strip():
         return await deal_line(f"h{line}")
@@ -211,7 +221,7 @@ async def show_help(line: str):
     ayaka_clog("<y>h</y> | 查看帮助")
 
 
-@handler.on("")
+@ handler.on("")
 async def deal_line(msg: str):
     if not handler.session_id or not handler.sender_id:
         return ayaka_log("请先设置默认角色（发出第一条模拟消息后自动设置）")
