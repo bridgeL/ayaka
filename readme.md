@@ -23,6 +23,8 @@
 
 https://bridgel.github.io/ayaka/
 
+注意：文档版本与pypi包正式版本一致，因此其内容可能会落后于各个beta版
+
 ## 历史遗留问题
 
 如果你之前安装过`nonebot_plugin_ayaka`，请先确保它卸载干净
