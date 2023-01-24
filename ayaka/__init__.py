@@ -1,6 +1,13 @@
 '''
-    ayaka - cat Cat CAT - 0.0.2.0b2
+Ayaka - 猫猫，猫猫！ 
+
+专注群聊、多人互动的插件开发
+
+文档：https://bridgel.github.io/ayaka/
+
+注意：文档版本与pypi包正式版本一致，因此其内容可能会落后于各个beta版
 '''
+
 # logger
 from . import logger as __logger
 # 根据py包的导入情况，猜测当前插件工作在哪个机器人框架下，加载对应的代码
