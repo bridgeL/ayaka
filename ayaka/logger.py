@@ -1,6 +1,7 @@
 import sys
 from loguru import logger
 from functools import partial
+from .helpers import ensure_dir_exists
 
 logger.level("AYAKA", no=27, icon="⚡", color="<blue>")
 
@@ -26,3 +27,9 @@ except ValueError:
 if not logger._core.handlers:
     # 输出至终端
     logger.add(sys.stdout, level=0, diagnose=False, format=logger_format)
+
+
+# 输出报错至本地日志文件
+error_path = ensure_dir_exists("data/ayaka/error.log")
+file = error_path.open("a+", encoding="utf8")
+logger.add(file, level="ERROR", diagnose=False, format=logger_format+"\n\n")

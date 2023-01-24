@@ -3,7 +3,7 @@
 '''
 import json
 from pydantic import ValidationError, BaseModel
-from .logger import logger, clogger, logger_format
+from .logger import logger, clogger
 from .helpers import ensure_dir_exists
 
 AYAKA_VERSION = "0.0.2.0b1"
@@ -78,9 +78,3 @@ root_config = RootConfig()
 '''ayaka根配置'''
 
 root_config.version = AYAKA_VERSION
-
-
-# 输出报错至本地日志文件
-error_path = ensure_dir_exists("data/ayaka/error.log")
-file = error_path.open("a+", encoding="utf8")
-logger.add(file, level="ERROR", diagnose=False, format=logger_format)
