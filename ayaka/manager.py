@@ -21,7 +21,7 @@ class AyakaManager:
     async def handle_event(self, event: AyakaEvent):
         '''处理和转发事件'''
         for c in self.cats:
-            asyncio.create_task(c.handle_event(event))
+            await c.handle_event(event)
 
         # 排除已经转发的情况
         if event.private_forward_id:

@@ -504,14 +504,19 @@ class AyakaCat:
         sub_state = self.sub_state
 
         # 触发器列表
-        ts = [
-            *self.always_triggers,
-            *self.state_trigger_dict.get("*", {}).get("*", []),
-            *self.state_trigger_dict.get("*", {}).get(sub_state, []),
-            *self.state_trigger_dict.get(state, {}).get("*", []),
-            *self.state_trigger_dict.get(state, {}).get(sub_state, []),
-        ]
-        
+        ts = [*self.always_triggers]
+
+        if state:
+            s = self.state_trigger_dict.get("*", {})
+            if sub_state:
+                ts += s.get("*", [])
+            ts += s.get(sub_state, [])
+
+        s = self.state_trigger_dict.get(state, {})
+        if sub_state:
+            ts += s.get("*", [])
+        ts += s.get(sub_state, [])
+
         # 遍历尝试执行
         for t in ts:
             if await t.run():

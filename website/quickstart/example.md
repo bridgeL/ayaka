@@ -13,7 +13,7 @@ poetry shell
 poetry install
 ```
 
-本页的示例均可在其中找到
+**本页的示例均可在其example中找到**
 
 ## 示例插件
 
@@ -106,6 +106,72 @@ async def set_step():
     muyu.step = cat.nums[0]
 ```
 
+### 人员登记
+
+```py
+# example/input.py
+from ayaka import AyakaCat
+from pydantic import BaseModel
+
+cat = AyakaCat("人员登记")
+```
+
+```py
+# 创建数据对象
+class User(BaseModel):
+    name: str = ""
+    age: int = 0
+
+
+class UserList(BaseModel):
+    users: list[User] = []
+```
+
+```py
+# 编写业务逻辑
+@cat.on_cmd(cmds="查看登记情况")
+async def show():
+    # 展示总表
+    user_list = cat.get_data(UserList)
+    items = [repr(u) for u in user_list.users]
+    await cat.send_many(items)
+
+
+@cat.on_cmd(cmds="我要登记")
+async def start():
+    # 下一阶段
+    cat.sub_state = "name"
+    await cat.send("姓名")
+
+
+@cat.on_text(sub_states="name")
+async def input_name():
+    # 记录数据
+    user = cat.user.get_data(User)
+    user.name = cat.arg
+    
+    # 下一阶段
+    cat.sub_state = "age"
+    await cat.send("年龄")
+
+
+@cat.on_text(sub_states="age")
+async def input_age():
+    # 从缓存中清除
+    user = cat.user.pop_data(User)
+    user.age = cat.arg
+
+    # 复原状态
+    cat.sub_state = ""
+
+    # 记录到总表
+    user_list = cat.get_data(UserList)
+    user_list.users.append(user)
+
+    # 展示
+    await cat.send(f"登记完成 {user}")
+```
+
 ## 离线调试
 
 ### 作为console程序运行
@@ -117,6 +183,7 @@ import ayaka.adapters as cat
 # 加载插件
 from example import stone
 from example import muyu
+from example import input
 
 if __name__ == "__main__":
     cat.run()
@@ -126,26 +193,85 @@ if __name__ == "__main__":
 python run.py
 ```
 
-### 调用测试脚本
+### 测试脚本
 
 ```
-# 执行全部测试
-s 0
+# script/muyu.txt
+# 测试木鱼 √
 
+g 100 1 木鱼
+g 100 1 敲
+g 100 1 敲
+g 100 1 查询功德
+g 100 1 set step 1000
+g 100 1 hit
+g 100 1 query
+g 100 1 exit
+```
+
+```
+# script/stone.txt
+# 测试赌石 √
+
+# 设定默认角色
+g 100 1 
+
+# 接下来均以群聊100中的uid为1的角色来发言
+赌石
+敲
+敲
+hit
+hit
+exit
+```
+
+```
+# script/input.txt
+g 100 1 我要登记
+g 100 1 江山
+g 100 1 12
+g 100 2 我要登记
+g 100 2 明月
+g 100 3 我要登记
+g 100 1 查看登记情况
+g 100 3 红袖 
+g 100 2 100
+g 100 3 18
+g 100 1 查看登记情况
+```
+
+```
+# script/0.txt
 # 测试木鱼
 s muyu
 
 # 测试赌石
 s stone
+
+# 测试人员登记
+s input
+```
+
+### 运行测试脚本
+
+```
+python run.py
+```
+
+然后
+
+```
+s 0
 ```
 
 ## 猫猫帮助
 
-ayaka自动为以上两个插件生成了帮助
+ayaka自动为以上三个插件生成了帮助
 
 <div class="demo">
 "user" 说：猫猫帮助
 "Bot" 说：加载的猫猫列表
+- [人员登记]
 - [木鱼]
 - [猫猫管理器]
 - [赌石]
@@ -176,71 +302,14 @@ ayaka自动为以上两个插件生成了帮助
 - 调整步进/set step
 </div>
 
-## 避免命令碰撞
-
-以上两个插件可以同时加载，无需担心`敲/hit`、`退出/exit`命令发生碰撞
-
-这是因为它们从属于不同的猫猫，位于不同的碰撞域中，不会发生碰撞冲突
-
-ayaka规定同一时间只有一只猫猫可被唤醒，此时其他猫猫的命令都会被ayaka拒绝
-
-### 赌石
-
-| 命令             | 什么状态下可用 |
-| ---------------- | -------------- |
-| **赌石/stone**   | **未唤醒**     |
-| <u>退出/exit</u> | 任意状态       |
-| <u>敲/hit</u>    | idle           |
-
-### 木鱼
-
-| 命令              | 什么状态下可用 |
-| ----------------- | -------------- |
-| **木鱼/muyu**     | **未唤醒**     |
-| <u>退出/exit</u>  | 任意状态       |
-| <u>敲/hit</u>     | idle           |
-| 查询功德/query    | idle           |
-| 调整步进/set step | idle           |
-
-### 唤醒命令
-
-**所有的唤醒命令都位于同一碰撞域**，它们之间需要注意相互的唯一性
-
-也就是说，需要保证`赌石/stone`与`木鱼/muyu`不重复
-
-### 状态命令
-
-状态命令从属于各个猫猫，而不同猫猫的状态命令间不会发生碰撞
-
-因为当一只猫猫被唤醒后，所有其他猫猫的唤醒命令和状态命令都将被ayaka拒绝
-
-ayaka此时仅接受当前猫猫的状态命令
-
-### idle状态
-
-猫猫被唤醒后，默认进入idle状态
-
-此时ayaka将拒绝所有其他状态下的命令
-
-但是有一种特殊状态除外，那就是`*`（通用状态），它匹配所有状态，在任意状态下均被ayaka接受
-
-## 便利的数据缓存
-
-ayaka为每个群聊均设置了一份字典
-
-各个插件中的猫猫均可以通过`cat.cache`访问到该字典中的一部分空间：
-
-```
-cat.cache <-> total_dict[group_id][cat.name]
-```
-
-各个猫猫获取到的空间是相互独立的，不会发生冲突
-
-同时，ayaka还设计了`cat.get_data`、`cat.pop_data`方法读写`cat.cache`
-
-可以将`BaseModel`放入其中使用，解决了直接读写字典时缺乏类型提示的问题
-
-注意：缓存数据会在bot重启后丢失
+<div class="demo">
+"user" 说：猫猫帮助 赌石
+"Bot" 说：[人员登记]
+- 查看登记情况
+- 我要登记
+- &lt;任意文字>
+- &lt;任意文字>
+</div>
 
 ## 下一步
 
