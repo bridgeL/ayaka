@@ -196,11 +196,15 @@
   
 
 
-  <li class="md-tabs__item">
-    <a href="../../quickstart/" class="md-tabs__link">
-      快速开始
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../quickstart/example/" class="md-tabs__link">
+        快速开始
+      </a>
+    </li>
+  
 
       
         
@@ -350,10 +354,79 @@
   
   
   
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          快速开始
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="快速开始" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          快速开始
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../quickstart/" class="md-nav__link">
-        快速开始
+      <a href="../../quickstart/example/" class="md-nav__link">
+        示例插件
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/collision/" class="md-nav__link">
+        碰撞域
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/cache/" class="md-nav__link">
+        数据缓存
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -617,6 +690,7 @@
 <p><code>cat行为</code>：触发命令回调、消息回调 或 让cat发送消息 或 修改cat状态</p>
 <p>若两次<code>cat行为</code>的间隔大于指定时间，则会视为超时，猫猫会自动关闭</p>
 <h2 id="_2">如何设置<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>默认值是600s，若你想关闭，请设置为0或负数</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># 超时时间为1s</span>
 <span class="n">cat</span> <span class="o">=</span> <span class="n">AyakaCat</span><span class="p">(</span><span class="s2">&quot;你好，我是快猫&quot;</span><span class="p">,</span> <span class="n">overtime</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div>

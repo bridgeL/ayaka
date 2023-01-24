@@ -196,11 +196,15 @@
   
 
 
-  <li class="md-tabs__item">
-    <a href="../../quickstart/" class="md-tabs__link">
-      快速开始
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../quickstart/example/" class="md-tabs__link">
+        快速开始
+      </a>
+    </li>
+  
 
       
         
@@ -350,10 +354,79 @@
   
   
   
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          快速开始
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="快速开始" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          快速开始
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../quickstart/" class="md-nav__link">
-        快速开始
+      <a href="../../quickstart/example/" class="md-nav__link">
+        示例插件
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/collision/" class="md-nav__link">
+        碰撞域
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/cache/" class="md-nav__link">
+        数据缓存
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -624,6 +697,12 @@
 <td>rw</td>
 </tr>
 <tr>
+<td>sub_state</td>
+<td>猫猫子状态</td>
+<td>-</td>
+<td>rw</td>
+</tr>
+<tr>
 <td>cache</td>
 <td>猫猫缓存</td>
 <td>-</td>
@@ -638,25 +717,37 @@
 <tr>
 <td>valid</td>
 <td>当前猫猫是否可用</td>
-<td>通过猫猫管理器控制各个群组中各个猫猫的启用与禁用</td>
+<td>控制猫猫的启用/禁用</td>
 <td>rw</td>
 </tr>
 <tr>
 <td>event</td>
 <td>当前事件</td>
-<td>event.sender, event.channel, event.message, event.at, event.reply</td>
+<td>-</td>
 <td>r</td>
 </tr>
 <tr>
-<td>channel</td>
-<td>当前频道</td>
-<td>channel.id, channel.type</td>
+<td>session</td>
+<td>当前会话</td>
+<td>-</td>
 <td>r</td>
 </tr>
 <tr>
 <td>user</td>
 <td>当前用户</td>
-<td>user.id, user.name</td>
+<td>-</td>
+<td>r</td>
+</tr>
+<tr>
+<td>group</td>
+<td>当前群聊</td>
+<td>-</td>
+<td>r</td>
+</tr>
+<tr>
+<td>private</td>
+<td>当前私聊</td>
+<td>-</td>
 <td>r</td>
 </tr>
 <tr>

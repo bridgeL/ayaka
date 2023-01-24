@@ -196,11 +196,15 @@
   
 
 
-  <li class="md-tabs__item">
-    <a href="../../quickstart/" class="md-tabs__link">
-      快速开始
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../quickstart/example/" class="md-tabs__link">
+        快速开始
+      </a>
+    </li>
+  
 
       
         
@@ -350,10 +354,79 @@
   
   
   
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          快速开始
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="快速开始" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          快速开始
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../quickstart/" class="md-nav__link">
-        快速开始
+      <a href="../../quickstart/example/" class="md-nav__link">
+        示例插件
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/collision/" class="md-nav__link">
+        碰撞域
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/cache/" class="md-nav__link">
+        数据缓存
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -481,66 +554,25 @@
         
           <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
-    注册唤醒命令回调
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    注册混合命令回调
+    注册空状态命令回调
   </a>
   
 </li>
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    注册文字回调
+  </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
-    注册文字回调
-  </a>
-  
-    <nav class="md-nav" aria-label="注册文字回调">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    注册状态文字回调
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
-    注册通用状态文字回调
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
-    注册唤醒文字回调
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
-    注册混合文字回调
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
     高级
   </a>
   
@@ -569,7 +601,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
     处理顺序
   </a>
   
@@ -581,7 +613,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_13" class="md-nav__link">
+  <a href="#_8" class="md-nav__link">
     下一步
   </a>
   
@@ -724,7 +756,6 @@
 
 <h2 id="_1">注册命令回调<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>插件最常用的交互模式便是通过命令来交互</p>
-<p>通过前文可知，ayaka中的命令具有两类：唤醒命令、状态命令</p>
 <h3 id="_2">注册状态命令回调<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;命令A&quot;</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;状态1&quot;</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">():</span>
@@ -748,13 +779,10 @@
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;猫猫休息&#39;&#39;&#39;</span>
     <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">rest</span><span class="p">()</span>
 </code></pre></div>
-<h3 id="_4">注册唤醒命令回调<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p>大部分时间，你可以使用<code>cat.set_wakeup_cmds</code>来设置唤醒命令</p>
+<h3 id="_4">注册空状态命令回调<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>大部分时间，你可以使用<code>cat.set_wakeup_cmds</code>来设置空状态命令</p>
 <div class="highlight"><pre><span></span><code><span class="n">cat</span><span class="o">.</span><span class="n">set_wakeup_cmds</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;猫猫A&quot;</span><span class="p">,</span> <span class="s2">&quot;catA&quot;</span><span class="p">])</span>
 </code></pre></div>
-<p>但有时，你喜欢在唤醒猫猫的时候做些其他的事情</p>
-<p>其实，唤醒命令在形式上是一种特殊的状态命令，它注册在<code>""</code>（空字符串）状态下</p>
-<p><code>cat.on_cmd</code>的<code>states</code>参数的缺省值便是<code>""</code></p>
 <p>实际上，<code>cat.set_wakeup_cmds(cmds=cmds)</code>相当于</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="n">cmds</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">wakeup</span><span class="p">():</span>
@@ -762,6 +790,7 @@
     <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">wakeup</span><span class="p">()</span>
     <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send_help</span><span class="p">()</span>
 </code></pre></div>
+<p>注：<code>cat.on_cmd</code>的<code>states</code>参数的缺省值是<code>""</code></p>
 <p>因此，你可以自行注册唤醒命令回调，只要保证调用<code>cat.wakeup</code>即可</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;猫猫A&quot;</span><span class="p">,</span> <span class="s2">&quot;catA&quot;</span><span class="p">])</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">wakeup</span><span class="p">():</span>
@@ -769,46 +798,10 @@
     <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;喵~&quot;</span><span class="p">)</span>
 </code></pre></div>
 <p>当然，你甚至可以不调用<code>cat.wakeup</code></p>
-<p>这会导致这条命令并不会唤醒猫猫，从而维持<strong>没有任何猫猫被唤醒</strong>的情形</p>
-<h3 id="_5">注册混合命令回调<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
-<p>唤醒命令在形式上是一种特殊的状态命令，这一特性带来了特定的好处</p>
-<p>例如，有些时候，你希望猫猫在未唤醒和唤醒状态下，收到同一条命令时，执行相同操作（<code>喵~</code>）</p>
-<p>那么你可以</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;猫猫A&quot;</span><span class="p">,</span> <span class="s2">&quot;catA&quot;</span><span class="p">],</span> <span class="n">states</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;idle&quot;</span><span class="p">])</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">wakeup</span><span class="p">():</span>
-    <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">wakeup</span><span class="p">()</span>
-    <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;喵~&quot;</span><span class="p">)</span>
-</code></pre></div>
-<p>不用担心<code>cat.wakeup</code>重复调用的问题，它仅在猫猫未唤醒时才会真正执行，唤醒后执行该语句会直接返回</p>
-<h2 id="_6">注册文字回调<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<h3 id="_7">注册状态文字回调<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
-<p>文字回调往往是注册在某个状态下生效，当猫猫处于该状态时，任意消息都会触发该状态下的文字回调，进行相关处理</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_text</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">)</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">():</span>
-    <span class="o">...</span>
-</code></pre></div>
-<h3 id="_8">注册通用状态文字回调<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
-<p>同样的，文字回调也可以注册为通用状态，不过这种用法并不常见</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_text</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">)</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">():</span>
-    <span class="o">...</span>
-</code></pre></div>
-<h3 id="_9">注册唤醒文字回调<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_text</span><span class="p">()</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">():</span>
-    <span class="o">...</span>
-</code></pre></div>
-<p>这并不是一个清晰的表述，仅仅用于表现其与唤醒命令回调的某些<strong>相似之处</strong></p>
-<p>实际上，所谓唤醒命令回调、唤醒文字回调，都是指那些在<strong>没有任何猫猫被唤醒</strong>的情形下，可被ayaka响应的回调</p>
-<p>状态命令回调、状态文字回调，均是需要在其<strong>从属的猫猫被唤醒</strong>后，且<strong>状态匹配</strong>的时候才能被ayaka响应</p>
-<h3 id="_10">注册混合文字回调<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
-<p>与混合命令回调同理</p>
-<p>在某些特殊情况下会很有用</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_text</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">])</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">():</span>
-    <span class="o">...</span>
-</code></pre></div>
-<h2 id="_11">高级<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<p>这会导致这条命令并不会唤醒猫猫，令其状态保持为空状态</p>
+<h2 id="_5">注册文字回调<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>与命令回调同理，只是不需要再写cmds了</p>
+<h2 id="_6">高级<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <h3 id="always">always<a class="headerlink" href="#always" title="Permanent link">&para;</a></h3>
 <p>默认值 False</p>
 <p>设置为True，则该回调必定触发，不受ayaka各类状态规则的约束，并且执行优先级最高</p>
@@ -818,7 +811,7 @@
 <h3 id="block">block<a class="headerlink" href="#block" title="Permanent link">&para;</a></h3>
 <p>是否阻断消息传播</p>
 <p>默认值：命令回调 阻断，文字回调 不阻断</p>
-<h3 id="_12">处理顺序<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<h3 id="_7">处理顺序<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
 <p>消息传播依次经过</p>
 <ul>
 <li>always 命令回调</li>
@@ -827,7 +820,7 @@
 <li>文字回调</li>
 </ul>
 <p>期间任意回调block为True或抛出<code>BlockException</code>都会导致消息传播的结束</p>
-<h2 id="_13">下一步<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h2>
+<h2 id="_8">下一步<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <div align="right">
     在这里~ ↘
 </div>
