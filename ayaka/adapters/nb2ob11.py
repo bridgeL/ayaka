@@ -55,9 +55,9 @@ def get_current_bot() -> Bot:
 async def send_group(id: str, msg: str) -> bool:
     bot = get_current_bot()
     try:
-        await bot.send_group_msg(user_id=int(id), message=msg)
+        await bot.send_group_msg(group_id=int(id), message=msg)
     except ActionFailed:
-        await bot.send_group_msg(user_id=int(id), message="群聊消息发送失败")
+        await bot.send_group_msg(group_id=int(id), message="群聊消息发送失败")
     else:
         return True
 
