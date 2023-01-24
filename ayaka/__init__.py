@@ -1,5 +1,5 @@
 '''
-    ayaka - cat Cat CAT - 0.0.1.5b1
+    ayaka - cat Cat CAT - 0.0.2.0b0
 '''
 # logger
 from . import logger as __logger
@@ -12,7 +12,7 @@ from . import master as __master
 from .cat import AyakaCat, AyakaEvent
 from .config import AyakaConfig
 from .helpers import load_data_from_file, debug_print, simple_repr, ensure_dir_exists
-from .download import resource_download, resource_download_by_res_info, get_file_hash
-from .model import ResInfo, ResItem, GroupMember, AyakaChannel, AyakaEvent
+from .download import resource_download, resource_download_by_res_info, get_file_hash, ResInfo, ResItem
+from .event import AyakaEvent
 from .bridge import bridge
 from .orm import get_session

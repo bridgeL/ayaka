@@ -1,12 +1,12 @@
 '''适配命令行输入输出'''
 import re
-from typing import Awaitable, Callable
 import uvicorn
 import asyncio
 from fastapi import FastAPI
+from typing import Awaitable, Callable
 from ..logger import ayaka_log, ayaka_clog
-from ..model import AyakaEvent, AyakaChannel, AyakaSender, GroupMember
-from ..cat import bridge
+from ..event import AyakaEvent
+from ..bridge import bridge, GroupMemberInfo
 from ..helpers import ensure_dir_exists
 
 
@@ -15,8 +15,10 @@ pt = re.compile(r"@([^ ]+?)(?= |$)")
 
 class Handler:
     def __init__(self) -> None:
-        self.channel: AyakaChannel = None
-        self.sender: AyakaSender = None
+        self.session_type = "group"
+        self.session_id = 0
+        self.sender_id = 0
+        self.sender_name = ""
         self.func_dict: dict[str, Callable[[str], Awaitable]] = {}
 
     async def handle_line(self, line: str):
@@ -32,11 +34,11 @@ class Handler:
         return decorator
 
     def handle_msg(self, msg: str):
-        name = self.sender.name
-        uid = self.sender.id
+        name = self.sender_name
+        uid = self.sender_id
 
-        if self.channel.type == "group":
-            gid = self.channel.id
+        if self.session_type == "group":
+            gid = self.session_id
             ayaka_clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
         else:
             ayaka_clog(f"私聊({uid}) <y>{name}</y> 说：")
@@ -50,10 +52,12 @@ class Handler:
             break
 
         asyncio.create_task(bridge.handle_event(AyakaEvent(
-            channel=self.channel,
-            sender=self.sender,
+            session_type=self.session_type,
+            session_id=self.session_id,
+            sender_id=uid,
+            sender_name=name,
             message=msg,
-            at=at,
+            at=at
         )))
 
 
@@ -63,23 +67,6 @@ app = FastAPI()
 
 def on_startup(func):
     app.on_event("startup")(func)
-
-
-async def send(type: str, id: str, msg: str):
-    '''待废弃'''
-    if type == "group":
-        ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
-    else:
-        ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
-    print(msg)
-    return True
-
-
-async def send_many(id: str, msgs: list[str]):
-    '''待废弃'''
-    ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
-    print("\n\n".join(msgs))
-    return True
 
 
 async def send_group(id: str, msg: str) -> bool:
@@ -122,12 +109,12 @@ async def start_console_loop():
 
 
 async def get_member_info(gid: str, uid: str):
-    return GroupMember(id=uid, name=f"测试{uid}号", role="admin")
+    return GroupMemberInfo(id=uid, name=f"测试{uid}号", role="admin")
 
 
 async def get_member_list(gid: str):
     return [
-        GroupMember(id=uid, name=f"测试{uid}号", role="admin")
+        GroupMemberInfo(id=uid, name=f"测试{uid}号", role="admin")
         for uid in [i+1 for i in range(100)]
     ]
 
@@ -139,10 +126,6 @@ def get_prefixes():
 def get_separates():
     return [" "]
 
-
-# 注册外部服务 待废弃
-bridge.regist(send)
-bridge.regist(send_many)
 
 # 注册外部服务
 bridge.regist(send_group)
@@ -166,8 +149,10 @@ async def _(line: str):
 @handler.on("p ")
 async def _(line: str):
     uid, msg = safe_split(line, 2)
-    handler.sender = AyakaSender(id=uid, name=f"测试{uid}号")
-    handler.channel = AyakaChannel(type="private", id=uid)
+    handler.sender_id = uid
+    handler.sender_name = f"测试{uid}号"
+    handler.session_type = "private"
+    handler.session_id = uid
     if msg:
         handler.handle_msg(msg)
 
@@ -175,8 +160,10 @@ async def _(line: str):
 @handler.on("g ")
 async def _(line: str):
     gid, uid, msg = safe_split(line, 3)
-    handler.sender = AyakaSender(id=uid, name=f"测试{uid}号")
-    handler.channel = AyakaChannel(type="group", id=gid)
+    handler.sender_id = uid
+    handler.sender_name = f"测试{uid}号"
+    handler.session_type = "group"
+    handler.session_id = gid
     if msg:
         handler.handle_msg(msg)
 
@@ -226,9 +213,10 @@ async def show_help(line: str):
 
 @handler.on("")
 async def deal_line(msg: str):
-    if not (handler.channel and handler.sender and msg):
+    if not handler.session_id or not handler.sender_id:
         return ayaka_log("请先设置默认角色（发出第一条模拟消息后自动设置）")
-    handler.handle_msg(msg)
+    if msg:
+        handler.handle_msg(msg)
 
 
 def run():

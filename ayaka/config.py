@@ -4,10 +4,9 @@
 import json
 from pydantic import ValidationError, BaseModel
 from .logger import logger, clogger, logger_format
-from .model import AyakaChannel
 from .helpers import ensure_dir_exists
 
-AYAKA_VERSION = "0.0.1.5b1"
+AYAKA_VERSION = "0.0.2.0b0"
 clogger.success(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
 data_path = ensure_dir_exists("data/ayaka")
 
@@ -71,8 +70,8 @@ class RootConfig(AyakaConfig):
     version: str = AYAKA_VERSION
     '''版本号'''
 
-    block_cat_dict: dict[str, list[AyakaChannel]] = {}
-    '''屏蔽列表'''
+    block_cat_dict: dict[str, list[str]] = {}
+    '''屏蔽列表，dict[cat_name:list[session_mark]]'''
 
     error_report: bool = False
     '''记录所有错误'''

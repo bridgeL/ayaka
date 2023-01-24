@@ -1,7 +1,7 @@
-from sqlmodel import SQLModel, create_engine, Session
+from loguru import logger
+from sqlmodel import create_engine, SQLModel, Session
 from .bridge import bridge
 from .helpers import ensure_dir_exists
-from .logger import logger
 
 sqlite_path = "data/ayaka/ayaka.db"
 ensure_dir_exists(sqlite_path)

@@ -5,11 +5,19 @@
 
     缺点是，你完全不记得自己都在哪里加的这些方法
 '''
-from typing import Awaitable, Callable
-from .logger import logger
-from .model import AyakaEvent, GroupMember
+from pydantic import BaseModel
+from typing import Awaitable, Callable, Optional
+from loguru import logger
+from .event import AyakaEvent
 from .exception import NotRegistrationError, DuplicateRegistrationError
 from .config import root_config
+
+
+class GroupMemberInfo(BaseModel):
+    id: str
+    name: str
+    role: Optional[str]
+    '''群主、管理员、普通用户'''
 
 
 class AyakaBridge:
@@ -39,14 +47,6 @@ class AyakaBridge:
 
     async def send_group_many(self, id: str, msgs: list[str]) -> bool:
         return await self._send_group_many(id, msgs)
-    
-    async def send(self, type: str, id: str, msg: str) -> bool:
-        '''待废弃'''
-        return await self._send(type, id, msg)
-
-    async def send_many(self, id: str, msgs: list[str]) -> bool:
-        '''待废弃'''
-        return await self._send_many(id, msgs)
 
     def get_prefixes(self) -> list[str]:
         return self._get_prefixes()
@@ -54,10 +54,10 @@ class AyakaBridge:
     def get_separates(self) -> list[str]:
         return self._get_separates()
 
-    async def get_member_info(self, gid: str, uid: str) -> GroupMember | None:
+    async def get_member_info(self, gid: str, uid: str) -> GroupMemberInfo | None:
         return await self._get_member_info(gid, uid)
 
-    async def get_member_list(self, gid: str) -> list[GroupMember] | None:
+    async def get_member_list(self, gid: str) -> list[GroupMemberInfo] | None:
         return await self._get_member_list(gid)
 
     def on_startup(self, func: Callable[..., Awaitable]):

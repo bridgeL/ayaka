@@ -1,9 +1,25 @@
 import hashlib
 from pathlib import Path
+from pydantic import BaseModel
 import httpx
 from .logger import clogger
-from .model import ResInfo
 from .helpers import ensure_dir_exists
+
+
+class ResItem(BaseModel):
+    '''资源项'''
+    path: str
+    '''下载地址的相对地址尾'''
+    hash: str = ""
+    '''资源的哈希值'''
+
+
+class ResInfo(BaseModel):
+    '''资源信息'''
+    base: str
+    '''下载地址的绝对地址头'''
+    items: list[ResItem] = []
+    '''资源项'''
 
 
 async def download_url(url: str) -> bytes:

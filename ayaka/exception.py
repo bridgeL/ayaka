@@ -1,6 +1,8 @@
 '''
     提供各类报错
 '''
+
+
 class NotRegistrationError(Exception):
     def __init__(self, async_func_name: str) -> None:
         super().__init__(f"{async_func_name} 方法未注册！")
@@ -14,11 +16,6 @@ class DuplicateCatNameError(Exception):
 class DuplicateRegistrationError(Exception):
     def __init__(self, async_func_name: str) -> None:
         super().__init__(f"{async_func_name} 方法重复注册！")
-
-
-class CannotFindModuleError(Exception):
-    def __init__(self, module_path: str) -> None:
-        super().__init__(f"无法找到module {module_path}！它真的导入了吗？")
 
 
 class BlockException(Exception):

@@ -1,3 +1,4 @@
 # 全部测试 √
 s muyu
 s stone
+s input
