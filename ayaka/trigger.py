@@ -42,7 +42,7 @@ class AyakaTrigger:
     def module_name(self):
         return self.func.__module__
 
-    async def run(self, prefix):
+    def pre_run(self, prefix):
         context = get_context()
 
         # 判定范围
@@ -79,6 +79,19 @@ class AyakaTrigger:
         pt = re.compile(r"^-?\d+$")
         context.nums = [int(arg) for arg in context.args if pt.search(arg)]
         # ---- 一些预处理，并保存到上下文中 ----
+        
+        return True
+
+    async def run(self):
+        # 获取命令前缀
+        prefixes = bridge.get_prefixes()
+        
+        # 预检查并做一些预处理
+        for prefix in prefixes:
+            if self.pre_run(prefix):
+                break
+        else:
+            return False
 
         # 打印日志
         items = [f"<y>猫猫</y> {self.cat.name}"]
@@ -105,6 +118,7 @@ class AyakaTrigger:
 
         # 返回是否阻断
         return self.block
+
 
     def __repr__(self) -> str:
         return simple_repr(

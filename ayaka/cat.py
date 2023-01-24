@@ -2,7 +2,6 @@ import asyncio
 import inspect
 from typing import Awaitable, Callable, TypeVar
 
-from loguru import logger
 from .logger import clogger
 from .helpers import ensure_list
 from .context import get_context
@@ -501,9 +500,6 @@ class AyakaCat:
         context = get_context()
         context.event = event
 
-        # 获取命令前缀
-        prefixes = bridge.get_prefixes()
-
         state = self.state
         sub_state = self.sub_state
 
@@ -515,12 +511,11 @@ class AyakaCat:
             *self.state_trigger_dict.get(state, {}).get("*", []),
             *self.state_trigger_dict.get(state, {}).get(sub_state, []),
         ]
-
+        
         # 遍历尝试执行
         for t in ts:
-            for prefix in prefixes:
-                if await t.run(prefix):
-                    return
+            if await t.run():
+                return
 
     # ---- 其他 ----
     async def get_user(self, uid: str):
