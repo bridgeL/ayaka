@@ -1,6 +1,8 @@
 import asyncio
 import inspect
 from typing import Awaitable, Callable, TypeVar
+
+from loguru import logger
 from .logger import clogger
 from .helpers import ensure_list
 from .context import get_context
@@ -226,6 +228,7 @@ class AyakaCat:
     # ---- on_xxx ----
     def on_cmd(
         self,
+        *,
         cmds: str | list[str] = "",
         states: str | list[str] = "",
         sub_states: str | list[str] = "",
@@ -269,19 +272,24 @@ class AyakaCat:
                         )
                         self.add_state_trigger(trigger, state, sub_state)
 
-            items = [
-                f"<y>猫猫</y> {self.name}",
-                f"<y>命令</y> {cmds}",
-                f"<y>状态</y> {states}",
-                f"<y>子状态</y> {sub_states}",
-                f"<y>回调</y> {func.__name__}",
-            ]
+            items = [f"<y>猫猫</y> {self.name}"]
+            if cmds != [""]:
+                items.append(f"<y>命令</y> {cmds}")
+            else:
+                items.append("<g>文字</g>")
+            if states != [""]:
+                items.append(f"<c>状态</c> {states}")
+            if sub_states != [""]:
+                items.append(f"<c>子状态</c> {sub_states}")
+            items.append(f"<y>回调</y> {func.__name__}")
+
             clogger.trace(f" | ".join(items))
             return func
         return decorator
 
     def on_text(
         self,
+        *,
         states: str | list[str] = "",
         sub_states: str | list[str] = "",
         always: bool = False,
@@ -388,14 +396,17 @@ class AyakaCat:
 
     # ---- 基本发送 ----
     async def send_group(self, id: str, msg: str):
+        '''基本发送方法 发送消息至指定群聊'''
         self._refresh_overtime_timer()
         return await bridge.send_group(id, msg)
 
     async def send_private(self, id: str, msg: str):
+        '''基本发送方法 发送消息至指定私聊'''
         self._refresh_overtime_timer()
         return await bridge.send_private(id, msg)
 
     async def send_group_many(self, id: str, msgs: list[str]):
+        '''基本发送方法 发送消息组至指定群聊'''
         self._refresh_overtime_timer()
         return await bridge.send_group_many(id, msgs)
 
@@ -483,7 +494,7 @@ class AyakaCat:
         std[state][sub_state].append(trigger)
         std[state][sub_state].sort(key=lambda t: len(t.cmd), reverse=True)
 
-    async def handle_event(self, event: AyakaEvent):
+    async def _handle_event(self, event: AyakaEvent):
         '''处理事件'''
 
         # 设置上下文
@@ -510,6 +521,13 @@ class AyakaCat:
             for prefix in prefixes:
                 if await t.run(prefix):
                     return
+
+    async def handle_event(self, event: AyakaEvent):
+        '''处理事件并记录'''
+        try:
+            await self._handle_event(event)
+        except:
+            logger.exception(f"ayaka 处理事件（{event}）时发生错误")
 
     # ---- 其他 ----
     async def get_user(self, uid: str):

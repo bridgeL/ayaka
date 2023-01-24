@@ -73,9 +73,6 @@ class RootConfig(AyakaConfig):
     block_cat_dict: dict[str, list[str]] = {}
     '''屏蔽列表，dict[cat_name:list[session_mark]]'''
 
-    error_report: bool = False
-    '''记录所有错误'''
-
 
 root_config = RootConfig()
 '''ayaka根配置'''
@@ -84,7 +81,6 @@ root_config.version = AYAKA_VERSION
 
 
 # 输出报错至本地日志文件
-if root_config.error_report:
-    error_path = ensure_dir_exists("data/ayaka/error.log")
-    file = error_path.open("a+", encoding="utf8")
-    logger.add(file, level="ERROR", diagnose=False, format=logger_format)
+error_path = ensure_dir_exists("data/ayaka/error.log")
+file = error_path.open("a+", encoding="utf8")
+logger.add(file, level="ERROR", diagnose=False, format=logger_format)

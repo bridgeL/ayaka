@@ -7,10 +7,8 @@
 '''
 from pydantic import BaseModel
 from typing import Awaitable, Callable, Optional
-from loguru import logger
 from .event import AyakaEvent
 from .exception import NotRegistrationError, DuplicateRegistrationError
-from .config import root_config
 
 
 class GroupMemberInfo(BaseModel):
@@ -65,13 +63,7 @@ class AyakaBridge:
 
     # ---- ayaka cat 提供服务 ----
     async def handle_event(self, event: "AyakaEvent") -> None:
-        if root_config.error_report:
-            try:
-                await self._handle_event(event)
-            except Exception as e:
-                logger.exception("ayaka 处理事务时发生错误")
-        else:
-            await self._handle_event(event)
+        await self._handle_event(event)
 
 
 bridge = AyakaBridge()
