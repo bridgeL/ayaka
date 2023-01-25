@@ -10,8 +10,9 @@ if TYPE_CHECKING:
 
 class AyakaContext:
     '''上下文，保存一些数据便于访问'''
-    def __init__(self) -> None:
-        self.event: Optional[AyakaEvent] = None
+
+    def __init__(self, event: AyakaEvent) -> None:
+        self.event: AyakaEvent = event
         self.trigger: Optional["AyakaTrigger"] = None
         self.cmd: Optional[str] = None
         self.arg: Optional[str] = None
@@ -22,14 +23,15 @@ class AyakaContext:
         return simple_repr(self)
 
 
-_ayaka_context: ContextVar[AyakaContext] = ContextVar("_ayaka_context", default=None)
+_ayaka_context: ContextVar[AyakaContext] = ContextVar("_ayaka_context")
+
+
+def set_context(event: AyakaEvent):
+    context = AyakaContext(event)
+    _ayaka_context.set(context)
+    return context
 
 
 def get_context():
     '''获取当前上下文'''
-    c = _ayaka_context.get()
-    if c:
-        return c
-    c = AyakaContext()
-    _ayaka_context.set(c)
-    return c
+    return _ayaka_context.get()

@@ -4,7 +4,7 @@ from loguru import logger
 from .logger import clogger
 from .bridge import bridge
 from .helpers import simple_repr
-from .context import get_context
+from .context import get_context, set_context
 from .exception import BlockException, NotBlockException
 
 if TYPE_CHECKING:
@@ -44,6 +44,9 @@ class AyakaTrigger:
 
     def pre_run(self, prefix):
         context = get_context()
+        
+        # 重设一个新的上下文
+        context = set_context(context.event)
 
         # 判定范围
         if context.event.session_type not in self.cat.session_types:
@@ -79,13 +82,13 @@ class AyakaTrigger:
         pt = re.compile(r"^-?\d+$")
         context.nums = [int(arg) for arg in context.args if pt.search(arg)]
         # ---- 一些预处理，并保存到上下文中 ----
-        
+
         return True
 
     async def run(self):
         # 获取命令前缀
         prefixes = bridge.get_prefixes()
-        
+
         # 预检查并做一些预处理
         for prefix in prefixes:
             if self.pre_run(prefix):
@@ -118,7 +121,6 @@ class AyakaTrigger:
 
         # 返回是否阻断
         return self.block
-
 
     def __repr__(self) -> str:
         return simple_repr(

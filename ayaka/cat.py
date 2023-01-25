@@ -1,6 +1,7 @@
 '''猫猫核心'''
 import asyncio
 import inspect
+from pathlib import Path
 from typing import Awaitable, Callable, TypeVar
 
 from .logger import clogger
@@ -13,6 +14,7 @@ from .event import AyakaEvent
 from .config import root_config
 from .trigger import AyakaTrigger
 
+cwd = Path(".").absolute()
 
 T = TypeVar("T")
 '''任意类型'''
@@ -41,7 +43,12 @@ class AyakaCat:
         self.name = name
         manager.add_cat(self)
 
-        self.module_path = inspect.stack()[1].filename
+        path = Path(inspect.stack()[1].filename)
+        if path.is_relative_to(cwd):
+            path = path.relative_to(cwd)
+            path = ".".join(path.with_suffix("").parts)
+            
+        self.module_path = str(path)
         '''模块地址'''
 
         self.sessions: list[AyakaSession] = []
@@ -496,11 +503,10 @@ class AyakaCat:
 
     async def handle_event(self, event: AyakaEvent):
         '''处理事件'''
+        await manager.handle_event(event)
 
-        # 设置上下文
-        context = get_context()
-        context.event = event
-
+    def get_triggers(self):
+        '''获取触发器'''
         state = self.state
         sub_state = self.sub_state
 
@@ -518,10 +524,7 @@ class AyakaCat:
             ts += s.get("*", [])
         ts += s.get(sub_state, [])
 
-        # 遍历尝试执行
-        for t in ts:
-            if await t.run():
-                return
+        return ts
 
     # ---- 其他 ----
     async def get_user(self, uid: str):

@@ -3,10 +3,19 @@ import asyncio
 from typing import TYPE_CHECKING
 from .exception import DuplicateCatNameError
 from .event import AyakaEvent
+from .context import set_context
 from .bridge import bridge
+from .trigger import AyakaTrigger
 
 if TYPE_CHECKING:
     from .cat import AyakaCat
+
+
+async def run_triggers(ts: list[AyakaTrigger]):
+    # 遍历尝试执行
+    for t in ts:
+        if await t.run():
+            return
 
 
 class AyakaManager:
@@ -25,11 +34,23 @@ class AyakaManager:
 
     async def handle_event(self, event: AyakaEvent):
         '''处理和转发事件'''
-        ts = [
-            asyncio.create_task(c.handle_event(event))
-            for c in self.cats
+        # 设置上下文
+        set_context(event)
+
+        # 获取碰撞域中的触发器
+        ts_list = [c.get_triggers() for c in self.cats]
+        
+        # for ts in ts_list:
+        #     for t in ts:
+        #         print(t)
+        #     print()
+
+        # 同时执行
+        tasks = [
+            asyncio.create_task(run_triggers(ts))
+            for ts in ts_list if ts
         ]
-        await asyncio.gather(*ts)
+        await asyncio.gather(*tasks)
 
         # 排除已经转发的情况
         if event.private_forward_id:
