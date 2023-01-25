@@ -72,6 +72,16 @@ async def wakeup():
 
 这会导致这条命令并不会唤醒猫猫，令其状态保持为空状态
 
+## 注册子状态命令回调
+
+```py
+@cat.on_text(state="idle", sub_states="name")
+async def _():
+    # do something
+```
+
+该回调会在群状态为`idle`，群成员状态为`name`时响应
+
 ## 注册文字回调
 
 与命令回调同理，只是不需要再写cmds了

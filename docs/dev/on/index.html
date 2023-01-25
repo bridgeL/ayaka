@@ -566,13 +566,20 @@
       
         <li class="md-nav__item">
   <a href="#_5" class="md-nav__link">
-    注册文字回调
+    注册子状态命令回调
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
+    注册文字回调
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
     高级
   </a>
   
@@ -601,7 +608,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#_8" class="md-nav__link">
     处理顺序
   </a>
   
@@ -613,7 +620,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#_9" class="md-nav__link">
     下一步
   </a>
   
@@ -799,9 +806,15 @@
 </code></pre></div>
 <p>当然，你甚至可以不调用<code>cat.wakeup</code></p>
 <p>这会导致这条命令并不会唤醒猫猫，令其状态保持为空状态</p>
-<h2 id="_5">注册文字回调<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_5">注册子状态命令回调<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_text</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">,</span> <span class="n">sub_states</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
+    <span class="c1"># do something</span>
+</code></pre></div>
+<p>该回调会在群状态为<code>idle</code>，群成员状态为<code>name</code>时响应</p>
+<h2 id="_6">注册文字回调<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>与命令回调同理，只是不需要再写cmds了</p>
-<h2 id="_6">高级<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_7">高级<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <h3 id="always">always<a class="headerlink" href="#always" title="Permanent link">&para;</a></h3>
 <p>默认值 False</p>
 <p>设置为True，则该回调必定触发，不受ayaka各类状态规则的约束，并且执行优先级最高</p>
@@ -811,7 +824,7 @@
 <h3 id="block">block<a class="headerlink" href="#block" title="Permanent link">&para;</a></h3>
 <p>是否阻断消息传播</p>
 <p>默认值：命令回调 阻断，文字回调 不阻断</p>
-<h3 id="_7">处理顺序<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<h3 id="_8">处理顺序<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
 <p>消息传播依次经过</p>
 <ul>
 <li>always 命令回调</li>
@@ -820,7 +833,7 @@
 <li>文字回调</li>
 </ul>
 <p>期间任意回调block为True或抛出<code>BlockException</code>都会导致消息传播的结束</p>
-<h2 id="_8">下一步<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<h2 id="_9">下一步<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
 <div align="right">
     在这里~ ↘
 </div>

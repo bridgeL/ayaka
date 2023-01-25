@@ -16,6 +16,7 @@ async def orm_init():
 
 
 def get_session(**kwargs):
+    '''kwargs请参考sqlmodel.Session'''
     # expire_on_commit 在commit后失效所有orm对象，一般建议关了
     kwargs.setdefault("expire_on_commit", False)
     return Session(engine, **kwargs)

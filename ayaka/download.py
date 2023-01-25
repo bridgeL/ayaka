@@ -1,7 +1,8 @@
+'''下载和校验文件hash值'''
+import httpx
 import hashlib
 from pathlib import Path
 from pydantic import BaseModel
-import httpx
 from .logger import clogger
 from .helpers import ensure_dir_exists
 

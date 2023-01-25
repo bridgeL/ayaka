@@ -1,4 +1,4 @@
-'''保存所有猫猫'''
+'''保存和管理所有猫猫，处理事件分发'''
 import asyncio
 from typing import TYPE_CHECKING
 from .exception import DuplicateCatNameError
@@ -17,6 +17,11 @@ class AyakaManager:
         '''所有猫猫'''
         self.private_redirect_dict: dict[str, list[str]] = {}
         '''将私聊消息转发至群聊，dict[private_id: list[group_id]]'''
+
+    @property
+    def wakeup_cats(self):
+        '''所有不处于空状态的猫猫'''
+        return [c for c in self.cats if c.state]
 
     async def handle_event(self, event: AyakaEvent):
         '''处理和转发事件'''

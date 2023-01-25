@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
 
 class AyakaContext:
+    '''上下文，保存一些数据便于访问'''
     def __init__(self) -> None:
         self.event: Optional[AyakaEvent] = None
         self.trigger: Optional["AyakaTrigger"] = None

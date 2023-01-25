@@ -1,3 +1,4 @@
+'''ayaka对logger进行自定义改造'''
 import sys
 from loguru import logger
 from functools import partial
@@ -6,11 +7,19 @@ from .helpers import ensure_dir_exists
 logger.level("AYAKA", no=27, icon="⚡", color="<blue>")
 
 ayaka_clog = partial(logger.opt(colors=True).log, "AYAKA")
-'''彩色 ayaka log方法（有<>不匹配风险）'''
+'''彩色 ayaka log方法（有<>不匹配风险）
+
+使用方法 ayaka_clog("<r>msg</r>")'''
+
 ayaka_log = partial(logger.log, "AYAKA")
-'''单色 ayaka log方法'''
+'''单色 ayaka log方法
+
+使用方法 ayaka_log("msg")'''
+
 clogger = logger.opt(colors=True)
-'''彩色 logger（有<>不匹配风险）'''
+'''彩色 logger（有<>不匹配风险）
+
+使用方法 clogger.success("<r>msg</r>")'''
 
 logger_format = "<g>{time:MM-DD HH:mm:ss}</g> [<lvl>{level}</lvl>] <c><u>{name}</u></c> | {message}"
 

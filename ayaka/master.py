@@ -54,10 +54,9 @@ async def show_help():
         return
 
     flag = False
-    for c in manager.cats:
-        if c.state:
-            await cat.send(c.help)
-            flag = True
+    for c in manager.wakeup_cats:
+        await cat.send(c.help)
+        flag = True
 
     if flag:
         return
@@ -90,9 +89,8 @@ async def show_all_help():
 async def show_state():
     '''展示猫猫状态'''
     infos = []
-    for c in manager.cats:
-        if c.state:
-            infos.append(f"猫猫 [{c.name}] 状态 [{c.state}] 子状态 [{c.sub_state}]")
+    for c in manager.wakeup_cats:
+        infos.append(f"猫猫 [{c.name}] 状态 [{c.state}] 子状态 [{c.sub_state}]")
     if not infos:
         infos.append("当前没有任何猫猫醒着")
     await cat.send("\n".join(infos))

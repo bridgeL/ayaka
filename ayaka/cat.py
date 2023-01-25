@@ -1,3 +1,4 @@
+'''猫猫核心'''
 import asyncio
 import inspect
 from typing import Awaitable, Callable, TypeVar
