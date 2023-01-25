@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://bridgel.github.io/ayaka/list/">
+        <link rel="canonical" href="https://bridgel.github.io/ayaka/change-log/">
       
       
         <link rel="prev" href="../dev/test/">
@@ -19,7 +19,7 @@
     
     
       
-        <title>相关链接 - Ayaka 猫猫，猫猫 😸</title>
+        <title>更新记录 - Ayaka 猫猫，猫猫 😸</title>
       
     
     
@@ -69,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ayaka" class="md-skip">
+        <a href="#0001" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              相关链接
+              更新记录
             
           </span>
         </div>
@@ -230,7 +230,7 @@
 
   <li class="md-tabs__item">
     <a href="./" class="md-tabs__link md-tabs__link--active">
-      相关链接
+      更新记录
     </a>
   </li>
 
@@ -609,12 +609,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          相关链接
+          更新记录
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        相关链接
+        更新记录
       </a>
       
         
@@ -633,8 +633,76 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ayaka" class="md-nav__link">
-    使用ayaka开发
+  <a href="#0001" class="md-nav__link">
+    0.0.0.1
+  </a>
+  
+    <nav class="md-nav" aria-label="0.0.0.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#0004" class="md-nav__link">
+    0.0.0.4
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#0005" class="md-nav__link">
+    0.0.0.5
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0010" class="md-nav__link">
+    0.0.1.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.0.1.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#0012" class="md-nav__link">
+    0.0.1.2
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#0013" class="md-nav__link">
+    0.0.1.3
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#0014" class="md-nav__link">
+    0.0.1.4
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#0015b1" class="md-nav__link">
+    0.0.1.5b1
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0020" class="md-nav__link">
+    0.0.2.0
   </a>
   
 </li>
@@ -666,13 +734,73 @@
 
 
 
-  <h1>相关链接</h1>
+  <h1>更新记录</h1>
 
-<h2 id="ayaka">使用ayaka开发<a class="headerlink" href="#ayaka" title="Permanent link">&para;</a></h2>
+<h2 id="0001">0.0.0.1<a class="headerlink" href="#0001" title="Permanent link">&para;</a></h2>
+<p>喵，从nonebot_plugin_ayaka发源</p>
+<h3 id="0004">0.0.0.4<a class="headerlink" href="#0004" title="Permanent link">&para;</a></h3>
+<p>第一个可用版本</p>
 <ul>
-<li><a href="https://github.com/bridgeL/ayaka_games/">ayaka小游戏合集</a></li>
-<li><a href="https://github.com/bridgeL/criminal_dance">犯人在跳舞</a></li>
-<li><a href="https://github.com/bridgeL/nonebot-plugin-ayaka-scan-cmd">命令探查</a></li>
+<li>新特性：可适配 nb1、nb2、hoshino 机器人框架</li>
+<li>新特性：通过state可实现对群状态的控制</li>
+<li>新特性：通过cache可实现对群缓存数据的控制</li>
+</ul>
+<h3 id="0005">0.0.0.5<a class="headerlink" href="#0005" title="Permanent link">&para;</a></h3>
+<ul>
+<li>新特性：可作为console程序离线运行</li>
+<li>新特性：取消separate、prefix只取第一项的限制</li>
+<li>新特性：提供下载和校验文件支持</li>
+<li>新特性：nb2ob11适配器在发送消息失败后自动发送失败提示消息</li>
+<li>新特性：报错信息保存至data/ayaka/error.log中</li>
+<li>修复BUG：nb2适配器中ayaka_event中的字符串未转义回正常格式</li>
+</ul>
+<h2 id="0010">0.0.1.0<a class="headerlink" href="#0010" title="Permanent link">&para;</a></h2>
+<ul>
+<li>破坏性变更：修改ayaka_event结构，新增AyakaSender，更新所有适配器</li>
+<li>破坏性变更：删除bridge.ready</li>
+<li>破坏性变更：删除AyakaCurrent，其原本功能合并至AyakaManager，AyakaCat新增多个计算属性</li>
+<li>破坏性变更：AyakaSession更名为AyakaChannel，更新所有适配器</li>
+<li>破坏性变更：AyakaEvent新增at、reply字段，更新所有适配器</li>
+<li>破坏性变更：删除旧orm，使用sqlmodel</li>
+<li>破坏性变更：User更名为GroupMember，所有适配器已更新</li>
+<li>修复BUG：特定情况下，AyakaParams无法正确解析参数</li>
+<li>修复BUG：猫猫管理器无法正确工作</li>
+<li>新增依赖：sqlmodel</li>
+<li>新增文档：本站</li>
+</ul>
+<h3 id="0012">0.0.1.2<a class="headerlink" href="#0012" title="Permanent link">&para;</a></h3>
+<ul>
+<li>新特性：新增handle_event方法</li>
+<li>新特性：优化base_send_many方法，令其支持私聊</li>
+</ul>
+<h3 id="0013">0.0.1.3<a class="headerlink" href="#0013" title="Permanent link">&para;</a></h3>
+<ul>
+<li>优化代码</li>
+</ul>
+<h3 id="0014">0.0.1.4<a class="headerlink" href="#0014" title="Permanent link">&para;</a></h3>
+<ul>
+<li>新特性：增加超时关闭猫猫功能</li>
+</ul>
+<h3 id="0015b1">0.0.1.5b1<a class="headerlink" href="#0015b1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>新特性：新增方法 base_send_group，base_send_private，base_send_group_many，
+add_private_redirect，remove_private_redirect</li>
+</ul>
+<h2 id="0020">0.0.2.0<a class="headerlink" href="#0020" title="Permanent link">&para;</a></h2>
+<p>重构代码</p>
+<ul>
+<li>新特性：新增sub_state，从而实现对群成员状态的控制</li>
+<li>新特性：新增AyakaSession</li>
+<li>新特性：取消同一时间同一群聊只能运行一个猫猫的限制</li>
+<li>破坏性变更：删除CannotFindModuleError类</li>
+<li>破坏性变更：移除了remove_listener，add_listener，base_send，base_send_many，
+base_send_group，base_send_private，base_send_group_many</li>
+<li>破坏性变更：删除了AyakaChannel类，AyakaEvent结构变化，所有适配器已更新</li>
+<li>破坏性变更：GroupMember更名为GroupMemberInfo</li>
+<li>破坏性变更：cat.channel被移除</li>
+<li>破坏性变更：cat.channel_types被更换为group、private参数</li>
+<li>破坏性变更：AyakaParams被AyakaContext取代</li>
+<li>修复BUG：多prefix时，文字回调的触发日志错误的多次打印</li>
 </ul>
 
 

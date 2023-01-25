@@ -50,7 +50,7 @@ nav:
   - 数据库: dev/database.md
   - 超时: dev/overtime.md
   - 脚本测试: dev/test.md
-- 相关链接: list.md
+- 更新记录: change-log.md
 
 markdown_extensions:
 - pymdownx.superfences

@@ -21,6 +21,12 @@
 - 地球爆炸
 - 作者跑路
 
+## 相关链接
+
+- [ayaka小游戏合集](https://github.com/bridgeL/ayaka_games/)
+- [犯人在跳舞](https://github.com/bridgeL/criminal_dance)
+- [命令探查](https://github.com/bridgeL/nonebot-plugin-ayaka-scan-cmd)
+
 ## 下一步
 
 <div align="right">
