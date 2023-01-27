@@ -128,7 +128,7 @@ async def get_member_list(gid: str):
 
 driver = nonebot.get_driver()
 prefixes = list(driver.config.command_start) or [""]
-separates = list(driver.config.command_sep) or [" "]
+separates = [" "]
 
 
 def get_prefixes():

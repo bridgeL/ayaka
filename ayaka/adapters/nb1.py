@@ -137,7 +137,7 @@ async def get_member_list(gid: str):
 
 bot = get_current_bot()
 prefixes = list(bot.config.COMMAND_START) or [""]
-separates = list(bot.config.COMMAND_SEP) or [" "]
+separates = [" "]
 
 
 def get_prefixes():
