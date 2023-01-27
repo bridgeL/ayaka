@@ -26,6 +26,8 @@
 - [ayaka小游戏合集](https://github.com/bridgeL/ayaka_games/)
 - [犯人在跳舞](https://github.com/bridgeL/criminal_dance)
 - [命令探查](https://github.com/bridgeL/nonebot-plugin-ayaka-scan-cmd)
+- [坏词撤回](https://github.com/bridgeL/nonebot-plugin-ayaka-prevent-bad-words)
+- [时区助手](https://github.com/bridgeL/nonebot-plugin-ayaka-timezone)
 
 ## 下一步
 

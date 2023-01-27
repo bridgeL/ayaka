@@ -67,3 +67,7 @@ base_send_group，base_send_private，base_send_group_many
 - 破坏性变更：cat.channel_types被更换为group、private参数
 - 破坏性变更：AyakaParams被AyakaContext取代
 - 修复BUG：多prefix时，文字回调的触发日志错误的多次打印
+
+## 0.0.2.1
+
+- 变更：不再使用command_sep配置
