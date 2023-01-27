@@ -49,9 +49,6 @@ class AyakaBridge:
     def get_prefixes(self) -> list[str]:
         return self._get_prefixes()
 
-    def get_separates(self) -> list[str]:
-        return self._get_separates()
-
     async def get_member_info(self, gid: str, uid: str) -> GroupMemberInfo | None:
         return await self._get_member_info(gid, uid)
 

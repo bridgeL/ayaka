@@ -68,8 +68,7 @@ class AyakaTrigger:
         context.cmd = self.cmd
 
         # 空格优先
-        separates = bridge.get_separates()
-        separate = " " if " " in separates else separates[0]
+        separate = " " 
         n = len(prefix+self.cmd)
 
         # 剥离命令

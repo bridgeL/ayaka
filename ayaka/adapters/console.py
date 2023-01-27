@@ -133,16 +133,11 @@ def get_prefixes():
     return [""]
 
 
-def get_separates():
-    return [" "]
-
-
 # 注册外部服务
 bridge.regist(send_group)
 bridge.regist(send_private)
 bridge.regist(send_group_many)
 bridge.regist(get_prefixes)
-bridge.regist(get_separates)
 bridge.regist(get_member_info)
 bridge.regist(get_member_list)
 bridge.regist(on_startup)

@@ -11,7 +11,7 @@ from ..bridge import bridge, GroupMemberInfo
 
 
 async def handle_msg(bot: Bot, event: MessageEvent):
-    separate = separates[0]
+    separate = " "
 
     # 处理消息事件，保留text，reply，to_me或第一个at
     at = None
@@ -128,15 +128,10 @@ async def get_member_list(gid: str):
 
 driver = nonebot.get_driver()
 prefixes = list(driver.config.command_start) or [""]
-separates = [" "]
 
 
 def get_prefixes():
     return prefixes
-
-
-def get_separates():
-    return separates
 
 
 # 注册外部服务
@@ -144,7 +139,6 @@ bridge.regist(send_group)
 bridge.regist(send_private)
 bridge.regist(send_group_many)
 bridge.regist(get_prefixes)
-bridge.regist(get_separates)
 bridge.regist(get_member_info)
 bridge.regist(get_member_list)
 bridge.regist(driver.on_startup)

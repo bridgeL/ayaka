@@ -12,7 +12,7 @@ from ..helpers import singleton
 
 
 async def handle_msg(ev: CQEvent):
-    separate = separates[0]
+    separate = " "
 
     # 处理消息，保留text、at、reply
     ms = ev.message
@@ -133,15 +133,11 @@ async def get_member_list(gid: str):
 
 bot = get_current_bot()
 prefixes = list(config.COMMAND_START) or [""]
-separates = [" "]
 
 
 def get_prefixes():
     return prefixes
 
-
-def get_separates():
-    return separates
 
 
 # 注册外部服务
@@ -149,7 +145,6 @@ bridge.regist(send_group)
 bridge.regist(send_private)
 bridge.regist(send_group_many)
 bridge.regist(get_prefixes)
-bridge.regist(get_separates)
 bridge.regist(get_member_info)
 bridge.regist(get_member_list)
 bridge.regist(bot.on_startup)
