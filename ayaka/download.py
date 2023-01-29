@@ -2,8 +2,8 @@
 import httpx
 import hashlib
 from pathlib import Path
+from loguru import logger
 from pydantic import BaseModel
-from .logger import clogger
 from .helpers import ensure_dir_exists
 
 
@@ -52,9 +52,9 @@ async def resource_download(url: str, path: str | Path = ""):
     '''
     if path:
         path = ensure_dir_exists(path)
-        clogger.info(f"下载文件 <blue>{path}</blue> ...")
+        logger.opt(colors=True).info(f"下载文件 <blue>{path}</blue> ...")
 
-    clogger.info(f"拉取数据 <blue>{url}</blue>  ...")
+    logger.opt(colors=True).info(f"拉取数据 <blue>{url}</blue>  ...")
     data = await download_url(url)
 
     # 保存

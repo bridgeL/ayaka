@@ -1,8 +1,8 @@
 '''上下文'''
 from typing import TYPE_CHECKING, Optional
 from contextvars import ContextVar
-from .event import AyakaEvent
-from .helpers import simple_repr
+from ..helpers import simple_repr
+from ..adapters import AyakaEvent
 
 if TYPE_CHECKING:
     from .trigger import AyakaTrigger

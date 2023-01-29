@@ -1,6 +1,13 @@
-'''ayaka消息事件'''
+'''GroupMemberInfo和AyakaEvent'''
 from typing import Optional
 from pydantic import BaseModel
+
+
+class GroupMemberInfo(BaseModel):
+    id: str
+    name: str
+    role: Optional[str]
+    '''群主、管理员、普通用户'''
 
 
 class AyakaEvent(BaseModel):

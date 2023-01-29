@@ -1,18 +1,133 @@
-'''猫猫核心'''
-import asyncio
+'''保存和管理所有猫猫，处理事件分发'''
 import inspect
+import asyncio
 from pathlib import Path
+from loguru import logger
 from typing import Awaitable, Callable, TypeVar
-
-from .logger import clogger
-from .helpers import ensure_list
-from .context import get_context
 from .session import get_session_cls, AyakaSession, AyakaGroup, AyakaPrivate
-from .bridge import bridge
-from .manager import manager
-from .event import AyakaEvent
-from .config import root_config
+from .context import get_context, set_context
+from .exception import DuplicateCatNameError
 from .trigger import AyakaTrigger
+from ..config import root_config
+from ..adapters import get_adapter
+from ..helpers import ensure_list
+from ..adapters import AyakaEvent
+
+
+async def run_triggers(ts: list[AyakaTrigger]):
+    # 遍历尝试执行
+    for t in ts:
+        if await t.run():
+            return
+
+
+class AyakaManager:
+    '''分发ayaka event'''
+
+    def __init__(self) -> None:
+        self.cats: list["AyakaCat"] = []
+        '''所有猫猫'''
+        self.private_redirect_dict: dict[str, list[str]] = {}
+        '''将私聊消息转发至群聊，dict[private_id: list[group_id]]'''
+
+    @property
+    def wakeup_cats(self):
+        '''所有不处于空状态的猫猫'''
+        return [c for c in self.cats if c.state]
+
+    async def handle_event(self, event: AyakaEvent):
+        '''处理和转发事件'''
+        # 设置上下文
+        set_context(event)
+
+        # 获取碰撞域中的触发器
+        ts_list = [c.get_triggers() for c in self.cats]
+
+        # for ts in ts_list:
+        #     for t in ts:
+        #         print(t)
+        #     print()
+
+        # 同时执行
+        tasks = [
+            asyncio.create_task(run_triggers(ts))
+            for ts in ts_list if ts
+        ]
+        await asyncio.gather(*tasks)
+
+        # 排除已经转发的情况
+        if event.private_forward_id:
+            return
+
+        # 转发私聊消息到群聊
+        if event.session_type == "private":
+            private_id = event.session_id
+            group_ids = self.private_redirect_dict.get(private_id, [])
+
+            for group_id in group_ids:
+                # 私聊消息转为群聊消息
+                _event = event.copy()
+                _event.session_type = "group"
+                _event.session_id = group_id
+                _event.private_forward_id = private_id
+
+                await self.handle_event(_event)
+
+    def add_cat(self, cat: "AyakaCat"):
+        for c in self.cats:
+            if c.name == cat.name:
+                raise DuplicateCatNameError(cat.name)
+        self.cats.append(cat)
+
+    def get_cat(self, name: str):
+        for c in self.cats:
+            if c.name == name:
+                return c
+
+    # ---- 监听 ----
+    def add_private_redirect(self, group_id: str, private_id: str):
+        if private_id not in self.private_redirect_dict:
+            self.private_redirect_dict[private_id] = [group_id]
+        elif group_id not in self.private_redirect_dict[private_id]:
+            self.private_redirect_dict[private_id].append(group_id)
+
+    def remove_private_redirect(self, group_id: str, private_id: str = ""):
+        # 移除所有监听
+        if not private_id:
+            empty_private_ids = []
+
+            # 遍历监听表
+            for private_id, group_ids in self.private_redirect_dict.items():
+                # 移除监听
+                if group_id in group_ids:
+                    group_ids.remove(group_id)
+
+                # 统计所有无监听者的目标
+                if not group_ids:
+                    empty_private_ids.append(private_id)
+
+            # 移除这些无监听者的目标
+            for private_id in empty_private_ids:
+                self.private_redirect_dict.pop(private_id)
+
+        # 移除指定监听
+        else:
+            group_ids = self.private_redirect_dict.get(private_id, [])
+
+            # 移除监听
+            if group_id in group_ids:
+                group_ids.remove(group_id)
+
+            # 移除无监听者的目标
+            if not group_ids:
+                self.private_redirect_dict.pop(private_id)
+
+
+manager = AyakaManager()
+
+
+'''猫猫核心'''
+
 
 cwd = Path(".").absolute()
 
@@ -47,7 +162,7 @@ class AyakaCat:
         if path.is_relative_to(cwd):
             path = path.relative_to(cwd)
             path = ".".join(path.with_suffix("").parts)
-            
+
         self.module_path = str(path)
         '''模块地址'''
 
@@ -290,7 +405,7 @@ class AyakaCat:
                 items.append(f"<c>子状态</c> {sub_states}")
             items.append(f"<y>回调</y> {func.__name__}")
 
-            clogger.trace(f" | ".join(items))
+            logger.opt(colors=True).trace(f" | ".join(items))
             return func
         return decorator
 
@@ -405,17 +520,17 @@ class AyakaCat:
     async def send_group(self, id: str, msg: str):
         '''基本发送方法 发送消息至指定群聊'''
         self._refresh_overtime_timer()
-        return await bridge.send_group(id, msg)
+        return await get_adapter().send_group(id, msg)
 
     async def send_private(self, id: str, msg: str):
         '''基本发送方法 发送消息至指定私聊'''
         self._refresh_overtime_timer()
-        return await bridge.send_private(id, msg)
+        return await get_adapter().send_private(id, msg)
 
     async def send_group_many(self, id: str, msgs: list[str]):
         '''基本发送方法 发送消息组至指定群聊'''
         self._refresh_overtime_timer()
-        return await bridge.send_group_many(id, msgs)
+        return await get_adapter().send_group_many(id, msgs)
 
     # ---- 快捷发送 ----
     async def send(self, msg: str):
@@ -530,9 +645,9 @@ class AyakaCat:
     async def get_user(self, uid: str):
         '''获取当前群组中指定uid的成员信息'''
         if uid and self.session_type == "group":
-            return await bridge.get_member_info(self.group.id, uid)
+            return await get_adapter().get_group_member(self.group.id, uid)
 
     async def get_users(self):
         '''获取当前群组中所有成员信息'''
         if self.session_type == "group":
-            return await bridge.get_member_list(self.group.id)
+            return await get_adapter().get_group_members(self.group.id)

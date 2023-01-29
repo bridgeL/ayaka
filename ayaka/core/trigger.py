@@ -1,14 +1,18 @@
 import re
 from typing import TYPE_CHECKING, Awaitable, Callable
 from loguru import logger
-from .logger import clogger
-from .bridge import bridge
-from .helpers import simple_repr
 from .context import get_context, set_context
 from .exception import BlockException, NotBlockException
+from ..helpers import simple_repr
+from ..adapters import get_adapter
+
 
 if TYPE_CHECKING:
     from .cat import AyakaCat
+
+
+# 获取命令前缀
+prefixes = get_adapter().prefixes
 
 
 class AyakaTrigger:
@@ -44,7 +48,7 @@ class AyakaTrigger:
 
     def pre_run(self, prefix):
         context = get_context()
-        
+
         # 重设一个新的上下文
         context = set_context(context.event)
 
@@ -68,7 +72,7 @@ class AyakaTrigger:
         context.cmd = self.cmd
 
         # 空格优先
-        separate = " " 
+        separate = " "
         n = len(prefix+self.cmd)
 
         # 剥离命令
@@ -85,9 +89,6 @@ class AyakaTrigger:
         return True
 
     async def run(self):
-        # 获取命令前缀
-        prefixes = bridge.get_prefixes()
-
         # 预检查并做一些预处理
         for prefix in prefixes:
             if self.pre_run(prefix):
@@ -106,7 +107,7 @@ class AyakaTrigger:
         if self.sub_state:
             items.append(f"<c>子状态</c> {self.sub_state}")
         items.append(f"<y>回调</y> {self.func_name}")
-        clogger.debug(" | ".join(items))
+        logger.opt(colors=True).debug(" | ".join(items))
 
         # 运行函数
         try:

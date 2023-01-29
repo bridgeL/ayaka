@@ -1,13 +1,11 @@
-'''
-    管理插件配置，提供读写支持
-'''
+'''管理插件配置，提供读写支持'''
 import json
+from loguru import logger
 from pydantic import ValidationError, BaseModel
-from .logger import logger, clogger
 from .helpers import ensure_dir_exists
 
-AYAKA_VERSION = "0.0.2.2a0"
-clogger.success(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
+AYAKA_VERSION = "0.0.3.0a0"
+logger.opt(colors=True).success(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
 data_path = ensure_dir_exists("data/ayaka")
 
 
@@ -46,7 +44,7 @@ class AyakaConfig(BaseModel):
 
         # 强制更新（更新默认值）
         self.save()
-        clogger.debug(f"已载入配置文件 <g>{name}</g>")
+        logger.opt(colors=True).debug(f"已载入配置文件 <g>{name}</g>")
 
     def __setattr__(self, name, value):
         if getattr(self, name) != value:
@@ -69,6 +67,12 @@ class RootConfig(AyakaConfig):
 
     version: str = AYAKA_VERSION
     '''版本号'''
+
+    auto_detect: bool = True
+    '''自动探测机器人框架'''
+
+    auto_ob11_qqguild_patch: bool = True
+    '''在ob11协议中自动使用qqguild_patch'''
 
     block_cat_dict: dict[str, list[str]] = {}
     '''屏蔽列表，dict[cat_name:list[session_mark]]'''

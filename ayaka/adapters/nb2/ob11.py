@@ -1,26 +1,30 @@
-'''适配 hoshino 机器人'''
+'''适配 nonebot2 机器人 onebot v11 协议'''
 from math import ceil
 from html import unescape
 from typing import Awaitable, Callable
 
-from hoshino import Service, config
-from aiocqhttp import Event as CQEvent
-from aiocqhttp.exceptions import ActionFailed
+import nonebot
+from nonebot.matcher import current_bot
+from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment
+from nonebot.exception import ActionFailed
 
-from .adapter import AyakaAdapter
-from .model import GroupMemberInfo, AyakaEvent
-from ..helpers import singleton
+from ..adapter import AyakaAdapter
+from ..model import GroupMemberInfo, AyakaEvent
 
 
-class HoshinoAdapter(AyakaAdapter):
-    '''hoshino 适配器'''
+driver = nonebot.get_driver()
+
+
+class Nonebot2Onebot11Adapter(AyakaAdapter):
+    '''nonebot2 onebot v11 适配器'''
 
     def first_init(self) -> None:
         '''在第一次初始化时执行'''
-        bot.on("message")(self.handle)
+        nonebot.on_message(handlers=[self.handle], block=False, priority=5)
 
     async def send_group(self, id: str, msg: str) -> bool:
         '''发送消息到指定群聊'''
+        bot = self.get_current_bot()
         try:
             await bot.send_group_msg(group_id=int(id), message=msg)
         except ActionFailed:
@@ -30,6 +34,7 @@ class HoshinoAdapter(AyakaAdapter):
 
     async def send_private(self, id: str, msg: str) -> bool:
         '''发送消息到指定私聊'''
+        bot = self.get_current_bot()
         try:
             await bot.send_private_msg(user_id=int(id), message=msg)
         except ActionFailed:
@@ -39,17 +44,21 @@ class HoshinoAdapter(AyakaAdapter):
 
     async def send_group_many(self, id: str, msgs: list[str]) -> bool:
         '''发送消息组到指定群聊'''
+        bot = self.get_current_bot()
         # 分割长消息组（不可超过100条
         div_len = 100
         div_cnt = ceil(len(msgs) / div_len)
-        bot_id = next(bot.get_self_ids())
         try:
             for i in range(div_cnt):
                 msgs = [
-                    {"user_id": bot_id, "nickname": "Ayaka Bot", "content": m}
+                    MessageSegment.node_custom(
+                        user_id=bot.self_id,
+                        nickname="Ayaka Bot",
+                        content=m
+                    )
                     for m in msgs[i*div_len: (i+1)*div_len]
                 ]
-                await bot.call_action("send_group_forward_msg", group_id=int(id), messages=msgs)
+                await bot.send_group_forward_msg(group_id=int(id), messages=msgs)
         except ActionFailed:
             await bot.send_group_msg(group_id=int(id), message="合并转发消息发送失败")
         else:
@@ -57,19 +66,26 @@ class HoshinoAdapter(AyakaAdapter):
 
     async def get_group_member(self, gid: str, uid: str) -> GroupMemberInfo | None:
         '''获取群内某用户的信息'''
+        bot = self.get_current_bot()
         try:
             user = await bot.get_group_member_info(group_id=int(gid), user_id=int(uid))
-            return GroupMemberInfo(id=user["user_id"], name=user["card"] or user["nickname"], role=user["role"])
+            return GroupMemberInfo(
+                id=user["user_id"],
+                name=user["card"] or user["nickname"],
+                role=user["role"]
+            )
         except:
             pass
 
     async def get_group_members(self, gid: str) -> list[GroupMemberInfo]:
         '''获取群内所有用户的信息'''
+        bot = self.get_current_bot()
         try:
             users = await bot.get_group_member_list(group_id=int(gid))
             return [
                 GroupMemberInfo(
-                    id=user["user_id"],  role="admin",
+                    id=user["user_id"],
+                    role="admin",
                     name=user["card"] or user["nickname"],
                 )
                 for user in users
@@ -77,33 +93,22 @@ class HoshinoAdapter(AyakaAdapter):
         except:
             pass
 
-    async def handle(self, ev: CQEvent):
+    async def handle(self, bot: Bot, event: MessageEvent):
         '''将输入的参数加工为ayaka_event，请在最后调用self.handle_event进行处理'''
 
-        # 处理消息，保留text、at、reply
-        ms = ev.message
+        # 处理消息事件，保留text，reply，to_me或第一个at
         at = None
         reply = None
-        if ms[0].type == "reply":
-            bot = get_current_bot()
-            try:
-                d = await bot.get_msg(message_id=ms[0].data["id"])
-                reply = unescape(d["message"])
-            except:
-                pass
-            else:
-                at = ms[1].data["qq"]
-                ms = ms[2:]
+        if event.reply:
+            reply = str(event.reply.message)
+            at = str(event.reply.sender.user_id)
+        if not at and event.to_me:
+            at = bot.self_id
 
         args: list[str] = []
-        for m in ms:
+        for m in event.message:
             if m.type == "text":
-                arg = unescape(str(m))
-                # 删除第一个空格，真无语
-                if arg.startswith(" "):
-                    arg = arg[1:]
-                if arg:
-                    args.append(arg)
+                args.append(unescape(str(m)))
             elif not at and m.type == "at":
                 at = str(m.data["qq"])
             else:
@@ -112,13 +117,13 @@ class HoshinoAdapter(AyakaAdapter):
         msg = self.separate.join(args)
 
         # 组成ayaka事件
-        stype = ev.message_type
-        sid = ev.group_id if stype == "group" else ev.user_id
+        stype = event.message_type
+        sid = event.group_id if stype == "group" else event.user_id
         ayaka_event = AyakaEvent(
             session_type=stype,
             session_id=sid,
-            sender_id=ev.sender["user_id"],
-            sender_name=ev.sender.get("card") or ev.sender["nickname"],
+            sender_id=event.sender.user_id,
+            sender_name=event.sender.card or event.sender.nickname,
             message=msg,
             at=at,
             reply=reply,
@@ -129,20 +134,13 @@ class HoshinoAdapter(AyakaAdapter):
 
     def on_startup(self, async_func: Callable[..., Awaitable]):
         '''asgi服务启动后钩子，注册回调必须是异步函数'''
-        bot.on_startup(async_func)
+        driver.on_startup(async_func)
 
     @classmethod
-    def get_current_bot(cls):
+    def get_current_bot(cls) -> Bot:
         '''获取当前bot'''
-        return get_current_bot()
+        return current_bot.get()
 
 
-@singleton
-def get_current_bot():
-    return Service('ayaka').bot
-
-
-bot = get_current_bot()
-
-HoshinoAdapter.name = "hoshino"
-HoshinoAdapter.prefixes = list(config.COMMAND_START) or [""]
+Nonebot2Onebot11Adapter.name = "nb2.ob11"
+Nonebot2Onebot11Adapter.prefixes = list(driver.config.command_start) or [""]

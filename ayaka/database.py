@@ -1,7 +1,7 @@
 from loguru import logger
 from sqlmodel import create_engine, SQLModel, Session
-from .bridge import bridge
 from .helpers import ensure_dir_exists
+from .adapters import get_adapter
 
 sqlite_path = "data/ayaka/ayaka.db"
 ensure_dir_exists(sqlite_path)
@@ -9,10 +9,11 @@ sqlite_url = f"sqlite:///{sqlite_path}"
 engine = create_engine(sqlite_url)
 
 
-@bridge.on_startup
 async def orm_init():
     SQLModel.metadata.create_all(engine)
-    logger.info("数据库已连接")
+    logger.success("数据库已连接")
+
+get_adapter().on_startup(orm_init)
 
 
 def get_session(**kwargs):

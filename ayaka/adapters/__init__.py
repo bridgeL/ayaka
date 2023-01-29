@@ -1,5 +1,9 @@
+'''适配器，自动识别机器人框架和协议'''
 import sys
+from .adapter import AyakaAdapter, regist, get_adapter, adapter_dict
+from .model import AyakaEvent, GroupMemberInfo
 from ..logger import ayaka_clog
+from ..config import root_config
 
 
 def is_hoshino():
@@ -21,19 +25,28 @@ def is_nb2ob11():
         return True
 
 
-# hoshino
-if is_hoshino():
-    from . import hoshino as __hoshino
+# 自动导入
+if root_config.auto_detect:
+    # hoshino
+    if is_hoshino():
+        from .hoshino import HoshinoAdapter
+        regist(HoshinoAdapter)
 
-# nonebot1
-elif is_nb1():
-    from . import nb1 as __nb1
+    # nonebot1
+    if is_nb1():
+        from .nb1 import Nonebot1Adapter
+        regist(Nonebot1Adapter)
 
-# nonebot2 onebot11
-elif is_nb2ob11():
-    from . import nb2ob11 as __nb2ob11
+    # nonebot2 onebot11
+    if is_nb2ob11():
+        from .nb2.ob11 import Nonebot2Onebot11Adapter
+        regist(Nonebot2Onebot11Adapter)
 
-# console
-else:
-    ayaka_clog("未检测到环境信息，加载为<y>console</y>程序")
-    from .console import run
+        if root_config.auto_ob11_qqguild_patch:
+            from .nb2.qqguild_patch import Nonebot2Onebot11QQguildPatchAdapter
+            regist(Nonebot2Onebot11QQguildPatchAdapter)
+
+    if not adapter_dict:
+        ayaka_clog("未检测到环境信息，加载为<y>console</y>程序")
+        from .console import ConsoleAdapter, run
+        regist(ConsoleAdapter)

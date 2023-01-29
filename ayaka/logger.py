@@ -16,11 +16,6 @@ ayaka_log = partial(logger.log, "AYAKA")
 
 使用方法 ayaka_log("msg")'''
 
-clogger = logger.opt(colors=True)
-'''彩色 logger（有<>不匹配风险）
-
-使用方法 clogger.success("<r>msg</r>")'''
-
 logger_format = "<g>{time:MM-DD HH:mm:ss}</g> [<lvl>{level}</lvl>] <c><u>{name}</u></c> | {message}"
 
 

@@ -2,23 +2,61 @@
 import re
 import uvicorn
 import asyncio
-from loguru import logger
 from fastapi import FastAPI
 from typing import Awaitable, Callable
-from ..logger import ayaka_log, ayaka_clog
-from ..event import AyakaEvent
-from ..bridge import bridge, GroupMemberInfo
+
+from .adapter import AyakaAdapter
+from .model import GroupMemberInfo, AyakaEvent
 from ..helpers import ensure_dir_exists
+from ..logger import ayaka_log, ayaka_clog
 
 
-pt = re.compile(r"@([^ ]+?)(?= |$)")
+at_pt = re.compile(r"@([^ ]+?)(?= |$)")
 
 
-async def handle_event(ayaka_event: AyakaEvent) -> None:
-    try:
-        await bridge.handle_event(ayaka_event)
-    except:
-        logger.exception(f"ayaka 处理事件（{ayaka_event}）时发生错误")
+class ConsoleAdapter(AyakaAdapter):
+    '''console 适配器'''
+
+    def first_init(self) -> None:
+        '''在第一次初始化时执行'''
+        handler.handle_event = self.handle_event
+
+    async def send_group(self, id: str, msg: str) -> bool:
+        '''发送消息到指定群聊'''
+        ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
+        print(msg)
+        return True
+
+    async def send_private(self, id: str, msg: str) -> bool:
+        '''发送消息到指定私聊'''
+        ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
+        print(msg)
+        return True
+
+    async def send_group_many(self, id: str, msgs: list[str]) -> bool:
+        '''发送消息组到指定群聊'''
+        ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
+        print("\n\n".join(msgs))
+        return True
+
+    async def get_group_member(self, gid: str, uid: str) -> GroupMemberInfo | None:
+        '''获取群内某用户的信息'''
+        return GroupMemberInfo(id=uid, name=f"测试{uid}号", role="admin")
+
+    async def get_group_members(self, gid: str) -> list[GroupMemberInfo]:
+        '''获取群内所有用户的信息'''
+        return [
+            GroupMemberInfo(id=uid, name=f"测试{uid}号", role="admin")
+            for uid in [i+1 for i in range(100)]
+        ]
+
+    def on_startup(self, async_func: Callable[..., Awaitable]):
+        '''asgi服务启动后钩子，注册回调必须是异步函数'''
+        app.on_event("startup")(async_func)
+
+
+ConsoleAdapter.name = "console"
+ConsoleAdapter.prefixes = [""]
 
 
 class Handler:
@@ -28,6 +66,7 @@ class Handler:
         self.sender_id = 0
         self.sender_name = ""
         self.func_dict: dict[str, Callable[[str], Awaitable]] = {}
+        self.handle_event = None
 
     async def handle_line(self, line: str):
         for cmd, func in self.func_dict.items():
@@ -54,7 +93,7 @@ class Handler:
         ayaka_log(msg)
 
         at = None
-        for r in pt.finditer(msg):
+        for r in at_pt.finditer(msg):
             at = r.group(1)
             msg = msg[:r.start()]+msg[r.end():]
             break
@@ -68,33 +107,7 @@ class Handler:
             at=at
         )
 
-        asyncio.create_task(handle_event(ayaka_event))
-
-
-handler = Handler()
-app = FastAPI()
-
-
-def on_startup(func):
-    app.on_event("startup")(func)
-
-
-async def send_group(id: str, msg: str) -> bool:
-    ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
-    print(msg)
-    return True
-
-
-async def send_private(id: str, msg: str) -> bool:
-    ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
-    print(msg)
-    return True
-
-
-async def send_group_many(id: str, msgs: list[str]) -> bool:
-    ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
-    print("\n\n".join(msgs))
-    return True
+        asyncio.create_task(self.handle_event(ayaka_event))
 
 
 def safe_split(text: str,  n: int, sep: str = " "):
@@ -103,6 +116,10 @@ def safe_split(text: str,  n: int, sep: str = " "):
     if i < n - 1:
         text += sep * (n - i - 1)
     return text.split(sep, maxsplit=n-1)
+
+
+app = FastAPI()
+handler = Handler()
 
 
 async def console_loop():
@@ -114,44 +131,17 @@ async def console_loop():
         await handler.handle_line(line)
 
 
-async def start_console_loop():
+@app.on_event("startup")
+async def init():
     asyncio.create_task(console_loop())
 
 
-async def get_member_info(gid: str, uid: str):
-    return GroupMemberInfo(id=uid, name=f"测试{uid}号", role="admin")
-
-
-async def get_member_list(gid: str):
-    return [
-        GroupMemberInfo(id=uid, name=f"测试{uid}号", role="admin")
-        for uid in [i+1 for i in range(100)]
-    ]
-
-
-def get_prefixes():
-    return [""]
-
-
-# 注册外部服务
-bridge.regist(send_group)
-bridge.regist(send_private)
-bridge.regist(send_group_many)
-bridge.regist(get_prefixes)
-bridge.regist(get_member_info)
-bridge.regist(get_member_list)
-bridge.regist(on_startup)
-
-# 内部服务注册到外部
-on_startup(start_console_loop)
-
-
-@ handler.on("#")
+@handler.on("#")
 async def _(line: str):
     pass
 
 
-@ handler.on("p ")
+@handler.on("p ")
 async def _(line: str):
     uid, msg = safe_split(line, 2)
     handler.sender_id = uid
@@ -162,7 +152,7 @@ async def _(line: str):
         handler.handle_msg(msg)
 
 
-@ handler.on("g ")
+@handler.on("g ")
 async def _(line: str):
     gid, uid, msg = safe_split(line, 3)
     handler.sender_id = uid
@@ -173,7 +163,7 @@ async def _(line: str):
         handler.handle_msg(msg)
 
 
-@ handler.on("d ")
+@handler.on("d ")
 async def _(line: str):
     try:
         n = float(line)
@@ -183,7 +173,7 @@ async def _(line: str):
     print()
 
 
-@ handler.on("s ")
+@handler.on("s ")
 async def _(line: str):
     path = ensure_dir_exists(f"script/{line}.txt")
     if not path.exists():
@@ -205,7 +195,7 @@ async def _(line: str):
         await handler.handle_line(after)
 
 
-@ handler.on("h")
+@handler.on("h")
 async def show_help(line: str):
     if line.strip():
         return await deal_line(f"h{line}")
@@ -216,7 +206,7 @@ async def show_help(line: str):
     ayaka_clog("<y>h</y> | 查看帮助")
 
 
-@ handler.on("")
+@handler.on("")
 async def deal_line(msg: str):
     if not handler.session_id or not handler.sender_id:
         return ayaka_log("请先设置默认角色（发出第一条模拟消息后自动设置）")

@@ -1,6 +1,5 @@
 '''猫猫管理器'''
-from .cat import AyakaCat
-from .manager import manager
+from .core import AyakaCat, manager
 
 
 cat = AyakaCat("猫猫管理器", overtime=-1)
