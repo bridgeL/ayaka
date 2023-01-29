@@ -68,6 +68,17 @@ base_send_group，base_send_private，base_send_group_many
 - 破坏性变更：AyakaParams被AyakaContext取代
 - 修复BUG：多prefix时，文字回调的触发日志错误的多次打印
 
-## 0.0.2.1
+### 0.0.2.1
 
 - 变更：不再使用command_sep配置
+
+### 0.0.2.2a0
+
+- 破坏性变更：删除了bridge.get_separates方法
+
+## 0.0.3.0
+
+- 重构代码：现在，ayaka能够同时注册多个适配器
+- 新特性：新增配置项 auto_detect，auto_ob11_qqguild_patch
+- 新特性：新增适配器 qqguild
+- 破坏性变更：删除了bridge
