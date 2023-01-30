@@ -117,6 +117,20 @@ async def _():
 
 期间任意回调block为True或抛出`BlockException`都会导致消息传播的结束
 
+## 钩子函数
+
+```py
+from ayaka import get_adapter
+
+adapter = get_adapter()
+
+@adapter.on_startup
+async def func():
+    print("hi")
+```
+
+func将在asgi服务启动后，发送hi
+
 ## 下一步
 
 <div align="right">

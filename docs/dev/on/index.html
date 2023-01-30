@@ -568,6 +568,13 @@
       
         <li class="md-nav__item">
   <a href="#_9" class="md-nav__link">
+    钩子函数
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
     下一步
   </a>
   
@@ -780,7 +787,17 @@
 <li>文字回调</li>
 </ul>
 <p>期间任意回调block为True或抛出<code>BlockException</code>都会导致消息传播的结束</p>
-<h2 id="_9">下一步<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<h2 id="_9">钩子函数<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">get_adapter</span>
+
+<span class="n">adapter</span> <span class="o">=</span> <span class="n">get_adapter</span><span class="p">()</span>
+
+<span class="nd">@adapter</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">func</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>func将在asgi服务启动后，发送hi</p>
+<h2 id="_10">下一步<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
 <div align="right">
     在这里~ ↘
 </div>
