@@ -82,3 +82,5 @@ base_send_group，base_send_private，base_send_group_many
 - 新特性：新增配置项 auto_detect，auto_ob11_qqguild_patch
 - 新特性：新增适配器 qqguild
 - 破坏性变更：删除了bridge
+- 修复BUG：当命令前缀不为空时，上下文结果与预期不符，受影响的上下文：cat.arg、cat.args、cat.nums
+- 优化日志表现
