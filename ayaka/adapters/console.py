@@ -7,6 +7,7 @@ from typing import Awaitable, Callable
 
 from .adapter import AyakaAdapter
 from .model import GroupMemberInfo, AyakaEvent
+from .detect import is_hoshino, is_nb1, is_nb2ob11
 from ..helpers import ensure_dir_exists
 from ..logger import ayaka_log, ayaka_clog
 
@@ -20,6 +21,7 @@ class ConsoleAdapter(AyakaAdapter):
     def first_init(self) -> None:
         '''在第一次初始化时执行'''
         handler.handle_event = self.handle_event
+        self.on_startup(start_loop)
 
     async def send_group(self, id: str, msg: str) -> bool:
         '''发送消息到指定群聊'''
@@ -52,7 +54,11 @@ class ConsoleAdapter(AyakaAdapter):
 
     def on_startup(self, async_func: Callable[..., Awaitable]):
         '''asgi服务启动后钩子，注册回调必须是异步函数'''
-        app.on_event("startup")(async_func)
+        if is_hoshino() or is_nb1():
+            import nonebot
+            nonebot.get_bot().on_startup(async_func)
+        else:
+            app.on_event("startup")(async_func)
 
 
 ConsoleAdapter.name = "console"
@@ -110,6 +116,10 @@ class Handler:
         asyncio.create_task(self.handle_event(ayaka_event))
 
 
+async def start_loop():
+    asyncio.create_task(console_loop())
+
+
 def safe_split(text: str,  n: int, sep: str = " "):
     '''安全分割字符串为n部分，不足部分使用空字符串补齐'''
     i = text.count(sep)
@@ -118,7 +128,15 @@ def safe_split(text: str,  n: int, sep: str = " "):
     return text.split(sep, maxsplit=n-1)
 
 
-app = FastAPI()
+if is_hoshino() or is_nb1():
+    import nonebot
+    app = nonebot.get_bot().asgi
+elif is_nb2ob11():
+    import nonebot
+    app = nonebot.get_asgi()
+else:
+    app = FastAPI()
+
 handler = Handler()
 
 
@@ -129,11 +147,6 @@ async def console_loop():
     while True:
         line = await loop.run_in_executor(None, input)
         await handler.handle_line(line)
-
-
-@app.on_event("startup")
-async def init():
-    asyncio.create_task(console_loop())
 
 
 @handler.on("#")
