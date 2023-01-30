@@ -14,6 +14,9 @@ if TYPE_CHECKING:
 # 获取命令前缀
 prefixes = get_adapter().prefixes
 
+# 获取参数分割符
+separate = get_adapter().separate
+
 
 class AyakaTrigger:
     def __init__(
@@ -71,9 +74,11 @@ class AyakaTrigger:
         context.trigger = self
         context.cmd = self.cmd
 
-        # 空格优先
-        separate = " "
-        n = len(prefix+self.cmd)
+        # 只有在有命令的情况下才剥离命令
+        if self.cmd:
+            n = len(prefix+self.cmd)
+        else:
+            n = 0
 
         # 剥离命令
         context.arg = context.event.message[n:].strip(separate)
