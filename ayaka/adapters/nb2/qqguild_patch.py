@@ -3,6 +3,7 @@ from html import unescape
 from typing import Literal
 from pydantic import Field, validator, root_validator, parse_obj_as
 
+import nonebot
 from nonebot.utils import escape_tag
 from nonebot.typing import overrides
 from nonebot.adapters.onebot.v11 import Adapter, Message, MessageEvent, MessageSegment, Bot, Event
@@ -123,10 +124,10 @@ class GuildMessageEvent(MessageEvent):
 class Nonebot2Onebot11QQguildPatchAdapter(Nonebot2Onebot11Adapter):
     '''nonebot2 onebot v11 qqguild patch 适配器'''
 
-    def first_init(__self) -> None:
+    def first_init(self) -> None:
         '''在第一次初始化时执行'''
         Adapter.add_custom_model(GuildMessageEvent)
-        super().first_init()
+        nonebot.on_message(handlers=[self.handle], block=False, priority=5)
 
     async def send_group(self, id: str, msg: str) -> bool:
         '''发送消息到指定群聊'''
@@ -153,7 +154,7 @@ class Nonebot2Onebot11QQguildPatchAdapter(Nonebot2Onebot11Adapter):
         '''发送消息到指定私聊'''
 
         # ---- 待完成 ----
-        raise NotImplementedError
+        await super().send_private(id, msg)
 
     async def send_group_many(self, id: str, msgs: list[str]) -> bool:
         '''发送消息组到指定群聊'''
@@ -162,15 +163,28 @@ class Nonebot2Onebot11QQguildPatchAdapter(Nonebot2Onebot11Adapter):
 
     async def get_group_member(self, gid: str, uid: str) -> GroupMemberInfo | None:
         '''获取群内某用户的信息'''
-
-        # ---- 待完成 ----
-        return GroupMemberInfo(id=uid, name=uid)
+        bot = self.get_current_bot()
+        guild_id, channel_id = gid.split(" ")
+        data = await bot.get_guild_member_profile(guild_id=guild_id, user_id=uid)
+        return GroupMemberInfo(id=uid, name=data["nickname"], role=str(data["roles"]))
 
     async def get_group_members(self, gid: str) -> list[GroupMemberInfo]:
         '''获取群内所有用户的信息'''
+        # ---- 待完善 ----
+        bot = self.get_current_bot()
+        guild_id, channel_id = gid.split(" ")
 
-        # ---- 待完成 ----
-        raise NotImplementedError
+        # 第一页
+        data = await bot.get_guild_member_list(guild_id=guild_id)
+
+        return [
+            GroupMemberInfo(
+                id=m["tiny_id"],
+                name=m["nickname"],
+                role=m["role_name"]
+            )
+            for m in data["members"]
+        ]
 
     async def handle(self, bot: Bot, event: GuildMessageEvent):
         '''将输入的参数加工为ayaka_event，请在最后调用self.handle_event进行处理'''
