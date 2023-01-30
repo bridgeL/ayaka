@@ -4,7 +4,7 @@ from loguru import logger
 from pydantic import ValidationError, BaseModel
 from .helpers import ensure_dir_exists
 
-AYAKA_VERSION = "0.0.3.0b0"
+AYAKA_VERSION = "0.0.3.0b1"
 logger.opt(colors=True).success(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
 data_path = ensure_dir_exists("data/ayaka")
 
