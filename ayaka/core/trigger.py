@@ -102,7 +102,10 @@ class AyakaTrigger:
             return False
 
         # 打印日志
-        items = [f"<y>猫猫</y> {self.cat.name}"]
+        items = [
+            f"<y>适配器</y> {get_adapter().name}",
+            f"<y>猫猫</y> {self.cat.name}"
+        ]
         if self.cmd:
             items.append(f"<y>命令</y> {self.cmd}")
         else:
