@@ -13,7 +13,8 @@ def is_hoshino():
 
 
 def is_nb1():
-    if "nonebot" in sys.modules:
+    # 防止hoshino重复注册
+    if "hoshino" not in sys.modules and "nonebot" in sys.modules:
         if hasattr(sys.modules["nonebot"], "NoneBot"):
             ayaka_clog("识别到 <y>nonebot1</y>，加载为nonebot1插件")
             return True
