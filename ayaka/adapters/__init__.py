@@ -8,12 +8,12 @@ from ..config import root_config
 if root_config.auto_detect:
     # hoshino
     if is_hoshino():
-        from .hoshino import HoshinoAdapter
+        from .nb1.hoshino import HoshinoAdapter
         regist(HoshinoAdapter)
 
     # nonebot1
     if is_nb1():
-        from .nb1 import Nonebot1Adapter
+        from .nb1.nb1 import Nonebot1Adapter
         regist(Nonebot1Adapter)
 
     # nonebot2 onebot11

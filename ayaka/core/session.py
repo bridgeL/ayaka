@@ -97,7 +97,7 @@ class AyakaGroup(AyakaSession):
         return gm
 
 
-SessionClasses: list[type[AyakaSession]] = [AyakaPrivate,  AyakaGroup]
+SessionClasses: list[type[AyakaSession]] = [AyakaPrivate, AyakaGroup]
 '''session类列表'''
 
 

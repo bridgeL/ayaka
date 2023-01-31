@@ -150,11 +150,7 @@ class Nonebot2Onebot11QQguildPatchAdapter(Nonebot2Onebot11Adapter):
         else:
             return True
 
-    async def send_private(self, id: str, msg: str) -> bool:
-        '''发送消息到指定私聊'''
-
-        # ---- 待完成 ----
-        await super().send_private(id, msg)
+    # ---- 待完成 发送消息到指定私聊 ----
 
     async def send_group_many(self, id: str, msgs: list[str]) -> bool:
         '''发送消息组到指定群聊'''

@@ -95,6 +95,10 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
 
     async def handle(self, bot: Bot, event: MessageEvent):
         '''将输入的参数加工为ayaka_event，请在最后调用self.handle_event进行处理'''
+        
+        # 排除频道适配事件
+        if hasattr(event, "guild_id"):
+            return
 
         # 处理消息事件，保留text，reply，to_me或第一个at
         at = None

@@ -1,19 +1,18 @@
-'''适配 hoshino 机器人'''
+'''适配 nonebot1 机器人'''
 from math import ceil
 from html import unescape
 from typing import Awaitable, Callable
 
-from hoshino import Service, config
+import nonebot
 from aiocqhttp import Event as CQEvent
 from aiocqhttp.exceptions import ActionFailed
 
-from .adapter import AyakaAdapter
-from .model import GroupMemberInfo, AyakaEvent
-from ..helpers import singleton
+from ..adapter import AyakaAdapter
+from ..model import GroupMemberInfo, AyakaEvent
 
 
-class HoshinoAdapter(AyakaAdapter):
-    '''hoshino 适配器'''
+class Nonebot1Adapter(AyakaAdapter):
+    '''nonebot1 适配器'''
 
     def first_init(self) -> None:
         '''在第一次初始化时执行'''
@@ -59,7 +58,11 @@ class HoshinoAdapter(AyakaAdapter):
         '''获取群内某用户的信息'''
         try:
             user = await bot.get_group_member_info(group_id=int(gid), user_id=int(uid))
-            return GroupMemberInfo(id=user["user_id"], name=user["card"] or user["nickname"], role=user["role"])
+            return GroupMemberInfo(
+                id=user["user_id"],
+                name=user["card"] or user["nickname"],
+                role=user["role"]
+            )
         except:
             pass
 
@@ -69,7 +72,8 @@ class HoshinoAdapter(AyakaAdapter):
             users = await bot.get_group_member_list(group_id=int(gid))
             return [
                 GroupMemberInfo(
-                    id=user["user_id"],  role="admin",
+                    id=user["user_id"],
+                    role="admin",
                     name=user["card"] or user["nickname"],
                 )
                 for user in users
@@ -85,7 +89,6 @@ class HoshinoAdapter(AyakaAdapter):
         at = None
         reply = None
         if ms[0].type == "reply":
-            bot = get_current_bot()
             try:
                 d = await bot.get_msg(message_id=ms[0].data["id"])
                 reply = unescape(d["message"])
@@ -134,15 +137,10 @@ class HoshinoAdapter(AyakaAdapter):
     @classmethod
     def get_current_bot(cls):
         '''获取当前bot'''
-        return get_current_bot()
+        return bot
 
 
-@singleton
-def get_current_bot():
-    return Service('ayaka').bot
+bot = nonebot.get_bot()
 
-
-bot = get_current_bot()
-
-HoshinoAdapter.name = "hoshino"
-HoshinoAdapter.prefixes = list(config.COMMAND_START) or [""]
+Nonebot1Adapter.name = "nb1"
+Nonebot1Adapter.prefixes = list(bot.config.COMMAND_START) or [""]
