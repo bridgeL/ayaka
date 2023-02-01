@@ -84,3 +84,8 @@ base_send_group，base_send_private，base_send_group_many
 - 破坏性变更：删除了bridge
 - 修复BUG：当命令前缀不为空时，上下文结果与预期不符，受影响的上下文：cat.arg、cat.args、cat.nums
 - 优化日志表现
+
+## 0.0.3.1
+
+- 修复BUG：频道消息事件意外地被ob11适配器处理
+- 新特性：更好的猫猫帮助和猫猫状态，已支持sub_state
