@@ -193,7 +193,7 @@ if __name__ == "__main__":
 python run.py
 ```
 
-### 测试脚本
+### 编写测试脚本
 
 ```
 # script/muyu.txt
@@ -283,9 +283,10 @@ ayaka自动为以上三个插件生成了帮助
 <div class="demo">
 "user" 说：猫猫帮助 赌石
 "Bot" 说：[赌石]
-- 赌石/stone 唤醒猫猫
+猫猫插件：赌石
 [*]
 - 退出/exit 猫猫休息
+- 赌石/stone 唤醒猫猫
 [idle]
 - 敲/hit
 </div>
@@ -293,9 +294,10 @@ ayaka自动为以上三个插件生成了帮助
 <div class="demo">
 "user" 说：猫猫帮助 木鱼
 "Bot" 说：[木鱼]
-- 木鱼/muyu 唤醒猫猫
+猫猫插件：木鱼
 [*]
 - 退出/exit 猫猫休息
+- 木鱼/muyu 唤醒猫猫
 [idle]
 - 敲/hit
 - 查询功德/query
@@ -303,12 +305,15 @@ ayaka自动为以上三个插件生成了帮助
 </div>
 
 <div class="demo">
-"user" 说：猫猫帮助 赌石
+"user" 说：猫猫帮助 人员登记
 "Bot" 说：[人员登记]
+猫猫插件：人员登记
 - 查看登记情况
 - 我要登记
-- &lt;任意文字>
-- &lt;任意文字>
+[age]
+-  &lt;任意文字>
+[name]
+-  &lt;任意文字>
 </div>
 
 ## 下一步

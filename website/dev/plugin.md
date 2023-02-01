@@ -57,3 +57,9 @@ async def rest():
 `cat.send`将自动根据上下文，发送到对应的群聊中
 
 若想指定群聊、私聊发送，请使用`cat.send_group`，`cat.send_private`
+
+## 下一步
+
+<div align="right">
+    在这里~ ↘
+</div>
