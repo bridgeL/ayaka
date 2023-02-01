@@ -11,14 +11,14 @@ from .trigger import AyakaTrigger
 from ..logger import init_error_log
 from ..helpers import ensure_list, singleton
 from ..adapters import AyakaEvent, get_adapter, auto_load_adapter
-from ..config import get_root_config
+from ..config import get_root_config, AYAKA_VERSION
 from ..database import create_all
 
 
 @singleton
 def init_all():
     '''初始化ayaka，仅执行一次'''
-    logger.opt(colors=True).info("初始化 <y>ayaka</y> 核心功能")
+    logger.opt(colors=True).info(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
 
     # 加载错误日志记录
     init_error_log()
