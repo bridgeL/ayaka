@@ -1,6 +1,6 @@
 ## 0.0.0.1
 
-喵，从nonebot_plugin_ayaka发源
+喵，从[nonebot_plugin_ayaka](https://github.com/bridgeL/nonebot-plugin-ayaka)发源
 
 ### 0.0.0.4
 
@@ -31,7 +31,7 @@
 - 修复BUG：特定情况下，AyakaParams无法正确解析参数
 - 修复BUG：猫猫管理器无法正确工作
 - 新增依赖：sqlmodel
-- 新增文档：本站
+- 新增文档站
 
 ### 0.0.1.2
 
@@ -53,7 +53,7 @@ add_private_redirect，remove_private_redirect
 
 ## 0.0.2.0
 
-重构代码
+重构代码，引入了sub_state的概念
 
 - 新特性：新增sub_state，从而实现对群成员状态的控制
 - 新特性：新增AyakaSession
@@ -78,7 +78,9 @@ base_send_group，base_send_private，base_send_group_many
 
 ## 0.0.3.0
 
-- 重构代码：现在，ayaka能够同时注册多个适配器
+重构代码，更加规范的、更利于拓展的适配器逻辑
+
+- 新特性：ayaka能够同时注册多个适配器
 - 新特性：新增配置项 auto_detect，auto_ob11_qqguild_patch
 - 新特性：新增适配器 qqguild
 - 破坏性变更：删除了bridge
@@ -87,5 +89,5 @@ base_send_group，base_send_private，base_send_group_many
 
 ### 0.0.3.1
 
-- 修复BUG：频道消息事件意外地被ob11适配器处理
 - 新特性：更好的猫猫帮助和猫猫状态，已支持sub_state
+- 修复BUG：频道消息事件意外地被ob11适配器处理
