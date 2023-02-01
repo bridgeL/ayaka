@@ -2,7 +2,7 @@
 
 插件最常用的交互模式便是通过命令来交互
 
-### 注册状态命令回调
+### 状态命令
 
 ```py
 @cat.on_cmd(cmds="命令A", states="状态1")
@@ -20,7 +20,7 @@ async def handle():
     ...
 ```
 
-### 注册通用状态命令回调
+### 通用状态命令
 
 通用状态命令匹配所有状态，在任意状态下均被ayaka接受并响应
 
@@ -39,7 +39,7 @@ async def rest():
     await cat.rest()
 ```
 
-### 注册空状态命令回调
+### 空状态命令
 
 大部分时间，你可以使用`cat.set_wakeup_cmds`来设置空状态命令
 
@@ -72,10 +72,10 @@ async def wakeup():
 
 这会导致这条命令并不会唤醒猫猫，令其状态保持为空状态
 
-## 注册子状态命令回调
+### 子状态命令
 
 ```py
-@cat.on_text(state="idle", sub_states="name")
+@cat.on_cmd(cmds="命令A", states="idle", sub_states="name")
 async def _():
     # do something
 ```
@@ -85,6 +85,12 @@ async def _():
 ## 注册文字回调
 
 与命令回调同理，只是不需要再写cmds了
+
+```py
+@cat.on_text(state="idle")
+async def _():
+    # do something
+```
 
 ## 高级
 

@@ -487,34 +487,34 @@
         
           <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
-    注册状态命令回调
+    状态命令
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
-    注册通用状态命令回调
+    通用状态命令
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
-    注册空状态命令回调
+    空状态命令
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    子状态命令
   </a>
   
 </li>
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    注册子状态命令回调
-  </a>
   
 </li>
       
@@ -717,7 +717,7 @@
 
 <h2 id="_1">注册命令回调<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>插件最常用的交互模式便是通过命令来交互</p>
-<h3 id="_2">注册状态命令回调<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<h3 id="_2">状态命令<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;命令A&quot;</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;状态1&quot;</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">():</span>
     <span class="o">...</span>
@@ -728,7 +728,7 @@
 <span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">():</span>
     <span class="o">...</span>
 </code></pre></div>
-<h3 id="_3">注册通用状态命令回调<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<h3 id="_3">通用状态命令<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <p>通用状态命令匹配所有状态，在任意状态下均被ayaka接受并响应</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;命令A&quot;</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">():</span>
@@ -740,7 +740,7 @@
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;猫猫休息&#39;&#39;&#39;</span>
     <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">rest</span><span class="p">()</span>
 </code></pre></div>
-<h3 id="_4">注册空状态命令回调<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<h3 id="_4">空状态命令<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <p>大部分时间，你可以使用<code>cat.set_wakeup_cmds</code>来设置空状态命令</p>
 <div class="highlight"><pre><span></span><code><span class="n">cat</span><span class="o">.</span><span class="n">set_wakeup_cmds</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;猫猫A&quot;</span><span class="p">,</span> <span class="s2">&quot;catA&quot;</span><span class="p">])</span>
 </code></pre></div>
@@ -760,14 +760,18 @@
 </code></pre></div>
 <p>当然，你甚至可以不调用<code>cat.wakeup</code></p>
 <p>这会导致这条命令并不会唤醒猫猫，令其状态保持为空状态</p>
-<h2 id="_5">注册子状态命令回调<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_text</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">,</span> <span class="n">sub_states</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+<h3 id="_5">子状态命令<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;命令A&quot;</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">,</span> <span class="n">sub_states</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
     <span class="c1"># do something</span>
 </code></pre></div>
 <p>该回调会在群状态为<code>idle</code>，群成员状态为<code>name</code>时响应</p>
 <h2 id="_6">注册文字回调<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>与命令回调同理，只是不需要再写cmds了</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_text</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
+    <span class="c1"># do something</span>
+</code></pre></div>
 <h2 id="_7">高级<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <h3 id="always">always<a class="headerlink" href="#always" title="Permanent link">&para;</a></h3>
 <p>默认值 False</p>
