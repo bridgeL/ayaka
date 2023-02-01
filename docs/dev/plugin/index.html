@@ -8,20 +8,20 @@
       
       
       
-        <link rel="canonical" href="https://bridgel.github.io/ayaka/dev/on/">
+        <link rel="canonical" href="https://bridgel.github.io/ayaka/dev/plugin/">
       
       
-        <link rel="prev" href="../plugin/">
+        <link rel="prev" href="../disable/">
       
       
-        <link rel="next" href="../property/">
+        <link rel="next" href="../on/">
       
       <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.2">
     
     
       
-        <title>回调 - Ayaka 猫猫，猫猫 😸</title>
+        <title>插件编写示例 - Ayaka 猫猫，猫猫 😸</title>
       
     
     
@@ -70,11 +70,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#_1" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -104,7 +99,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              回调
+              插件编写示例
             
           </span>
         </div>
@@ -446,20 +441,6 @@
               
   
   
-  
-    <li class="md-nav__item">
-      <a href="../plugin/" class="md-nav__link">
-        插件编写示例
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
     
   
   
@@ -469,144 +450,24 @@
       
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          回调
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
-        回调
+        插件编写示例
       </a>
       
-        
-
+    </li>
   
 
-<nav class="md-nav md-nav--secondary" aria-label="本页索引">
+            
+          
+            
+              
   
   
   
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      本页索引
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    注册命令回调
-  </a>
-  
-    <nav class="md-nav" aria-label="注册命令回调">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    普通状态
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    通用状态
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    空状态
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#idle" class="md-nav__link">
-    idle状态
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    子状态
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    注册文字回调
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    高级
-  </a>
-  
-    <nav class="md-nav" aria-label="高级">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#always" class="md-nav__link">
-    always
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#auto_help" class="md-nav__link">
-    auto_help
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#block" class="md-nav__link">
-    block
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
-    处理顺序
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
-    钩子函数
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
-    下一步
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
+    <li class="md-nav__item">
+      <a href="../on/" class="md-nav__link">
+        回调
+      </a>
     </li>
   
 
@@ -736,110 +597,37 @@
 
 
 
-  <h1>回调</h1>
+<p>以赌石为例</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># example/stone.py</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
+<span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">AyakaCat</span>
 
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">on_cmd</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">cmds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">states</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">sub_states</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">always</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">block</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">auto_help</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="p">):</span>
+<span class="c1"># 创建一只猫猫</span>
+<span class="n">cat</span> <span class="o">=</span> <span class="n">AyakaCat</span><span class="p">(</span><span class="s2">&quot;赌石&quot;</span><span class="p">)</span>
+
+<span class="c1"># 设置唤醒和休息命令</span>
+<span class="n">cat</span><span class="o">.</span><span class="n">set_wakeup_cmds</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;赌石&quot;</span><span class="p">,</span> <span class="s2">&quot;stone&quot;</span><span class="p">])</span>
+<span class="n">cat</span><span class="o">.</span><span class="n">set_rest_cmds</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;退出&quot;</span><span class="p">,</span> <span class="s2">&quot;exit&quot;</span><span class="p">])</span>
 </code></pre></div>
-<h2 id="_1">注册命令回调<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>插件最常用的交互模式便是通过命令来交互</p>
-<h3 id="_2">普通状态<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;命令A&quot;</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;状态1&quot;</span><span class="p">)</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">():</span>
-    <span class="o">...</span>
-</code></pre></div>
-<p><strong>注意：回调必须是无参数的异步方法，ayaka的所有注册回调均是如此！</strong></p>
-<p>你也可以注册多个命令（命令别名），多个状态</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;命令A&quot;</span><span class="p">,</span> <span class="s2">&quot;命令B&quot;</span><span class="p">],</span> <span class="n">states</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;状态1&quot;</span><span class="p">,</span> <span class="s2">&quot;状态2&quot;</span><span class="p">])</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">():</span>
-    <span class="o">...</span>
-</code></pre></div>
-<h3 id="_3">通用状态<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>通用状态命令匹配所有<strong>非空</strong>状态，在任意状态下均被ayaka接受并响应</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;命令A&quot;</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">)</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">handle</span><span class="p">():</span>
-    <span class="o">...</span>
-</code></pre></div>
-<h3 id="_4">空状态<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p><code>cat</code>的初始状态是空，即<code>cat.state == ""</code></p>
-<p>空状态命令就是指在该状态下，可以响应的命令</p>
-<p>大部分时间，你可以使用<code>cat.set_wakeup_cmds</code>来设置空状态命令</p>
-<div class="highlight"><pre><span></span><code><span class="n">cat</span><span class="o">.</span><span class="n">set_wakeup_cmds</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;猫猫A&quot;</span><span class="p">,</span> <span class="s2">&quot;catA&quot;</span><span class="p">])</span>
-</code></pre></div>
-<p>实际上，它相当于</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;猫猫A&quot;</span><span class="p">,</span> <span class="s2">&quot;catA&quot;</span><span class="p">])</span>
+<p><code>cat.set_wakeup_cmds(cmds=["赌石", "stone"])</code> 相当于</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;赌石&quot;</span><span class="p">,</span> <span class="s2">&quot;stone&quot;</span><span class="p">],</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">wakeup</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;唤醒猫猫&#39;&#39;&#39;</span>
     <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">wakeup</span><span class="p">()</span>
     <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send_help</span><span class="p">()</span>
 </code></pre></div>
-<p><code>wakeup</code>方法将改变<code>cat</code>的状态，使其从<code>空状态</code>变为<code>idle状态</code></p>
-<p>你也可以加入参数，那么</p>
-<p><code>wakeup("test")</code>将使<code>cat</code>从<code>空状态</code>变为<code>test状态</code></p>
-<h3 id="idle">idle状态<a class="headerlink" href="#idle" title="Permanent link">&para;</a></h3>
-<p>idle状态是普通状态的一种，它是<code>wakeup</code>方法调用，<code>cat</code>的默认状态</p>
-<h3 id="_5">子状态<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;命令A&quot;</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">,</span> <span class="n">sub_states</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
-    <span class="c1"># do something</span>
+<p>而所有<code>cat</code>的初始状态都是空，即<code>cat.state == ""</code></p>
+<p>当发送<code>赌石</code>命令后，<code>cat</code>的状态从<code>空</code>转为<code>idle</code>（wakeup参数默认值），此时再次发送<code>赌石</code>命令，将不会再次触发该回调</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 编写业务逻辑</span>
+<span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;敲&quot;</span><span class="p">,</span> <span class="s2">&quot;hit&quot;</span><span class="p">],</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">hit</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;运气真好，开出了和田玉&quot;</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;只是一块破石头&quot;</span><span class="p">)</span>
 </code></pre></div>
-<p>该回调会在群状态为<code>idle</code>，群成员状态为<code>name</code>时响应</p>
-<p>同样的，子状态也有空子状态、通用子状态</p>
-<h2 id="_6">注册文字回调<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<p>与命令回调同理，只是不需要再写cmds了</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_text</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">)</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
-    <span class="c1"># do something</span>
-</code></pre></div>
-<h2 id="_7">高级<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
-<h3 id="always">always<a class="headerlink" href="#always" title="Permanent link">&para;</a></h3>
-<p>默认值 False</p>
-<p>设置为True，则该回调必定触发，不受ayaka各类状态规则的约束，并且执行优先级最高</p>
-<h3 id="auto_help">auto_help<a class="headerlink" href="#auto_help" title="Permanent link">&para;</a></h3>
-<p>默认值 True</p>
-<p>设置为False，则禁止对该回调生成猫猫帮助</p>
-<h3 id="block">block<a class="headerlink" href="#block" title="Permanent link">&para;</a></h3>
-<p>是否阻断消息传播</p>
-<p>默认值：命令回调 阻断，文字回调 不阻断</p>
-<h3 id="_8">处理顺序<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
-<p>消息传播依次经过</p>
-<ul>
-<li>always 命令回调</li>
-<li>always 文字回调</li>
-<li>命令回调</li>
-<li>通用状态 通用子状态</li>
-<li>通用状态 当前子状态</li>
-<li>当前状态 通用子状态</li>
-<li>当前状态 当前子状态</li>
-<li>文字回调</li>
-<li>通用状态 通用子状态</li>
-<li>通用状态 当前子状态</li>
-<li>当前状态 通用子状态</li>
-<li>当前状态 当前子状态</li>
-</ul>
-<p>期间任意回调block为True或抛出<code>BlockException</code>都会导致消息传播的结束</p>
-<h2 id="_9">钩子函数<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">get_adapter</span>
-
-<span class="n">adapter</span> <span class="o">=</span> <span class="n">get_adapter</span><span class="p">()</span>
-
-<span class="nd">@adapter</span><span class="o">.</span><span class="n">on_startup</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">func</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
-</code></pre></div>
-<p>func将在asgi服务启动后，发送hi</p>
-<h2 id="_10">下一步<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
-<div align="right">
-    在这里~ ↘
-</div>
+<p>当发送<code>敲</code>命令后，若<code>cat</code>的状态为<code>idle</code>，将触发该回调，随机一个结果，发送出去</p>
+<p><code>cat.send</code>将自动根据上下文，发送到对应的群聊中</p>
+<p>若想指定群聊、私聊发送，请使用<code>cat.send_group</code>，<code>cat.send_private</code></p>
 
 
 
@@ -868,7 +656,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../plugin/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 插件编写示例" rel="prev">
+          <a href="../disable/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 局限" rel="prev">
             <div class="md-footer__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
@@ -877,20 +665,20 @@
                 <span class="md-footer__direction">
                   Previous
                 </span>
-                插件编写示例
+                局限
               </div>
             </div>
           </a>
         
         
           
-          <a href="../property/" class="md-footer__link md-footer__link--next" aria-label="Next: 属性" rel="next">
+          <a href="../on/" class="md-footer__link md-footer__link--next" aria-label="Next: 回调" rel="next">
             <div class="md-footer__title">
               <div class="md-ellipsis">
                 <span class="md-footer__direction">
                   Next
                 </span>
-                属性
+                回调
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -41,6 +41,7 @@ nav:
   - 数据缓存: quickstart/cache.md
 - 深入: 
   - 局限: dev/disable.md
+  - 插件编写示例: dev/plugin.md
   - 回调: dev/on.md
   - 属性: dev/property.md
   - 缓存: dev/cache.md

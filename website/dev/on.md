@@ -43,15 +43,6 @@ async def handle():
     ...
 ```
 
-实际上，`cat.set_rest_cmds(cmds=cmds)`相当于
-
-```py
-@cat.on_cmd(cmds=cmds, states="*")
-async def rest():
-    '''猫猫休息'''
-    await cat.rest()
-```
-
 ### 空状态
 
 `cat`的初始状态是空，即`cat.state == ""`
