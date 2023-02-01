@@ -14,11 +14,28 @@ from ..helpers import ensure_list
 from ..adapters import AyakaEvent
 
 
-async def run_triggers(ts: list[AyakaTrigger]):
-    # 遍历尝试执行
-    for t in ts:
-        if await t.run():
-            return
+class AyakaFuncHelp:
+    def __init__(self,  cmds: list[str], states: list[str], sub_states: list[str], func: Callable[[], Awaitable]) -> None:
+        self.cmds = cmds
+        self.states = states
+        self.sub_states = sub_states
+        self.func = func
+
+        info = "- "
+        if cmds and cmds[0]:
+            info += "/".join(cmds) + " "
+        else:
+            info += "<任意文字> "
+
+        if func.__doc__:
+            info += func.__doc__
+
+        self.info = info
+
+    def state_iter(self):
+        for s in self.states:
+            for ss in self.sub_states:
+                yield f"{s}.{ss}"
 
 
 class AyakaManager:
@@ -33,7 +50,13 @@ class AyakaManager:
     @property
     def wakeup_cats(self):
         '''所有不处于空状态的猫猫'''
-        return [c for c in self.cats if c.state]
+        return [c for c in self.cats if c.state or c.sub_state]
+
+    async def run_triggers(self, ts: list[AyakaTrigger]):
+        # 遍历尝试执行
+        for t in ts:
+            if await t.run():
+                return
 
     async def handle_event(self, event: AyakaEvent):
         '''处理和转发事件'''
@@ -50,7 +73,7 @@ class AyakaManager:
 
         # 同时执行
         tasks = [
-            asyncio.create_task(run_triggers(ts))
+            asyncio.create_task(self.run_triggers(ts))
             for ts in ts_list if ts
         ]
         await asyncio.gather(*tasks)
@@ -124,12 +147,11 @@ class AyakaManager:
 
 
 manager = AyakaManager()
-
-
-'''猫猫核心'''
+'''分发事件'''
 
 
 cwd = Path(".").absolute()
+'''当前工作目录'''
 
 T = TypeVar("T")
 '''任意类型'''
@@ -190,7 +212,7 @@ class AyakaCat:
         self._intro = ""
         '''猫猫介绍'''
 
-        self._helps: dict[str, list] = {}
+        self._helps: list[AyakaFuncHelp] = []
         '''自动猫猫帮助'''
 
         self._invalid_list = root_config.block_cat_dict.get(name, [])
@@ -378,7 +400,8 @@ class AyakaCat:
 
         def decorator(func: Callable[[], Awaitable]):
             if auto_help:
-                self._add_help(cmds, states, func)
+                self._helps.append(AyakaFuncHelp(
+                    cmds, states, sub_states, func))
 
             for cmd in cmds:
                 for state in states:
@@ -433,43 +456,31 @@ class AyakaCat:
         return self.on_cmd(states=states, always=always, block=block, auto_help=auto_help, sub_states=sub_states)
 
     # ---- 猫猫帮助 ----
-    def _add_help(self, cmds: list[str], states: list[str], func: Callable[[], Awaitable]):
-        '''添加帮助
-
-        参数:
-
-            cmds: 命令
-
-            states: 状态
-
-            func: 回调
-        '''
-        info = "- "
-        if cmds and cmds[0]:
-            info += "/".join(cmds) + " "
-        else:
-            info += "<任意文字> "
-        if func.__doc__:
-            info += func.__doc__
-        for state in states:
-            if state not in self._helps:
-                self._helps[state] = [info]
-            else:
-                self._helps[state].append(info)
-
     @property
     def help(self):
         '''猫猫帮助'''
         items = [f"[{self.name}]"]
         if self._intro:
             items.append(self._intro)
-        items.extend(self._helps.get("", []))
+        else:
+            items.append(f"猫猫插件：{self.name}")
 
-        for state, infos in self._helps.items():
-            if not state:
-                continue
-            items.append(f"[{state}]")
-            items.extend(infos)
+        state_dict = {}
+        for h in self._helps:
+            for s in h.state_iter():
+                if s not in state_dict:
+                    state_dict[s] = h.info
+                else:
+                    state_dict[s] += f"\n{h.info}"
+
+        state_dict = list(state_dict.items())
+        state_dict.sort(key=lambda x: x[0])
+
+        for k, v in state_dict:
+            k = k.strip(".")
+            if k:
+                items.append(f"[{k}]")
+            items.append(v)
 
         return "\n".join(items)
 
