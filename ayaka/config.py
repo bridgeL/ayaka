@@ -2,11 +2,15 @@
 import json
 from loguru import logger
 from pydantic import ValidationError, BaseModel
-from .helpers import ensure_dir_exists
+from .helpers import ensure_dir_exists, singleton
 
 AYAKA_VERSION = "0.0.3.1"
-logger.opt(colors=True).success(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
-data_path = ensure_dir_exists("data/ayaka")
+logger.opt(colors=True).info(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
+
+
+@singleton
+def get_data_path():
+    return ensure_dir_exists("data/ayaka")
 
 
 class AyakaConfig(BaseModel):
@@ -19,16 +23,13 @@ class AyakaConfig(BaseModel):
     __config_name__ = ""
     '''配置文件的名称'''
 
-    def __init__(self):
+    def __init__(self, **data):
         name = self.__config_name__
         if not name:
             raise Exception("__config_name__不可为空")
 
-        # 默认空数据
-        data = {}
-
         try:
-            path = data_path / f"{name}.json"
+            path = get_data_path() / f"{name}.json"
             # 存在则读取
             if path.exists():
                 with path.open("r", encoding="utf8") as f:
@@ -55,11 +56,12 @@ class AyakaConfig(BaseModel):
         '''修改可变成员变量后，需要使用该方法才能保存其值到文件'''
         name = self.__config_name__
         data = self.dict()
-        path = data_path / f"{name}.json"
+        path = get_data_path() / f"{name}.json"
         with path.open("w+", encoding="utf8") as f:
             json.dump(data, f, ensure_ascii=0, indent=4)
 
 
+@singleton
 class RootConfig(AyakaConfig):
     '''根配置'''
 
@@ -68,9 +70,6 @@ class RootConfig(AyakaConfig):
     version: str = AYAKA_VERSION
     '''版本号'''
 
-    auto_detect: bool = True
-    '''自动探测机器人框架'''
-
     auto_ob11_qqguild_patch: bool = True
     '''在ob11协议中自动使用qqguild_patch'''
 
@@ -78,7 +77,6 @@ class RootConfig(AyakaConfig):
     '''屏蔽列表，dict[cat_name:list[session_mark]]'''
 
 
-root_config = RootConfig()
-'''ayaka根配置'''
-
-root_config.version = AYAKA_VERSION
+def get_root_config():
+    '''获取ayaka根配置'''
+    return RootConfig()

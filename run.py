@@ -1,4 +1,4 @@
-import ayaka.adapters as cat
+import ayaka.adapters.console as cat
 
 # 加载插件
 from example import stone

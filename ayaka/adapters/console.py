@@ -54,11 +54,7 @@ class ConsoleAdapter(AyakaAdapter):
 
     def on_startup(self, async_func: Callable[..., Awaitable]):
         '''asgi服务启动后钩子，注册回调必须是异步函数'''
-        if is_hoshino() or is_nb1():
-            import nonebot
-            nonebot.get_bot().on_startup(async_func)
-        else:
-            app.on_event("startup")(async_func)
+        on_startup(async_func)
 
 
 ConsoleAdapter.name = "console"
@@ -131,11 +127,14 @@ def safe_split(text: str,  n: int, sep: str = " "):
 if is_hoshino() or is_nb1():
     import nonebot
     app = nonebot.get_bot().asgi
+    on_startup = nonebot.get_bot().on_startup
 elif is_nb2ob11():
     import nonebot
     app = nonebot.get_asgi()
+    on_startup = nonebot.get_driver().on_startup
 else:
     app = FastAPI()
+    on_startup = app.on_event("startup")
 
 handler = Handler()
 

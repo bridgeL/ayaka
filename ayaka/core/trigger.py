@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Awaitable, Callable
 from loguru import logger
 from .context import get_context, set_context
 from .exception import BlockException, NotBlockException
-from ..helpers import simple_repr
+from ..helpers import simple_repr, singleton
 from ..adapters import get_adapter
 
 
@@ -11,11 +11,16 @@ if TYPE_CHECKING:
     from .cat import AyakaCat
 
 
-# 获取命令前缀
-prefixes = get_adapter().prefixes
+@singleton
+def get_prefixes():
+    '''获取命令前缀'''
+    return get_adapter().prefixes
 
-# 获取参数分割符
-separate = get_adapter().separate
+
+@singleton
+def get_separate():
+    '''获取参数分割符'''
+    return get_adapter().separate
 
 
 class AyakaTrigger:
@@ -80,6 +85,8 @@ class AyakaTrigger:
         else:
             n = 0
 
+        separate = get_separate()
+
         # 剥离命令
         context.arg = context.event.message[n:].strip(separate)
 
@@ -95,7 +102,7 @@ class AyakaTrigger:
 
     async def run(self):
         # 预检查并做一些预处理
-        for prefix in prefixes:
+        for prefix in get_prefixes():
             if self.pre_run(prefix):
                 break
         else:

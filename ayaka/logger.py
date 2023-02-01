@@ -33,7 +33,13 @@ if not logger._core.handlers:
     logger.add(sys.stdout, level=0, diagnose=False, format=logger_format)
 
 
-# 输出报错至本地日志文件
-error_path = ensure_dir_exists("data/ayaka/error.log")
-file = error_path.open("a+", encoding="utf8")
-logger.add(file, level="ERROR", diagnose=False, format="\n\n"+logger_format)
+def init_error_log():
+    # 输出报错至本地日志文件
+    error_path = ensure_dir_exists("data/ayaka/error.log")
+    file = error_path.open("a+", encoding="utf8")
+    logger.add(
+        file,
+        level="ERROR",
+        diagnose=False,
+        format="\n\n"+logger_format
+    )

@@ -8,10 +8,29 @@ from .session import get_session_cls, AyakaSession, AyakaGroup, AyakaPrivate
 from .context import get_context, set_context
 from .exception import DuplicateCatNameError
 from .trigger import AyakaTrigger
-from ..config import root_config
-from ..adapters import get_adapter
-from ..helpers import ensure_list
-from ..adapters import AyakaEvent
+from ..logger import init_error_log
+from ..helpers import ensure_list, singleton
+from ..adapters import AyakaEvent, get_adapter, auto_load_adapter
+from ..config import get_root_config
+from ..database import create_all
+
+
+@singleton
+def init_all():
+    '''初始化ayaka，仅执行一次'''
+    logger.opt(colors=True).info("初始化 <y>ayaka</y> 核心功能")
+
+    # 加载错误日志记录
+    init_error_log()
+
+    # 加载适配器
+    auto_load_adapter()
+
+    # 注册数据库加载函数
+    get_adapter().on_startup(create_all)
+
+    # 加载猫猫管理器
+    from .. import master
 
 
 class AyakaFuncHelp:
@@ -177,6 +196,9 @@ class AyakaCat:
 
             overtime：超时未收到指令则自动关闭，单位：秒，<=0则禁止该特性
         '''
+        # 异味代码...但是不想改
+        init_all()
+
         self.name = name
         manager.add_cat(self)
 
@@ -215,7 +237,7 @@ class AyakaCat:
         self._helps: list[AyakaFuncHelp] = []
         '''自动猫猫帮助'''
 
-        self._invalid_list = root_config.block_cat_dict.get(name, [])
+        self._invalid_list = get_root_config().block_cat_dict.get(name, [])
         '''被各个会话的屏蔽情况'''
 
     # ---- 超时控制 ----
@@ -278,6 +300,7 @@ class AyakaCat:
             change_flag = True
 
         if change_flag:
+            root_config = get_root_config()
             if self._invalid_list:
                 root_config.block_cat_dict[self.name] = self._invalid_list
             else:

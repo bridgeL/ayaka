@@ -1,9 +1,8 @@
 '''适配器基类'''
-from contextvars import ContextVar
 from loguru import logger
+from contextvars import ContextVar
 from typing import Awaitable, Callable
 from .model import GroupMemberInfo, AyakaEvent
-from ..logger import ayaka_clog
 
 adapter_name_ctx: ContextVar[str] = ContextVar("adapter_name_ctx")
 
@@ -66,6 +65,7 @@ adapter_dict: dict[str, AyakaAdapter] = {}
 
 def regist(adapter_cls: type[AyakaAdapter]):
     '''注册适配器'''
+
     name = adapter_cls.name
     if name in adapter_dict:
         return adapter_dict[name]
@@ -73,7 +73,7 @@ def regist(adapter_cls: type[AyakaAdapter]):
     adapter = adapter_cls()
     adapter.first_init()
     adapter_dict[name] = adapter
-    ayaka_clog(f"ayaka适配器注册成功 <y>{name}</y>")
+    logger.opt(colors=True).info(f"ayaka适配器注册成功 <y>{name}</y>")
     return adapter
 
 

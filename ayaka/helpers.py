@@ -49,13 +49,15 @@ async def do_nothing():
 
 def singleton(cls):
     '''单例模式的装饰器'''
-    instance = None
+    result = None
+    done = False
 
     def getinstance(*args, **kwargs):
-        nonlocal instance
-        if instance is None:
-            instance = cls(*args, **kwargs)
-        return instance
+        nonlocal result, done
+        if not done:
+            done = True
+            result = cls(*args, **kwargs)
+        return result
 
     return getinstance
 
@@ -139,19 +141,19 @@ def debug_print(*args):
 
 def simple_repr(obj: object, exclude: set[str] = set(), **params):
     '''快速获得一份简单的对象repr
-    
+
     参数：
 
         obj：对象
-        
+
         exclude：不展示该对象的一些属性
-        
+
         params：使用指定值覆盖该对象的一些属性（不修改对象值）
-        
+
             该参数在一些属性的默认str不便于展示时尤为好用，可以自己设置该属性的展示值，例如：
-            
+
             simple_repr(a, func=a.func.__name__)
-            
+
             其展示的func属性则为str(a.func.__name__)而非str(a.func)
     '''
     # 复制一份，防止update修改原内容
