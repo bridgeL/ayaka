@@ -4,7 +4,7 @@ from loguru import logger
 from pydantic import ValidationError, BaseModel
 from .helpers import ensure_dir_exists, singleton
 
-AYAKA_VERSION = "0.0.3.1"
+AYAKA_VERSION = "0.0.3.2b0"
 logger.opt(colors=True).info(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
 
 
