@@ -1,8 +1,21 @@
+```py
+def on_cmd(
+    self,
+    *,
+    cmds: str | list[str] = "",
+    states: str | list[str] = "",
+    sub_states: str | list[str] = "",
+    always: bool = False,
+    block: bool = True,
+    auto_help: bool = True
+):
+```
+
 ## 注册命令回调
 
 插件最常用的交互模式便是通过命令来交互
 
-### 状态命令
+### 普通状态
 
 ```py
 @cat.on_cmd(cmds="命令A", states="状态1")
@@ -20,9 +33,9 @@ async def handle():
     ...
 ```
 
-### 通用状态命令
+### 通用状态
 
-通用状态命令匹配所有状态，在任意状态下均被ayaka接受并响应
+通用状态命令匹配所有**非空**状态，在任意状态下均被ayaka接受并响应
 
 ```py
 @cat.on_cmd(cmds="命令A", states="*")
@@ -39,7 +52,11 @@ async def rest():
     await cat.rest()
 ```
 
-### 空状态命令
+### 空状态
+
+`cat`的初始状态是空，即`cat.state == ""`
+
+空状态命令就是指在该状态下，可以响应的命令
 
 大部分时间，你可以使用`cat.set_wakeup_cmds`来设置空状态命令
 
@@ -47,32 +64,27 @@ async def rest():
 cat.set_wakeup_cmds(cmds=["猫猫A", "catA"])
 ```
 
-实际上，`cat.set_wakeup_cmds(cmds=cmds)`相当于
+实际上，它相当于
 
 ```py
-@cat.on_cmd(cmds=cmds)
+@cat.on_cmd(cmds=["猫猫A", "catA"])
 async def wakeup():
     '''唤醒猫猫'''
     await cat.wakeup()
     await cat.send_help()
 ```
 
-注：`cat.on_cmd`的`states`参数的缺省值是`""`
+`wakeup`方法将改变`cat`的状态，使其从`空状态`变为`idle状态`
 
-因此，你可以自行注册唤醒命令回调，只要保证调用`cat.wakeup`即可
+你也可以加入参数，那么
 
-```py
-@cat.on_cmd(cmds=["猫猫A", "catA"])
-async def wakeup():
-    await cat.wakeup()
-    await cat.send("喵~")
-```
+`wakeup("test")`将使`cat`从`空状态`变为`test状态`
 
-当然，你甚至可以不调用`cat.wakeup`
+### idle状态
 
-这会导致这条命令并不会唤醒猫猫，令其状态保持为空状态
+idle状态是普通状态的一种，它是`wakeup`方法调用，`cat`的默认状态
 
-### 子状态命令
+### 子状态
 
 ```py
 @cat.on_cmd(cmds="命令A", states="idle", sub_states="name")
@@ -81,6 +93,8 @@ async def _():
 ```
 
 该回调会在群状态为`idle`，群成员状态为`name`时响应
+
+同样的，子状态也有空子状态、通用子状态
 
 ## 注册文字回调
 
@@ -119,7 +133,15 @@ async def _():
 - always 命令回调
 - always 文字回调
 - 命令回调
+  - 通用状态 通用子状态
+  - 通用状态 当前子状态
+  - 当前状态 通用子状态
+  - 当前状态 当前子状态
 - 文字回调
+  - 通用状态 通用子状态
+  - 通用状态 当前子状态
+  - 当前状态 通用子状态
+  - 当前状态 当前子状态
 
 期间任意回调block为True或抛出`BlockException`都会导致消息传播的结束
 
