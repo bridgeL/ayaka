@@ -70,6 +70,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#set_wakeup_cmds" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -450,9 +455,54 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          插件编写示例
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         插件编写示例
       </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="本页索引">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      本页索引
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#set_wakeup_cmds" class="md-nav__link">
+    set_wakeup_cmds
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#set_rest_cmds" class="md-nav__link">
+    set_rest_cmds
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hit" class="md-nav__link">
+    hit
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -597,6 +647,8 @@
 
 
 
+  <h1>插件编写示例</h1>
+
 <p>以赌石为例</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># example/stone.py</span>
 <span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
@@ -608,7 +660,15 @@
 <span class="c1"># 设置唤醒和休息命令</span>
 <span class="n">cat</span><span class="o">.</span><span class="n">set_wakeup_cmds</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;赌石&quot;</span><span class="p">,</span> <span class="s2">&quot;stone&quot;</span><span class="p">])</span>
 <span class="n">cat</span><span class="o">.</span><span class="n">set_rest_cmds</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;退出&quot;</span><span class="p">,</span> <span class="s2">&quot;exit&quot;</span><span class="p">])</span>
+
+<span class="c1"># 编写业务逻辑</span>
+<span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;敲&quot;</span><span class="p">,</span> <span class="s2">&quot;hit&quot;</span><span class="p">],</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">hit</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;运气真好，开出了和田玉&quot;</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;只是一块破石头&quot;</span><span class="p">)</span>
 </code></pre></div>
+<h2 id="set_wakeup_cmds">set_wakeup_cmds<a class="headerlink" href="#set_wakeup_cmds" title="Permanent link">&para;</a></h2>
 <p><code>cat.set_wakeup_cmds(cmds=["赌石", "stone"])</code> 相当于</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;赌石&quot;</span><span class="p">,</span> <span class="s2">&quot;stone&quot;</span><span class="p">],</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">wakeup</span><span class="p">():</span>
@@ -618,14 +678,17 @@
 </code></pre></div>
 <p>而所有<code>cat</code>的初始状态都是空，即<code>cat.state == ""</code></p>
 <p>当发送<code>赌石</code>命令后，<code>cat</code>的状态从<code>空</code>转为<code>idle</code>（wakeup参数默认值），此时再次发送<code>赌石</code>命令，将不会再次触发该回调</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># 编写业务逻辑</span>
-<span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;敲&quot;</span><span class="p">,</span> <span class="s2">&quot;hit&quot;</span><span class="p">],</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">)</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">hit</span><span class="p">():</span>
-    <span class="k">if</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="k">return</span> <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;运气真好，开出了和田玉&quot;</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;只是一块破石头&quot;</span><span class="p">)</span>
+<h2 id="set_rest_cmds">set_rest_cmds<a class="headerlink" href="#set_rest_cmds" title="Permanent link">&para;</a></h2>
+<p><code>cat.set_rest_cmds(cmds=["退出", "exit"])</code>相当于</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;退出&quot;</span><span class="p">,</span> <span class="s2">&quot;exit&quot;</span><span class="p">],</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">rest</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;猫猫休息&#39;&#39;&#39;</span>
+    <span class="k">await</span> <span class="n">cat</span><span class="o">.</span><span class="n">rest</span><span class="p">()</span>
 </code></pre></div>
-<p>当发送<code>敲</code>命令后，若<code>cat</code>的状态为<code>idle</code>，将触发该回调，随机一个结果，发送出去</p>
+<p>当发送<code>退出</code>命令后，若<code>cat</code>的状态为<code>任意非空状态</code>，将触发该回调</p>
+<p><code>cat.rest</code>将把cat的状态恢复为<code>空</code></p>
+<h2 id="hit">hit<a class="headerlink" href="#hit" title="Permanent link">&para;</a></h2>
+<p>当发送<code>敲</code>命令后，若<code>cat</code>的状态为<code>idle</code>，将触发hit回调，随机一个结果，发送出去</p>
 <p><code>cat.send</code>将自动根据上下文，发送到对应的群聊中</p>
 <p>若想指定群聊、私聊发送，请使用<code>cat.send_group</code>，<code>cat.send_private</code></p>
 

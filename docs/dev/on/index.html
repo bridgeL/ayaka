@@ -811,20 +811,22 @@
 <p>默认值：命令回调 阻断，文字回调 不阻断</p>
 <h3 id="_8">处理顺序<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
 <p>消息传播依次经过</p>
-<ul>
-<li>always 命令回调</li>
-<li>always 文字回调</li>
-<li>命令回调</li>
-<li>通用状态 通用子状态</li>
-<li>通用状态 当前子状态</li>
-<li>当前状态 通用子状态</li>
-<li>当前状态 当前子状态</li>
-<li>文字回调</li>
-<li>通用状态 通用子状态</li>
-<li>通用状态 当前子状态</li>
-<li>当前状态 通用子状态</li>
-<li>当前状态 当前子状态</li>
-</ul>
+<div class="highlight"><pre><span></span><code>- always 
+  - 命令回调
+  - 文字回调
+- 通用状态 通用子状态
+  - 命令回调
+  - 文字回调
+- 通用状态 当前子状态
+  - 命令回调
+  - 文字回调
+- 当前状态 通用子状态
+  - 命令回调
+  - 文字回调
+- 当前状态 当前子状态
+  - 命令回调
+  - 文字回调
+</code></pre></div>
 <p>期间任意回调block为True或抛出<code>BlockException</code>都会导致消息传播的结束</p>
 <h2 id="_9">钩子函数<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">get_adapter</span>
