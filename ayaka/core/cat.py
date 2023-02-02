@@ -8,29 +8,9 @@ from .session import get_session_cls, AyakaSession, AyakaGroup, AyakaPrivate
 from .context import get_context, set_context
 from .exception import DuplicateCatNameError
 from .trigger import AyakaTrigger
-from ..logger import init_error_log
-from ..helpers import ensure_list, singleton
-from ..adapters import AyakaEvent, get_adapter, auto_load_adapter
-from ..config import get_root_config, AYAKA_VERSION
-from ..database import create_all
-
-
-@singleton
-def init_all():
-    '''初始化ayaka，仅执行一次'''
-    logger.opt(colors=True).info(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
-
-    # 加载错误日志记录
-    init_error_log()
-
-    # 加载适配器
-    auto_load_adapter()
-
-    # 注册数据库加载函数
-    get_adapter().on_startup(create_all)
-
-    # 加载猫猫管理器
-    from .. import master
+from ..helpers import ensure_list
+from ..adapters import AyakaEvent, get_adapter
+from ..config import get_root_config
 
 
 class AyakaFuncHelp:
@@ -196,9 +176,6 @@ class AyakaCat:
 
             overtime：超时未收到指令则自动关闭，单位：秒，<=0则禁止该特性
         '''
-        # 异味代码...但是不想改
-        init_all()
-
         self.name = name
         manager.add_cat(self)
 

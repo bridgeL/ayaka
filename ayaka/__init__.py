@@ -13,3 +13,4 @@ from .download import resource_download, resource_download_by_res_info, get_file
 from .database import get_session
 from .config import AyakaConfig
 from .core import AyakaCat
+from .subscribe import AyakaSubscribe
