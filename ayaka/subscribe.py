@@ -33,11 +33,11 @@ class AyakaSubscribe:
         '''监视某个类的属性变换'''
         func = cls.__setattr__
 
-        def new_func(_self, name: str, value) -> None:
-            old_value = getattr(self, name, None)
+        def new_func(c_self, name: str, value) -> None:
+            old_value = getattr(c_self, name, None)
             event_name = f"{cls.__name__}.{name}.change"
-            asyncio.create_task(self.emit(event_name, old_value, value, _self))
-            func(_self, name, value)
+            asyncio.create_task(self.emit(event_name, old_value, value, c_self))
+            func(c_self, name, value)
 
         cls.__setattr__ = new_func
         return cls
