@@ -1,5 +1,6 @@
 '''适配命令行输入输出'''
 import re
+from loguru import logger
 import uvicorn
 import asyncio
 from fastapi import FastAPI
@@ -52,9 +53,14 @@ class ConsoleAdapter(AyakaAdapter):
             for uid in [i+1 for i in range(100)]
         ]
 
-    def on_startup(self, async_func: Callable[..., Awaitable]):
+    def on_startup(self, async_func: Callable[[], Awaitable]):
         '''asgi服务启动后钩子，注册回调必须是异步函数'''
-        on_startup(async_func)
+        async def _func():
+            try:
+                await async_func()
+            except:
+                logger.exception("asgi服务启动后钩子发生错误")
+        on_startup(_func)
 
 
 ConsoleAdapter.name = "console"
