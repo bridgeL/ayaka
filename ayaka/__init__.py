@@ -10,7 +10,6 @@ Ayaka - 猫猫，猫猫！
 from .adapters import get_adapter, AyakaEvent
 from .helpers import load_data_from_file, debug_print, simple_repr, ensure_dir_exists
 from .download import resource_download, resource_download_by_res_info, get_file_hash, ResInfo, ResItem
-from .database import get_session
 from .config import AyakaConfig
-from .core import AyakaCat
-from .subscribe import AyakaSubscribe
+from .core import AyakaCat, AyakaSubscribe
+from .database import get_session

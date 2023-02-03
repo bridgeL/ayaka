@@ -1,10 +1,13 @@
+import asyncio
 import re
 from typing import TYPE_CHECKING, Awaitable, Callable
 from loguru import logger
+
 from .context import get_context, set_context
 from .exception import BlockException, NotBlockException
 from ..helpers import simple_repr, singleton
 from ..adapters import get_adapter
+from ..database import get_session
 
 
 if TYPE_CHECKING:
@@ -79,6 +82,10 @@ class AyakaTrigger:
         context.trigger = self
         context.cmd = self.cmd
 
+        # 创建数据库会话
+        context.db_session = get_session()
+        context.wait_tasks = []
+
         # 只有在有命令的情况下才剥离命令
         if self.cmd:
             n = len(prefix+self.cmd)
@@ -133,6 +140,15 @@ class AyakaTrigger:
         except NotBlockException:
             logger.info("NotBlockException")
             return False
+
+        context = get_context()
+        while context.wait_tasks:
+            ts = context.wait_tasks
+            context.wait_tasks = []
+            await asyncio.gather(*ts)
+        
+        # 必须关，否则内存泄漏
+        context.db_session.close()
 
         # 返回是否阻断
         return self.block

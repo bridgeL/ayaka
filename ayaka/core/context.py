@@ -1,5 +1,7 @@
 '''上下文'''
+import asyncio
 from typing import TYPE_CHECKING, Optional
+from sqlmodel import Session
 from contextvars import ContextVar
 from ..helpers import simple_repr
 from ..adapters import AyakaEvent
@@ -18,6 +20,8 @@ class AyakaContext:
         self.arg: Optional[str] = None
         self.args: Optional[list[str]] = None
         self.nums: Optional[list[int]] = None
+        self.db_session: Optional[Session] = None
+        self.wait_tasks: Optional[list[asyncio.Task]] = None
 
     def __repr__(self) -> str:
         return simple_repr(self)

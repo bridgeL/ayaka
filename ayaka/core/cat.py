@@ -9,7 +9,7 @@ from .context import get_context, set_context
 from .exception import DuplicateCatNameError
 from .trigger import AyakaTrigger
 from ..helpers import ensure_list
-from ..adapters import AyakaEvent, get_adapter
+from ..adapters import AyakaEvent, get_adapter, init_all
 from ..config import get_root_config
 
 
@@ -176,6 +176,9 @@ class AyakaCat:
 
             overtime：超时未收到指令则自动关闭，单位：秒，<=0则禁止该特性
         '''
+        # 异味代码...但是不想改
+        init_all()
+
         self.name = name
         manager.add_cat(self)
 
@@ -368,6 +371,11 @@ class AyakaCat:
     def nums(self):
         '''当前消息中的的整数数字'''
         return self.context.nums
+
+    @property
+    def db_session(self):
+        '''数据库会话'''
+        return self.context.db_session
 
     # ---- on_xxx ----
     def on_cmd(
