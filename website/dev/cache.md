@@ -1,3 +1,5 @@
+使用[pydantic](https://docs.pydantic.dev/)的`BaseModel`，真香
+
 ## 直接读写（不推荐）
 
 ```py
@@ -14,8 +16,6 @@ async def _():
 缺乏类型提示，而且当需要缓存的参数过多时，代码体验尤其地狱
 
 ## get_data（推荐）
-
-使用[pydantic](https://docs.pydantic.dev/)的`BaseModel`，真香
 
 ```py
 from pydantic import BaseModel

@@ -1,5 +1,6 @@
 '''订阅事件'''
 import asyncio
+import inspect
 from .context import get_context
 
 
@@ -24,10 +25,12 @@ class AyakaSubscribe:
 
         return decorator
 
-    async def emit(self, event_name: str, *args, **kwargs):
+    async def emit(self, event_name: str, *args):
         '''发送某事件'''
         if event_name in self.async_funcs:
-            return await self.async_funcs[event_name](*args, **kwargs)
+            async_func = self.async_funcs[event_name]
+            s = inspect.signature(async_func)
+            return await async_func(*args[:len(s.parameters)])
 
     def cls_property_watch(self, cls):
         '''监视某个类的属性变换'''

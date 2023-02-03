@@ -4,6 +4,9 @@
 
 ```py
 from sqlmodel import SQLModel, Field
+from ayaka import AyakaCat
+
+cat = AyakaCat("test")
 
 class Money(SQLModel, table=True):
     # __tablename__可以用于自定义表名，当然你可以不写，使用类名作为默认值
@@ -13,66 +16,43 @@ class Money(SQLModel, table=True):
     user_id: str = Field(primary_key=True)
     # money
     money: int = 1000
+
+# ayaka会在asgi服务启动后自动创建所有SQLModel表
 ```
 
 ## 增 insert
 
 ```py
-from ayaka import get_session
-
+@cat.on_text()
 async def _():
-    # ...
-    with get_session() as session:
-        money = Money(group_id=100, user_id=1)
-        session.add(money)
-        session.commit()
-    # ...
+    money = Money(group_id=100, user_id=1)
+    cat.db_session.add(money)
+    # cat.db_session会在回调结束后自动commit
 ```
 
 ## 删 delete
 
 ```py
-from ayaka import get_session
-
 async def _():
-    # ...
-    with get_session() as session:
-        money = Money(group_id=100, user_id=1)
-        session.delete(money)
-        session.commit()
-    # ...
+    money = Money(group_id=100, user_id=1)
+    cat.db_session.delete(money)
+    # cat.db_session会在回调结束后自动commit
 ```
 
-## 查 select
+## 查 select， 改 update
 
 ```py
-from ayaka import get_session
 from sqlmodel import select
 
 async def _():
-    # ...
-    with get_session() as session:
-        stmt = select(Money).filter_by(group_id=100, user_id=1)
-        results = session.exec(stmt)
-        money = results.one()
-    # ...
-```
+    # 查
+    stmt = select(Money).filter_by(group_id=100, user_id=1)
+    cursor = cat.db_session.exec(stmt)
+    money = cursor.one()
 
-## 改 update
-
-```py
-from ayaka import get_session
-from sqlmodel import select
-
-async def _():
-    # ...
-    with get_session() as session:
-        stmt = select(Money).filter_by(group_id=100, user_id=1)
-        results = session.exec(stmt)
-        money = results.one()
-        money.money += 1000
-        session.commit()
-    # ...
+    # 改
+    money.money += 1000
+    # cat.db_session会在回调结束后自动commit
 ```
 
 ## 下一步

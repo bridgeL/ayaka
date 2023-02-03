@@ -91,3 +91,8 @@ base_send_group，base_send_private，base_send_group_many
 
 - 新特性：更好的猫猫帮助和猫猫状态，已支持sub_state
 - 修复BUG：频道消息事件意外地被ob11适配器处理
+
+### 0.0.3.2
+
+- 新特性：新增上下文db_session
+- 新特性：新增AyakaSubscribe，AyakaSubscribe可以监视某个类的属性变化，并触发相应回调，帮助开发成就系统

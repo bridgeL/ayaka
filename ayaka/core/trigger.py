@@ -5,9 +5,9 @@ from loguru import logger
 
 from .context import get_context, set_context
 from .exception import BlockException, NotBlockException
+from .database import get_session
 from ..helpers import simple_repr, singleton
 from ..adapters import get_adapter
-from ..database import get_session
 
 
 if TYPE_CHECKING:
@@ -147,6 +147,8 @@ class AyakaTrigger:
             context.wait_tasks = []
             await asyncio.gather(*ts)
         
+        # ---- 待修改
+        context.db_session.commit()
         # 必须关，否则内存泄漏
         context.db_session.close()
 

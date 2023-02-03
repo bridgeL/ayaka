@@ -5,7 +5,6 @@ from typing import Awaitable, Callable
 from .model import GroupMemberInfo, AyakaEvent
 from ..config import AYAKA_VERSION
 from ..helpers import singleton
-from ..database import create_all
 from ..logger import init_error_log
 
 adapter_name_ctx: ContextVar[str] = ContextVar("adapter_name_ctx")
@@ -101,6 +100,7 @@ def init_all():
     auto_load_adapter()
 
     # 注册数据库加载函数
+    from ..core.database import create_all
     get_adapter().on_startup(create_all)
 
     # 加载猫猫管理器
