@@ -3,17 +3,13 @@
 ## 创建表
 
 ```py
-from sqlmodel import SQLModel, Field
-from ayaka import AyakaCat
+from ayaka import AyakaCat, UserDBBase
 
 cat = AyakaCat("test")
 
-class Money(SQLModel, table=True):
+class Money(UserDBBase, table=True):
     # __tablename__可以用于自定义表名，当然你可以不写，使用类名作为默认值
     __tablename__ = "my_money"
-    # 设置为主键
-    group_id: str = Field(primary_key=True)
-    user_id: str = Field(primary_key=True)
     # money
     money: int = 1000
 

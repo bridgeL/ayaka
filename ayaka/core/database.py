@@ -31,6 +31,9 @@ def get_session(**kwargs):
     kwargs 请参考sqlmodel.Session'''
 
     kwargs.setdefault("bind", SQLModel.metadata.bind)
+    # 在数据库高频修改的情况下，autoflush可能会导致数据错误，例如多次相加只生效1次
+    # 但减少了数据库崩溃报错的可能，并且提高数据库吞吐量
+    kwargs.setdefault("autoflush", False)
     # expire_on_commit 在commit后失效所有orm对象，一般建议关了
     kwargs.setdefault("expire_on_commit", False)
 
@@ -44,8 +47,8 @@ class GroupDBBase(SQLModel):
     def _get_or_create(model, **kwargs):
         session = get_context().db_session
         statement = select(model).filter_by(**kwargs)
-        results = session.exec(statement)
-        instance = results.one_or_none()
+        cursor = session.exec(statement)
+        instance = cursor.one_or_none()
         if not instance:
             instance = model(**kwargs)
             session.add(instance)
