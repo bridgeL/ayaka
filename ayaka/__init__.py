@@ -11,4 +11,4 @@ from .adapters import get_adapter, AyakaEvent
 from .helpers import load_data_from_file, debug_print, simple_repr, ensure_dir_exists
 from .download import resource_download, resource_download_by_res_info, get_file_hash, ResInfo, ResItem
 from .config import AyakaConfig
-from .core import AyakaCat, AyakaSubscribe, get_session
+from .core import AyakaCat, AyakaSubscribe, UserDBBase, GroupDBBase, get_session
