@@ -420,10 +420,12 @@ class AyakaCat:
                             cmd=cmd,
                             state=state,
                             sub_state=sub_state,
-                            always=always,
                             block=block,
                         )
-                        self.add_state_trigger(trigger, state, sub_state)
+                        if always:
+                            self.add_always_trigger(trigger)
+                        else:
+                            self.add_state_trigger(trigger, state, sub_state)
 
             items = [f"<y>猫猫</y> {self.name}"]
             if cmds != [""]:

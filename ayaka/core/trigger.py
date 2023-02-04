@@ -34,7 +34,6 @@ class AyakaTrigger:
         cmd: str,
         state: str,
         sub_state: str,
-        always: bool,
         block: bool
     ) -> None:
         self.cmd = cmd
@@ -44,7 +43,6 @@ class AyakaTrigger:
         '''顺便可以区分wakeup和state'''
 
         self.sub_state = sub_state
-        self.always = always
         self.block = block
         self.func = func
         self.cat = cat
