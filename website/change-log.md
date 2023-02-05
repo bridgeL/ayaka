@@ -96,3 +96,5 @@ base_send_group，base_send_private，base_send_group_many
 
 - 新特性：新增上下文db_session
 - 新特性：新增AyakaSubscribe，AyakaSubscribe可以监视某个类的属性变化，并触发相应回调，帮助开发成就系统
+- 修复BUG：注册回调时，always参数没有正确生效
+

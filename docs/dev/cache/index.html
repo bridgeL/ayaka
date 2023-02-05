@@ -663,6 +663,7 @@
 
   <h1>缓存</h1>
 
+<p>使用<a href="https://docs.pydantic.dev/">pydantic</a>的<code>BaseModel</code>，真香</p>
 <h2 id="_1">直接读写（不推荐）<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
@@ -675,7 +676,6 @@
 </code></pre></div>
 <p>缺乏类型提示，而且当需要缓存的参数过多时，代码体验尤其地狱</p>
 <h2 id="get_data">get_data（推荐）<a class="headerlink" href="#get_data" title="Permanent link">&para;</a></h2>
-<p>使用<a href="https://docs.pydantic.dev/">pydantic</a>的<code>BaseModel</code>，真香</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
 
 <span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
