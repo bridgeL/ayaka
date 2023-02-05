@@ -52,6 +52,10 @@ async def rest():
 
 ## hit
 
+```py
+@cat.on_cmd(cmds=["敲", "hit"], states="idle")
+```
+
 当发送`敲`命令后，若`cat`的状态为`idle`，将触发hit回调，随机一个结果，发送出去
 
 `cat.send`将自动根据上下文，发送到对应的群聊中

@@ -795,7 +795,7 @@
 <p>同样的，子状态也有空子状态、通用子状态</p>
 <h2 id="_6">注册文字回调<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>与命令回调同理，只是不需要再写cmds了</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_text</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_text</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
     <span class="c1"># do something</span>
 </code></pre></div>

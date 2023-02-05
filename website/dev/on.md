@@ -92,7 +92,7 @@ async def _():
 与命令回调同理，只是不需要再写cmds了
 
 ```py
-@cat.on_text(state="idle")
+@cat.on_text(states="idle")
 async def _():
     # do something
 ```

@@ -53,9 +53,9 @@ ayaka把当前消息转为str对象后，直接放到`cat.message`中了
 
 ### 如何修改状态？
 
-`cat.state = "yes"` 修改群状态为yes
+`cat.state = "yes"` 修改状态为yes
 
-`cat.sub_state = "yes"` 修改群成员状态为yes
+`cat.sub_state = "yes"` 修改子状态为yes
 
 ## 下一步
 

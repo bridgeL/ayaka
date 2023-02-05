@@ -695,6 +695,8 @@
 <p>当发送<code>退出</code>命令后，若<code>cat</code>的状态为<code>任意非空状态</code>，将触发该回调</p>
 <p><code>cat.rest</code>将把cat的状态恢复为<code>空</code></p>
 <h2 id="hit">hit<a class="headerlink" href="#hit" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_cmd</span><span class="p">(</span><span class="n">cmds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;敲&quot;</span><span class="p">,</span> <span class="s2">&quot;hit&quot;</span><span class="p">],</span> <span class="n">states</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">)</span>
+</code></pre></div>
 <p>当发送<code>敲</code>命令后，若<code>cat</code>的状态为<code>idle</code>，将触发hit回调，随机一个结果，发送出去</p>
 <p><code>cat.send</code>将自动根据上下文，发送到对应的群聊中</p>
 <p>若想指定群聊、私聊发送，请使用<code>cat.send_group</code>，<code>cat.send_private</code></p>
