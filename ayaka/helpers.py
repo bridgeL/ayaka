@@ -74,10 +74,11 @@ class Timer:
     ```
     '''
 
-    def __init__(self, name: str = "", show: bool = True) -> None:
+    def __init__(self, name: str = "", show: bool = True, formater=lambda x: f"{x:.2f}s") -> None:
         self.name = name
         self.diff = 0
         self.show = show
+        self.formater = formater
 
     def __enter__(self):
         self.time = time()
@@ -85,7 +86,7 @@ class Timer:
     def __exit__(self, a, b, c):
         self.diff = time() - self.time
         if self.show:
-            print(f"[{self.name}] 耗时{self.diff:.2f}s")
+            print(f"[{self.name}] 耗时{self.formater(self.diff)}")
 
 
 def load_data_from_file(path: str | Path):
@@ -161,3 +162,10 @@ def simple_repr(obj: object, exclude: set[str] = set(), **params):
     data.update(params)
     data = ", ".join(f"{k}={v}" for k, v in data.items())
     return f"{obj.__class__.__name__}({data})"
+
+
+async def simple_async_wrap(func):
+    '''简单将一个同步函数表面上转为异步'''
+    async def async_func(*args, **kwargs):
+        func(*args, **kwargs)
+    return async_func

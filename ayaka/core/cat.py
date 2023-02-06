@@ -3,14 +3,57 @@ import inspect
 import asyncio
 from pathlib import Path
 from loguru import logger
+from sqlmodel import select
 from typing import Awaitable, Callable, TypeVar
-from .session import get_session_cls, AyakaSession, AyakaGroup, AyakaPrivate
+
+from .trigger import AyakaTrigger
+from .database import AyakaDB, ayaka_db
 from .context import get_context, set_context
 from .exception import DuplicateCatNameError
-from .trigger import AyakaTrigger
+from .session import get_session_cls, AyakaSession, AyakaGroup, AyakaPrivate
+
 from ..helpers import ensure_list
-from ..adapters import AyakaEvent, get_adapter, init_all
-from ..config import get_root_config
+from ..adapters import AyakaEvent, get_adapter
+from ..config import AyakaConfig
+
+
+class CatBlock(ayaka_db.EasyModel, table=True):
+    session_mark: str
+    cat_name: str
+
+    @classmethod
+    def _get(cls, session_mark: str, cat_name: str):
+        session = ayaka_db.get_session()
+        stmt = select(cls).filter_by(
+            session_mark=session_mark,
+            cat_name=cat_name
+        )
+        cursor = session.exec(stmt)
+        r = cursor.one_or_none()
+        return session, r
+
+    @classmethod
+    def check(cls, session_mark: str, cat_name: str):
+        session, r = cls._get(session_mark, cat_name)
+        session.close()
+        return not r
+
+    @classmethod
+    def add(cls, session_mark: str, cat_name: str):
+        session, r = cls._get(session_mark, cat_name)
+        if not r:
+            r = cls(session_mark=session_mark, cat_name=cat_name)
+            session.add(r)
+            session.commit()
+        session.close()
+
+    @classmethod
+    def remove(cls, session_mark: str, cat_name: str):
+        session, r = cls._get(session_mark, cat_name)
+        if r:
+            session.delete(r)
+            session.commit()
+        session.close()
 
 
 class AyakaFuncHelp:
@@ -62,8 +105,9 @@ class AyakaManager:
         # 设置上下文
         set_context(event)
 
+        # 查询屏蔽情况
         # 获取碰撞域中的触发器
-        ts_list = [c.get_triggers() for c in self.cats]
+        ts_list = [c.get_triggers() for c in self.cats if c.valid]
 
         # for ts in ts_list:
         #     for t in ts:
@@ -148,16 +192,11 @@ class AyakaManager:
 manager = AyakaManager()
 '''分发事件'''
 
-
 cwd = Path(".").absolute()
 '''当前工作目录'''
 
 T = TypeVar("T")
 '''任意类型'''
-
-
-STD = dict[str, dict[str, list[AyakaTrigger]]]
-'''状态触发字典'''
 
 
 class AyakaCat:
@@ -167,6 +206,7 @@ class AyakaCat:
         overtime: int = 600,
         group: bool = True,
         private: bool = False,
+        db: AyakaDB = ayaka_db,
     ) -> None:
         '''创建猫猫
 
@@ -177,7 +217,7 @@ class AyakaCat:
             overtime：超时未收到指令则自动关闭，单位：秒，<=0则禁止该特性
         '''
         # 异味代码...但是不想改
-        init_all()
+        get_adapter()
 
         self.name = name
         manager.add_cat(self)
@@ -196,7 +236,7 @@ class AyakaCat:
         self.always_triggers: list[AyakaTrigger] = []
         '''总是触发'''
 
-        self.state_trigger_dict: STD = {}
+        self.state_trigger_dict: dict[str, dict[str, list[AyakaTrigger]]] = {}
         '''状态触发'''
 
         items = []
@@ -217,8 +257,14 @@ class AyakaCat:
         self._helps: list[AyakaFuncHelp] = []
         '''自动猫猫帮助'''
 
-        self._invalid_list = get_root_config().block_cat_dict.get(name, [])
-        '''被各个会话的屏蔽情况'''
+        # 配置类
+        class Config(AyakaConfig):
+            __config_name__ = name
+
+        self.Config = Config
+
+        # 数据库类
+        self.db = db
 
     # ---- 超时控制 ----
     @property
@@ -265,27 +311,15 @@ class AyakaCat:
     @property
     def valid(self):
         '''当前猫猫是否可用'''
-        return self.session.mark not in self._invalid_list
+        return CatBlock.check(self.session.mark, self.name)
 
     @valid.setter
     def valid(self, value: bool):
         '''设置当前猫猫是否可用'''
-        change_flag = False
-        if value and not self.valid:
-            self._invalid_list.remove(self.session.mark)
-            change_flag = True
-
-        elif not value and self.valid:
-            self._invalid_list.append(self.session.mark)
-            change_flag = True
-
-        if change_flag:
-            root_config = get_root_config()
-            if self._invalid_list:
-                root_config.block_cat_dict[self.name] = self._invalid_list
-            else:
-                root_config.block_cat_dict.pop(self.name, None)
-            root_config.save()
+        if value:
+            CatBlock.remove(self.session.mark, self.name)
+        else:
+            CatBlock.add(self.session.mark, self.name)
 
     # ---- 会话 ----
     @property

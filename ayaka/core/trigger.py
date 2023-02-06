@@ -1,14 +1,11 @@
-import asyncio
 import re
-from typing import TYPE_CHECKING, Awaitable, Callable
+import asyncio
 from loguru import logger
-
+from typing import TYPE_CHECKING, Awaitable, Callable
 from .context import get_context, set_context
 from .exception import BlockException, NotBlockException
-from .database import get_session
 from ..helpers import simple_repr, singleton
 from ..adapters import get_adapter
-
 
 if TYPE_CHECKING:
     from .cat import AyakaCat
@@ -65,10 +62,6 @@ class AyakaTrigger:
         if context.event.session_type not in self.cat.session_types:
             return False
 
-        # 判断是否被屏蔽
-        if not self.cat.valid:
-            return False
-
         # if 命令触发，命令是否符合
         if self.cmd and not context.event.message.startswith(prefix + self.cmd):
             return False
@@ -81,7 +74,7 @@ class AyakaTrigger:
         context.cmd = self.cmd
 
         # 创建数据库会话
-        context.db_session = get_session()
+        context.db_session = self.cat.db.get_session()
         context.wait_tasks = []
 
         # 只有在有命令的情况下才剥离命令
@@ -144,7 +137,7 @@ class AyakaTrigger:
             ts = context.wait_tasks
             context.wait_tasks = []
             await asyncio.gather(*ts)
-        
+
         # ---- 待修改
         context.db_session.commit()
         # 必须关，否则内存泄漏

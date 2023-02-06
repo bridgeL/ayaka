@@ -39,9 +39,14 @@ async def set_redirect():
     await cat.send("好的，我知道了")
 
 
-@cat.on_cmd(cmds="猫猫帮助", always=True)
+@cat.on_cmd(cmds=["猫猫帮助", "全部猫猫帮助"], always=True)
 async def show_help():
     '''展示猫猫帮助'''
+    if cat.cmd == "全部猫猫帮助":
+        infos = [c.help for c in manager.cats]
+        await cat.send_many(infos)
+        return
+
     if cat.arg:
         name = cat.arg
         c = manager.get_cat(name)
@@ -77,13 +82,6 @@ async def show_help():
     await cat.send("\n".join(infos))
 
 
-@cat.on_cmd(cmds="全部猫猫帮助", always=True)
-async def show_all_help():
-    '''展示展示所有猫猫的帮助'''
-    infos = [c.help for c in manager.cats]
-    await cat.send_many(infos)
-
-
 @cat.on_cmd(cmds="猫猫状态", always=True)
 async def show_state():
     '''展示猫猫状态'''
@@ -97,7 +95,7 @@ async def show_state():
 
 @cat.on_cmd(cmds="强制休息", always=True)
 async def force_exit():
-    '''<猫猫名> 强制让猫猫休息'''
+    '''<猫猫名>'''
     if not cat.arg:
         return await cat.send("请使用 强制休息 <猫猫名>")
 
@@ -112,30 +110,11 @@ async def force_exit():
     c.remove_private_redirect()
 
 
-@cat.on_cmd(cmds="屏蔽猫猫", always=True)
+@cat.on_cmd(cmds=["屏蔽猫猫", "取消屏蔽猫猫"], always=True)
 async def block_cat():
-    '''<猫猫名> 屏蔽猫猫'''
+    '''<猫猫名>'''
     if not cat.arg:
-        return await cat.send("请使用 屏蔽猫猫 <猫猫名>")
-
-    name = cat.arg
-    c = manager.get_cat(name)
-    if not c:
-        await cat.send("没有找到对应猫猫")
-        await show_relative_cats(name)
-        return
-
-    await c.rest()
-    c.valid = False
-    await cat.send(f"已屏蔽猫猫 {name}")
-
-
-@cat.on_cmd(cmds="取消屏蔽猫猫", always=True)
-async def unblock_cat():
-    '''<猫猫名> 取消屏蔽猫猫'''
-    if not cat.arg:
-        await cat.send("请使用 取消屏蔽猫猫 <猫猫名>")
-        return
+        return await cat.send("没有参数")
 
     name = cat.arg
     if name == cat.name:
@@ -148,5 +127,10 @@ async def unblock_cat():
         await show_relative_cats(name)
         return
 
-    c.valid = True
-    await cat.send(f"已取消屏蔽猫猫 {name}")
+    if cat.cmd == "屏蔽猫猫":
+        await c.rest()
+        c.valid = False
+        await cat.send(f"已屏蔽猫猫 {name}")
+    else:
+        c.valid = True
+        await cat.send(f"已取消屏蔽猫猫 {name}")

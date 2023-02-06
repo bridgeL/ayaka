@@ -60,7 +60,6 @@ class AyakaConfig(BaseModel):
             json.dump(data, f, ensure_ascii=0, indent=4)
 
 
-@singleton
 class RootConfig(AyakaConfig):
     '''根配置'''
 
@@ -72,10 +71,9 @@ class RootConfig(AyakaConfig):
     auto_ob11_qqguild_patch: bool = True
     '''在ob11协议中自动使用qqguild_patch'''
 
-    block_cat_dict: dict[str, list[str]] = {}
-    '''屏蔽列表，dict[cat_name:list[session_mark]]'''
 
-
+@singleton
 def get_root_config():
     '''获取ayaka根配置'''
+    logger.opt(colors=True).info(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
     return RootConfig()
