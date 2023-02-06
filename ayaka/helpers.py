@@ -164,7 +164,7 @@ def simple_repr(obj: object, exclude: set[str] = set(), **params):
     return f"{obj.__class__.__name__}({data})"
 
 
-async def simple_async_wrap(func):
+def simple_async_wrap(func):
     '''简单将一个同步函数表面上转为异步'''
     async def async_func(*args, **kwargs):
         func(*args, **kwargs)
