@@ -145,6 +145,9 @@ def init_all():
 
     # 加载适配器
     auto_load_adapter()
+    
+    # 初始化 cat_block
+    from ..core.cat_block import get_db
 
     # 加载猫猫管理器
     from .. import master
