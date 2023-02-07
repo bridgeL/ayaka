@@ -146,9 +146,5 @@ def init_all():
     # 加载适配器
     auto_load_adapter()
 
-    # 初始化根数据库
-    from ..core.database import ayaka_db
-    ayaka_db.init()
-
     # 加载猫猫管理器
     from .. import master

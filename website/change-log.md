@@ -98,3 +98,11 @@ base_send_group，base_send_private，base_send_group_many
 - 新特性：新增AyakaSubscribe，AyakaSubscribe可以监视某个类的属性变化，并触发相应回调，帮助开发成就系统
 - 修复BUG：注册回调时，always参数没有正确生效
 
+## 0.0.4.0
+
+- 破坏性变更：根数据库地址变更为 data/ayaka/data.db
+- 破坏性变更：ayaka不再导出get_session, UserDBBase, GroupDBBase，请使用cat.db.UserDBBase，cat.Config
+- 变更：移除root_config中的block，新增CatBlock
+- 新特性：新增AyakaDB，通过它，你可以让各个插件拥有独立的数据库
+- 新特性：Timer可自定义formater
+- 优化console使用，现在初始默认角色为群号100中uid为1的群成员

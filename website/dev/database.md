@@ -3,11 +3,11 @@
 ## 创建表
 
 ```py
-from ayaka import AyakaCat, UserDBBase
+from ayaka import AyakaCat
 
 cat = AyakaCat("test")
 
-class Money(UserDBBase, table=True):
+class Money(cat.db.UserDBBase, table=True):
     # __tablename__可以用于自定义表名，当然你可以不写，使用类名作为默认值
     __tablename__ = "my_money"
     # money

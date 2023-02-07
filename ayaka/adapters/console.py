@@ -72,7 +72,7 @@ class Handler:
         self.session_type = "group"
         self.session_id = 100
         self.sender_id = 1
-        self.sender_name = ""
+        self.sender_name = "测试1号"
         self.func_dict: dict[str, Callable[[str], Awaitable]] = {}
         self.handle_event = None
 
