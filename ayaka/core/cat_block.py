@@ -1,10 +1,10 @@
 from sqlmodel import select
 from .database import get_db
 
-db = get_db()
+IDModel = get_db().IDModel
 
 
-class CatBlock(db.EasyModel, table=True):
+class CatBlock(IDModel, table=True):
     session_mark: str
     cat_name: str
 

@@ -24,32 +24,33 @@ class AyakaDB:
             def __tablename__(cls) -> str:
                 return inflection.underscore(cls.__name__)
 
-            @classmethod
-            def get_session(cls, **kwargs):
+            @staticmethod
+            def get_session(**kwargs):
                 '''创建一个新的数据库session
 
                 kwargs 请参考sqlmodel.Session'''
                 return self.get_session(**kwargs)
 
-        self.SQLModel = Model
+        self.Model = Model
 
-        class DBBase(Model):
+        class IDModel(Model):
             id: Optional[int] = Field(None, primary_key=True)
 
-        self.EasyModel = DBBase
+        self.IDModel = IDModel
         '''自带id'''
 
         class GroupDBBase(Model):
             group_id: str = Field(primary_key=True)
 
             @classmethod
-            def _get_or_create(model, **kwargs):
+            def _get_or_create(cls, **kwargs):
+                '''若不存在则根据参数值创建'''
                 session = get_context().db_session
-                statement = select(model).filter_by(**kwargs)
+                statement = select(cls).filter_by(**kwargs)
                 cursor = session.exec(statement)
                 instance = cursor.one_or_none()
                 if not instance:
-                    instance = model(**kwargs)
+                    instance = cls(**kwargs)
                     session.add(instance)
                 return instance
 
