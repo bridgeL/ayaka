@@ -665,11 +665,11 @@
 
 <p>使用<a href="https://sqlmodel.tiangolo.com/">SQLModel</a>实现数据持久化，真香</p>
 <h2 id="_1">创建表<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">AyakaCat</span><span class="p">,</span> <span class="n">UserDBBase</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">AyakaCat</span>
 
 <span class="n">cat</span> <span class="o">=</span> <span class="n">AyakaCat</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">Money</span><span class="p">(</span><span class="n">UserDBBase</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Money</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">UserDBBase</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="c1"># __tablename__可以用于自定义表名，当然你可以不写，使用类名作为默认值</span>
     <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;my_money&quot;</span>
     <span class="c1"># money</span>

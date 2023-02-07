@@ -717,6 +717,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#0040" class="md-nav__link">
+    0.0.4.0
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -840,6 +847,15 @@ base_send_group，base_send_private，base_send_group_many</li>
 <li>新特性：新增上下文db_session</li>
 <li>新特性：新增AyakaSubscribe，AyakaSubscribe可以监视某个类的属性变化，并触发相应回调，帮助开发成就系统</li>
 <li>修复BUG：注册回调时，always参数没有正确生效</li>
+</ul>
+<h2 id="0040">0.0.4.0<a class="headerlink" href="#0040" title="Permanent link">&para;</a></h2>
+<ul>
+<li>破坏性变更：根数据库地址变更为 data/ayaka/data.db</li>
+<li>破坏性变更：ayaka不再导出get_session, UserDBBase, GroupDBBase，请使用cat.db.UserDBBase，cat.Config</li>
+<li>变更：移除root_config中的block，新增CatBlock</li>
+<li>新特性：新增AyakaDB，通过它，你可以让各个插件拥有独立的数据库</li>
+<li>新特性：Timer可自定义formater</li>
+<li>优化console使用，现在初始默认角色为群号100中uid为1的群成员</li>
 </ul>
 
 
