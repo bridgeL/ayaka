@@ -1,5 +1,5 @@
-from typing import Optional
 import inflection
+from typing import Optional
 from loguru import logger
 from sqlalchemy.orm import declared_attr
 from sqlmodel import MetaData, Session, SQLModel, Field, select, create_engine
@@ -9,10 +9,11 @@ from ..helpers import ensure_dir_exists, simple_async_wrap
 
 
 class AyakaDB:
+    '''数据库'''
 
-    def __init__(self, name: str = "ayaka", auto_init: bool = True) -> None:
+    def __init__(self, name: str = "ayaka", _auto_regist: bool = True) -> None:
         self.name = name
-        self.metadata = MetaData(info={"name": name})
+        self.metadata = MetaData()
 
         class Model(SQLModel):
             metadata = self.metadata
@@ -57,16 +58,16 @@ class AyakaDB:
 
         self.UserDBBase = UserDBBase
 
-        if auto_init:
+        if _auto_regist:
             get_adapter().on_startup(simple_async_wrap(self.init))
 
     def init(self):
         '''初始化所有表'''
-        self.path = ensure_dir_exists(f"data/{self.name}/ayaka.db")
+        self.path = ensure_dir_exists(f"data/{self.name}/data.db")
         self.engine = create_engine(f"sqlite:///{self.path}")
         self.metadata.bind = self.engine
         self.metadata.create_all()
-        logger.opt(colors=True).debug(f"已初始化数据库 <g>{self.name}</g>")
+        logger.opt(colors=True).debug(f"已初始化数据库 <g>{self.path}</g>")
 
     def get_session(self, **kwargs):
         '''创建一个新的数据库session
@@ -83,9 +84,4 @@ class AyakaDB:
         return Session(**kwargs)
 
 
-ayaka_db = AyakaDB(auto_init=False)
-
-# 兼容性
-get_session = ayaka_db.get_session
-GroupDBBase = ayaka_db.GroupDBBase
-UserDBBase = ayaka_db.UserDBBase
+ayaka_db = AyakaDB(_auto_regist=False)

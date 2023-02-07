@@ -70,8 +70,8 @@ ConsoleAdapter.prefixes = [""]
 class Handler:
     def __init__(self) -> None:
         self.session_type = "group"
-        self.session_id = 0
-        self.sender_id = 0
+        self.session_id = 100
+        self.sender_id = 1
         self.sender_name = ""
         self.func_dict: dict[str, Callable[[str], Awaitable]] = {}
         self.handle_event = None
@@ -226,8 +226,6 @@ async def show_help(line: str):
 
 @handler.on("")
 async def deal_line(msg: str):
-    if not handler.session_id or not handler.sender_id:
-        return ayaka_log("请先设置默认角色（发出第一条模拟消息后自动设置）")
     if msg:
         handler.handle_msg(msg)
 

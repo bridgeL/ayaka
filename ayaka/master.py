@@ -82,6 +82,32 @@ async def show_help():
     await cat.send("\n".join(infos))
 
 
+@cat.on_cmd(cmds=["屏蔽猫猫", "取消屏蔽猫猫"], always=True)
+async def block_cat():
+    '''<猫猫名>'''
+    if not cat.arg:
+        return await cat.send("没有参数")
+
+    name = cat.arg
+    if name == cat.name:
+        await cat.send("不可屏蔽猫猫管理器")
+        return
+
+    c = manager.get_cat(name)
+    if not c:
+        await cat.send("没有找到对应猫猫")
+        await show_relative_cats(name)
+        return
+
+    if cat.cmd == "屏蔽猫猫":
+        await c.rest()
+        c.valid = False
+        await cat.send(f"已屏蔽猫猫 {name}")
+    else:
+        c.valid = True
+        await cat.send(f"已取消屏蔽猫猫 {name}")
+
+
 @cat.on_cmd(cmds="猫猫状态", always=True)
 async def show_state():
     '''展示猫猫状态'''
@@ -108,29 +134,3 @@ async def force_exit():
 
     await c.rest()
     c.remove_private_redirect()
-
-
-@cat.on_cmd(cmds=["屏蔽猫猫", "取消屏蔽猫猫"], always=True)
-async def block_cat():
-    '''<猫猫名>'''
-    if not cat.arg:
-        return await cat.send("没有参数")
-
-    name = cat.arg
-    if name == cat.name:
-        await cat.send("不可屏蔽猫猫管理器")
-        return
-
-    c = manager.get_cat(name)
-    if not c:
-        await cat.send("没有找到对应猫猫")
-        await show_relative_cats(name)
-        return
-
-    if cat.cmd == "屏蔽猫猫":
-        await c.rest()
-        c.valid = False
-        await cat.send(f"已屏蔽猫猫 {name}")
-    else:
-        c.valid = True
-        await cat.send(f"已取消屏蔽猫猫 {name}")

@@ -259,7 +259,7 @@ class AyakaCat:
 
         # 配置类
         class Config(AyakaConfig):
-            __config_name__ = name
+            __config_dir__ = name
 
         self.Config = Config
 
