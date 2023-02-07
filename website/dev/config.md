@@ -1,51 +1,69 @@
+使用[pydantic](https://docs.pydantic.dev/)的`BaseModel`，真香
+
 ## 作为配置使用
 
-### 定义与读取
+### 定义
 
 ```py
 from ayaka import AyakaConfig
+# AyakaConfig 是 BaseModel 的子类
 
 class Config(AyakaConfig):
+    __config_dir__ = "testttt"
+    __config_name__ = "我是配置"
+    version:str = "1.0.0"
+    greeting:str = "你好"
+    reward:int = 20
+    names:list[str] = []
+```
+
+你也可以这样定义
+
+```py
+cat = AyakaCat("testttt")
+
+class Config(cat.Config):
     __config_name__ = "我是配置"
     version:str = "1.0.0"
     greeting:str = "你好"
     reward:int = 20
     names:list[str] = []
 
-# 加载配置
+```
+
+### 加载与读取
+
+```py
+# 从本地加载
 config = Config()
 
-# 使用
+# 读取
 # do something
 config.reward
 ```
 
-配置将保存在`data/ayaka/<__config_name__>.json`中
+配置将保存在`data/testttt/我是配置.json`中
 
-实际上，`AyakaConfig`继承自`BaseModel`
-
-### 可以写入配置
+### 写入
 
 配置文件可以在代码中动态修改，而非仅外部可修改
 
-```py
-async def _():
-    # ...
-    config.reward = 10000
-    # ...
-```
+**对于不可变对象**
 
-对于不可变对象，可以直接赋值，`AyakaConfig`会自动将新值写入本地配置文件中
+直接赋值，`AyakaConfig`会**自动**将新值写入本地配置文件中
 
 ```py
-async def _():
-    # ...
-    config.names.append("oh no")
-    config.save()
-    # ...
+config.reward = 10000
 ```
 
-对于可变对象，则需要手动执行`config.save`方法，将新值写入本地配置文件中
+**对于可变对象**
+
+需要**手动**执行`config.save`方法，将新值写入本地配置文件中
+
+```py
+config.names.append("oh no")
+config.save()
+```
 
 ## 作为持久化数据的手段
 

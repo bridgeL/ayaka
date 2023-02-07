@@ -545,14 +545,21 @@
         
           <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
-    定义与读取
+    定义
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
-    可以写入配置
+    加载与读取
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    写入
   </a>
   
 </li>
@@ -563,14 +570,14 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     作为持久化数据的手段
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     下一步
   </a>
   
@@ -669,46 +676,55 @@
 
   <h1>配置</h1>
 
+<p>使用<a href="https://docs.pydantic.dev/">pydantic</a>的<code>BaseModel</code>，真香</p>
 <h2 id="_1">作为配置使用<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<h3 id="_2">定义与读取<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<h3 id="_2">定义<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">AyakaConfig</span>
+<span class="c1"># AyakaConfig 是 BaseModel 的子类</span>
 
 <span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">AyakaConfig</span><span class="p">):</span>
+    <span class="n">__config_dir__</span> <span class="o">=</span> <span class="s2">&quot;testttt&quot;</span>
     <span class="n">__config_name__</span> <span class="o">=</span> <span class="s2">&quot;我是配置&quot;</span>
     <span class="n">version</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1.0.0&quot;</span>
     <span class="n">greeting</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;你好&quot;</span>
     <span class="n">reward</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
     <span class="n">names</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</code></pre></div>
+<p>你也可以这样定义</p>
+<div class="highlight"><pre><span></span><code><span class="n">cat</span> <span class="o">=</span> <span class="n">AyakaCat</span><span class="p">(</span><span class="s2">&quot;testttt&quot;</span><span class="p">)</span>
 
-<span class="c1"># 加载配置</span>
+<span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">Config</span><span class="p">):</span>
+    <span class="n">__config_name__</span> <span class="o">=</span> <span class="s2">&quot;我是配置&quot;</span>
+    <span class="n">version</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1.0.0&quot;</span>
+    <span class="n">greeting</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;你好&quot;</span>
+    <span class="n">reward</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">names</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</code></pre></div>
+<h3 id="_3">加载与读取<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># 从本地加载</span>
 <span class="n">config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
 
-<span class="c1"># 使用</span>
+<span class="c1"># 读取</span>
 <span class="c1"># do something</span>
 <span class="n">config</span><span class="o">.</span><span class="n">reward</span>
 </code></pre></div>
-<p>配置将保存在<code>data/ayaka/&lt;__config_name__&gt;.json</code>中</p>
-<p>实际上，<code>AyakaConfig</code>继承自<code>BaseModel</code></p>
-<h3 id="_3">可以写入配置<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>配置将保存在<code>data/testttt/我是配置.json</code>中</p>
+<h3 id="_4">写入<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <p>配置文件可以在代码中动态修改，而非仅外部可修改</p>
-<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
-    <span class="c1"># ...</span>
-    <span class="n">config</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="mi">10000</span>
-    <span class="c1"># ...</span>
+<p><strong>对于不可变对象</strong></p>
+<p>直接赋值，<code>AyakaConfig</code>会<strong>自动</strong>将新值写入本地配置文件中</p>
+<div class="highlight"><pre><span></span><code><span class="n">config</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="mi">10000</span>
 </code></pre></div>
-<p>对于不可变对象，可以直接赋值，<code>AyakaConfig</code>会自动将新值写入本地配置文件中</p>
-<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
-    <span class="c1"># ...</span>
-    <span class="n">config</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;oh no&quot;</span><span class="p">)</span>
-    <span class="n">config</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-    <span class="c1"># ...</span>
+<p><strong>对于可变对象</strong></p>
+<p>需要<strong>手动</strong>执行<code>config.save</code>方法，将新值写入本地配置文件中</p>
+<div class="highlight"><pre><span></span><code><span class="n">config</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;oh no&quot;</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
 </code></pre></div>
-<p>对于可变对象，则需要手动执行<code>config.save</code>方法，将新值写入本地配置文件中</p>
-<h2 id="_4">作为持久化数据的手段<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_5">作为持久化数据的手段<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p>缓存数据在bot重启后会丢失，可以使用<code>AyakaConfig</code>来保存需要持久化的数据</p>
 <p>不过，这可能会导致一些概念上的混乱，配置与数据混杂在一起并不是什么好事</p>
 <p>当然对于数据量较小且多变的情况而言，使用<code>AyakaConfig</code>也是一种不错的选择</p>
-<h2 id="_5">下一步<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_6">下一步<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <div align="right">
     在这里~ ↘
 </div>
