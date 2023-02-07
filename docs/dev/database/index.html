@@ -667,7 +667,7 @@
 <h2 id="_1">创建表<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">ayaka</span> <span class="kn">import</span> <span class="n">AyakaCat</span>
 
-<span class="n">cat</span> <span class="o">=</span> <span class="n">AyakaCat</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="n">cat</span> <span class="o">=</span> <span class="n">AyakaCat</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="s2">&quot;test_hhhh&quot;</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">Money</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">UserDBBase</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="c1"># __tablename__可以用于自定义表名，当然你可以不写，使用类名作为默认值</span>
@@ -677,6 +677,7 @@
 
 <span class="c1"># ayaka会在asgi服务启动后自动创建所有SQLModel表</span>
 </code></pre></div>
+<p>数据库位置<code>data/test_hhhh/data.db</code></p>
 <h2 id="insert">增 insert<a class="headerlink" href="#insert" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="nd">@cat</span><span class="o">.</span><span class="n">on_text</span><span class="p">()</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
