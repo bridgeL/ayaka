@@ -89,6 +89,7 @@ class Handler:
         return decorator
 
     def handle_msg(self, msg: str):
+        raw_msg = msg
         name = self.sender_name
         uid = self.sender_id
 
@@ -112,7 +113,8 @@ class Handler:
             sender_id=uid,
             sender_name=name,
             message=msg,
-            at=at
+            at=at,
+            raw_message=raw_msg
         )
 
         asyncio.create_task(self.handle_event(ayaka_event))

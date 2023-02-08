@@ -131,6 +131,7 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
             message=msg,
             at=at,
             reply=reply,
+            raw_message=event.raw_message
         )
 
         # 处理事件

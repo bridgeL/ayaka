@@ -27,6 +27,8 @@ class AyakaEvent(BaseModel):
     '''回复消息，如果gocq获取不到则为空字符串'''
     at: Optional[str]
     '''消息中的第一个at对象的uid'''
+    raw_message: str
+    '''从gocq收到的原始消息'''
 
     private_forward_id: Optional[str]
     '''私聊转发'''

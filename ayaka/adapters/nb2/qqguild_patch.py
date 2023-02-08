@@ -216,6 +216,7 @@ class Nonebot2Onebot11QQguildPatchAdapter(Nonebot2Onebot11Adapter):
             message=msg,
             at=at,
             reply=reply,
+            raw_message=event.raw_message
         )
 
         # 处理事件
