@@ -86,7 +86,7 @@ class Nonebot1Adapter(AyakaAdapter):
         # 处理消息，保留text、at、reply
         ms = ev.message
         raw_msg = ms
-        
+
         at = None
         reply = None
         if ms[0].type == "reply":
@@ -145,4 +145,3 @@ class Nonebot1Adapter(AyakaAdapter):
 bot = nonebot.get_bot()
 
 Nonebot1Adapter.name = "nb1"
-Nonebot1Adapter.prefixes = list(bot.config.COMMAND_START) or [""]

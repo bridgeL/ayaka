@@ -15,4 +15,3 @@ class HoshinoAdapter(Nonebot1Adapter):
 bot = Service('ayaka').bot
 
 HoshinoAdapter.name = "hoshino"
-HoshinoAdapter.prefixes = list(config.COMMAND_START) or [""]

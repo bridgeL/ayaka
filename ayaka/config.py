@@ -1,5 +1,6 @@
 '''管理插件配置，提供读写支持'''
 import json
+from typing import Optional
 import inflection
 from loguru import logger
 from pydantic import ValidationError, BaseModel
@@ -76,13 +77,14 @@ class AyakaConfig(BaseModel):
 class RootConfig(AyakaConfig):
     '''根配置'''
 
-    __config_name__ = "root"
-
     version: str = AYAKA_VERSION
     '''版本号'''
 
     auto_ob11_qqguild_patch: bool = True
     '''在ob11协议中自动使用qqguild_patch'''
+
+    prefixes: list[str] = ["", "#"]
+    separate: str = " "
 
 
 @singleton

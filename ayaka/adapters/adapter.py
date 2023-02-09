@@ -16,10 +16,16 @@ class AyakaAdapter:
 
     name: str = ""
     '''适配器名称'''
-    prefixes: list[str] = []
-    '''命令前缀'''
-    separate: str = " "
-    '''参数分隔符'''
+
+    @property
+    def prefixes(self):
+        '''命令前缀'''
+        return get_root_config().prefixes
+
+    @property
+    def separate(self):
+        '''参数分隔符'''
+        return get_root_config().separate
 
     def on_startup(self, func: Callable):
         '''asgi服务启动后钩子'''

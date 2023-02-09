@@ -63,7 +63,6 @@ class ConsoleAdapter(AyakaAdapter):
 
 
 ConsoleAdapter.name = "console"
-ConsoleAdapter.prefixes = [""]
 
 
 class Handler:

@@ -736,11 +736,12 @@
 <p>当你发出一条模拟消息后，ayaka会记录你使用的角色身份，例如（群聊100的uid为1的用户）</p>
 <p>随后，你可以省略<code>g 100 1</code>，不必<code>g 100 1 命令</code>，而是直接发送<code>命令</code></p>
 <p>默认角色总是使用最近一条模拟消息的角色</p>
+<p>若你刚刚启动程序，未发送任何消息，则初始角色为<code>g 100 1</code></p>
 <h2 id="_4">脚本示例<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code># script/stone.txt
 # 测试赌石 √
 
-# 设定默认角色
+# 设定默认角色（此句可省略，默认为g 100 1）
 g 100 1 
 
 # 接下来均以群聊100中的uid为1的角色来发言

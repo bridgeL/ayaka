@@ -106,3 +106,9 @@ base_send_group，base_send_private，base_send_group_many
 - 新特性：新增AyakaDB，通过它，你可以让各个插件拥有独立的数据库
 - 新特性：Timer可自定义formater
 - 优化console使用，现在初始默认角色为群号100中uid为1的群成员
+
+### 0.0.4.1
+
+- 优化代码结构
+- 新特性：adapter.on_startup现在可以添加同步函数，请注意，所有程序都将等待其完成
+- 新特性：AyakaEvent新增字段raw_messsage
