@@ -3,7 +3,7 @@ from loguru import logger
 from contextvars import ContextVar
 from typing import Awaitable, Callable
 from .model import GroupMemberInfo, AyakaEvent
-from .detect import is_hoshino, is_nb1, is_nb2ob11, is_no_env
+from .detect import is_hoshino, is_nb1, is_nb2ob11
 from ..config import get_root_config
 from ..init_ctrl import init_all
 from ..helpers import is_async_callable, simple_async_wrap
@@ -13,6 +13,7 @@ current_adapter: ContextVar["AyakaAdapter"] = ContextVar("current_adapter")
 
 class AyakaAdapter:
     '''ayaka适配器，用于实现跨机器人框架和协议的兼容'''
+    asgi = None
 
     name: str = ""
     '''适配器名称'''
@@ -76,6 +77,10 @@ adapter_dict: dict[str, AyakaAdapter] = {}
 first_adapter: AyakaAdapter = None
 
 
+def get_first_adapter():
+    return first_adapter
+
+
 def regist(adapter_cls: type[AyakaAdapter]):
     '''注册适配器'''
 
@@ -115,22 +120,14 @@ def auto_load_adapter():
     # hoshino
     if is_hoshino():
         from .nb1.hoshino import HoshinoAdapter
-        regist(HoshinoAdapter)
 
     # nonebot1
     if is_nb1():
         from .nb1.nb1 import Nonebot1Adapter
-        regist(Nonebot1Adapter)
 
     # nonebot2 onebot11
     if is_nb2ob11():
         from .nb2.ob11 import Nonebot2Onebot11Adapter
-        regist(Nonebot2Onebot11Adapter)
 
-        if get_root_config().auto_ob11_qqguild_patch:
-            from .nb2.qqguild_patch import Nonebot2Onebot11QQguildPatchAdapter
-            regist(Nonebot2Onebot11QQguildPatchAdapter)
-
-    if is_no_env():
+    if not get_first_adapter():
         from .console import ConsoleAdapter
-        regist(ConsoleAdapter)

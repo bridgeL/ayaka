@@ -7,7 +7,7 @@ import nonebot
 from aiocqhttp import Event as CQEvent
 from aiocqhttp.exceptions import ActionFailed
 
-from ..adapter import AyakaAdapter
+from ..adapter import AyakaAdapter, regist
 from ..model import GroupMemberInfo, AyakaEvent
 
 
@@ -15,6 +15,7 @@ class Nonebot1Adapter(AyakaAdapter):
     '''nonebot1 适配器'''
 
     def __init__(self) -> None:
+        self.asgi = nonebot.get_bot().asgi
         bot.on("message")(self.handle)
 
     async def send_group(self, id: str, msg: str) -> bool:
@@ -145,3 +146,5 @@ class Nonebot1Adapter(AyakaAdapter):
 bot = nonebot.get_bot()
 
 Nonebot1Adapter.name = "nb1"
+
+regist(Nonebot1Adapter)

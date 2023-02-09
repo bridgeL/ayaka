@@ -8,8 +8,9 @@ from nonebot.matcher import current_bot
 from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment
 from nonebot.exception import ActionFailed
 
-from ..adapter import AyakaAdapter
+from ..adapter import AyakaAdapter, regist
 from ..model import GroupMemberInfo, AyakaEvent
+from ...config import get_root_config
 
 
 driver = nonebot.get_driver()
@@ -19,6 +20,7 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
     '''nonebot2 onebot v11 适配器'''
 
     def __init__(self) -> None:
+        self.asgi = nonebot.get_app()
         nonebot.on_message(handlers=[self.handle], block=False, priority=5)
 
     async def send_group(self, id: str, msg: str) -> bool:
@@ -94,7 +96,7 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
 
     async def handle(self, bot: Bot, event: MessageEvent):
         '''将输入的参数加工为ayaka_event，请在最后调用self.handle_event进行处理'''
-        
+
         # 排除频道适配事件
         if hasattr(event, "guild_id"):
             return
@@ -147,4 +149,7 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
 
 
 Nonebot2Onebot11Adapter.name = "nb2.ob11"
-Nonebot2Onebot11Adapter.prefixes = list(driver.config.command_start) or [""]
+regist(Nonebot2Onebot11Adapter)
+
+if get_root_config().auto_ob11_qqguild_patch:
+    from .qqguild_patch import Nonebot2Onebot11QQguildPatchAdapter

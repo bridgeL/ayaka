@@ -1,68 +1,18 @@
 '''适配命令行输入输出'''
 import re
-from loguru import logger
 import uvicorn
 import asyncio
 from fastapi import FastAPI
 from typing import Awaitable, Callable
 
-from .adapter import AyakaAdapter
+from .adapter import AyakaAdapter, regist, get_first_adapter
 from .model import GroupMemberInfo, AyakaEvent
-from .detect import is_hoshino, is_nb1, is_nb2ob11
 from ..helpers import ensure_dir_exists
 from ..logger import ayaka_log, ayaka_clog
 
 
 at_pt = re.compile(r"@([^ ]+?)(?= |$)")
-
-
-class ConsoleAdapter(AyakaAdapter):
-    '''console 适配器'''
-
-    def __init__(self) -> None:
-        handler.handle_event = self.handle_event
-        self.on_startup(start_loop)
-
-    async def send_group(self, id: str, msg: str) -> bool:
-        '''发送消息到指定群聊'''
-        ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
-        print(msg)
-        return True
-
-    async def send_private(self, id: str, msg: str) -> bool:
-        '''发送消息到指定私聊'''
-        ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
-        print(msg)
-        return True
-
-    async def send_group_many(self, id: str, msgs: list[str]) -> bool:
-        '''发送消息组到指定群聊'''
-        ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
-        print("\n\n".join(msgs))
-        return True
-
-    async def get_group_member(self, gid: str, uid: str) -> GroupMemberInfo | None:
-        '''获取群内某用户的信息'''
-        return GroupMemberInfo(id=uid, name=f"测试{uid}号", role="admin")
-
-    async def get_group_members(self, gid: str) -> list[GroupMemberInfo]:
-        '''获取群内所有用户的信息'''
-        return [
-            GroupMemberInfo(id=uid, name=f"测试{uid}号", role="admin")
-            for uid in [i+1 for i in range(100)]
-        ]
-
-    def _on_startup(self, async_func: Callable[[], Awaitable]):
-        '''asgi服务启动后钩子，注册回调必须是异步函数'''
-        async def _func():
-            try:
-                await async_func()
-            except:
-                logger.exception("asgi服务启动后钩子发生错误")
-        on_startup(_func)
-
-
-ConsoleAdapter.name = "console"
+app = None
 
 
 class Handler:
@@ -118,10 +68,6 @@ class Handler:
         asyncio.create_task(self.handle_event(ayaka_event))
 
 
-async def start_loop():
-    asyncio.create_task(console_loop())
-
-
 def safe_split(text: str,  n: int, sep: str = " "):
     '''安全分割字符串为n部分，不足部分使用空字符串补齐'''
     i = text.count(sep)
@@ -130,28 +76,7 @@ def safe_split(text: str,  n: int, sep: str = " "):
     return text.split(sep, maxsplit=n-1)
 
 
-if is_hoshino() or is_nb1():
-    import nonebot
-    app = nonebot.get_bot().asgi
-    on_startup = nonebot.get_bot().on_startup
-elif is_nb2ob11():
-    import nonebot
-    app = nonebot.get_asgi()
-    on_startup = nonebot.get_driver().on_startup
-else:
-    app = FastAPI()
-    on_startup = app.on_event("startup")
-
 handler = Handler()
-
-
-async def console_loop():
-    ayaka_clog("已接入 <g>Ayaka Console Adapter</g>")
-    await show_help("")
-    loop = asyncio.get_running_loop()
-    while True:
-        line = await loop.run_in_executor(None, input)
-        await handler.handle_line(line)
 
 
 @handler.on("#")
@@ -228,6 +153,70 @@ async def show_help(line: str):
 async def deal_line(msg: str):
     if msg:
         handler.handle_msg(msg)
+
+
+class ConsoleAdapter(AyakaAdapter):
+    '''console 适配器'''
+
+    def __init__(self) -> None:
+        first_adapter = get_first_adapter()
+        if first_adapter:
+            self.asgi = first_adapter.asgi
+            self.on_startup = first_adapter.on_startup
+        else:
+            self.asgi = FastAPI()
+            self.on_startup = self.asgi.on_event("startup")
+
+        global app
+        app = self.asgi
+
+        handler.handle_event = self.handle_event
+
+        async def start_loop():
+            asyncio.create_task(console_loop())
+
+        async def console_loop():
+            ayaka_clog("已接入 <g>Ayaka Console Adapter</g>")
+            await show_help("")
+            loop = asyncio.get_running_loop()
+            while True:
+                line = await loop.run_in_executor(None, input)
+                await handler.handle_line(line)
+
+        self.on_startup(start_loop)
+
+    async def send_group(self, id: str, msg: str) -> bool:
+        '''发送消息到指定群聊'''
+        ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
+        print(msg)
+        return True
+
+    async def send_private(self, id: str, msg: str) -> bool:
+        '''发送消息到指定私聊'''
+        ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
+        print(msg)
+        return True
+
+    async def send_group_many(self, id: str, msgs: list[str]) -> bool:
+        '''发送消息组到指定群聊'''
+        ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
+        print("\n\n".join(msgs))
+        return True
+
+    async def get_group_member(self, gid: str, uid: str) -> GroupMemberInfo | None:
+        '''获取群内某用户的信息'''
+        return GroupMemberInfo(id=uid, name=f"测试{uid}号", role="admin")
+
+    async def get_group_members(self, gid: str) -> list[GroupMemberInfo]:
+        '''获取群内所有用户的信息'''
+        return [
+            GroupMemberInfo(id=uid, name=f"测试{uid}号", role="admin")
+            for uid in [i+1 for i in range(100)]
+        ]
+
+
+ConsoleAdapter.name = "console"
+regist(ConsoleAdapter)
 
 
 def run():
