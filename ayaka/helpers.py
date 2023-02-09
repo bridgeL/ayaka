@@ -7,15 +7,6 @@ from time import time
 from pathlib import Path
 
 
-def is_async_callable(obj) -> bool:
-    while isinstance(obj, functools.partial):
-        obj = obj.func
-
-    return asyncio.iscoroutinefunction(obj) or (
-        callable(obj) and asyncio.iscoroutinefunction(obj.__call__)
-    )
-
-
 def ensure_list(data: str | list | tuple | set):
     '''确保为列表'''
     if isinstance(data, str):
