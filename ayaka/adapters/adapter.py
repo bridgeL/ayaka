@@ -119,7 +119,7 @@ class AyakaAdapter:
         current_adapter.set(get_adapter(self.name))
         try:
             # ---- 解除循环引用，待优化 ----
-            from ..core import manager
+            from ..core.cat import manager
             await manager.handle_event(ayaka_event)
         except:
             logger.exception(f"ayaka 处理事件（{ayaka_event}）时发生错误")

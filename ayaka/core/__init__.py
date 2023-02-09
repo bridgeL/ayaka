@@ -1,2 +1,2 @@
-from .cat import AyakaCat, manager
+from .cat import AyakaCat
 from .subscribe import AyakaSubscribe
