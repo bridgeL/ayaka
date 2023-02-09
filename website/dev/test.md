@@ -60,6 +60,23 @@ hit
 exit
 ```
 
+## 直接连接到gocq上
+
+```py
+# run2.py
+import ayaka.adapters.gocq as cat
+
+# 加载插件
+# do something
+
+if __name__ == "__main__":
+    cat.run()
+```
+
+```
+python run2.py
+```
+
 ## 下一步
 
 <div align="right">

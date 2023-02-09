@@ -112,3 +112,4 @@ base_send_group，base_send_private，base_send_group_many
 - 优化代码结构
 - 新特性：adapter.on_startup现在可以添加同步函数，请注意，所有程序都将等待其完成
 - 新特性：AyakaEvent新增字段raw_messsage
+- 新特性：新增适配器 gocq

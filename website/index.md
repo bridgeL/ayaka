@@ -29,7 +29,10 @@
 - [hoshino](https://github.com/Ice-Cirno/HoshinoBot)
 - [nonebot1](https://github.com/nonebot/nonebot)
 
-也可将其作为console程序离线运行，便于调试
+也可将其
+
+- 作为console程序离线运行，便于调试
+- 直接通过反向ws连接到gocq上
 
 ## 安装
 
