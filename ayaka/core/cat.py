@@ -14,7 +14,7 @@ from .session import get_session_cls, AyakaSession, AyakaGroup, AyakaPrivate
 
 from ..helpers import ensure_list
 from ..adapters import AyakaEvent, get_adapter
-from ..init_ctrl import init_ctrl
+from ..init_ctrl import init_all
 from ..config import AyakaConfig
 
 
@@ -219,7 +219,7 @@ class AyakaCat:
             overtime：超时未收到指令则自动关闭，单位：秒，<=0则禁止该特性
         '''
         # 异味代码...但是不想改
-        init_ctrl.init_all()
+        init_all()
 
         self.name = name
         manager.add_cat(self)

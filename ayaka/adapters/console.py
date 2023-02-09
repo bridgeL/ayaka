@@ -52,7 +52,7 @@ class ConsoleAdapter(AyakaAdapter):
             for uid in [i+1 for i in range(100)]
         ]
 
-    def on_startup(self, async_func: Callable[[], Awaitable]):
+    def _on_startup(self, async_func: Callable[[], Awaitable]):
         '''asgi服务启动后钩子，注册回调必须是异步函数'''
         async def _func():
             try:

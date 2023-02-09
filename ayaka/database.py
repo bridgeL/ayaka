@@ -4,7 +4,6 @@ from loguru import logger
 from sqlalchemy.orm import declared_attr
 from sqlmodel import MetaData, Session, SQLModel, Field, select, create_engine
 from .helpers import ensure_dir_exists
-from .init_ctrl import init_ctrl
 
 
 class AyakaDB:
@@ -72,10 +71,6 @@ class AyakaDB:
 
         self.UserDBBase = UserDBBase
         '''自带group_id、user_id'''
-
-        # 异味代码...但是不想改
-        if init_ctrl.done:
-            self.init()
 
     def init(self):
         '''初始化所有表'''

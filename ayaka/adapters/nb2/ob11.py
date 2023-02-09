@@ -136,7 +136,7 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
         # 处理事件
         await self.handle_event(ayaka_event)
 
-    def on_startup(self, async_func: Callable[..., Awaitable]):
+    def _on_startup(self, async_func: Callable[..., Awaitable]):
         '''asgi服务启动后钩子，注册回调必须是异步函数'''
         driver.on_startup(async_func)
 

@@ -5,7 +5,8 @@ from typing import Awaitable, Callable
 from .model import GroupMemberInfo, AyakaEvent
 from .detect import is_hoshino, is_nb1, is_nb2ob11, is_no_env
 from ..config import get_root_config
-from ..init_ctrl import init_ctrl
+from ..init_ctrl import init_all
+from ..helpers import is_async_callable, simple_async_wrap
 
 current_adapter: ContextVar["AyakaAdapter"] = ContextVar("current_adapter")
 
@@ -20,7 +21,13 @@ class AyakaAdapter:
     separate: str = " "
     '''参数分隔符'''
 
-    def on_startup(self, async_func: Callable[..., Awaitable]):
+    def on_startup(self, func: Callable):
+        '''asgi服务启动后钩子'''
+        if not is_async_callable(func):
+            func = simple_async_wrap(func)
+        self._on_startup(func)
+
+    def _on_startup(self, async_func: Callable[..., Awaitable]):
         '''asgi服务启动后钩子，注册回调必须是异步函数'''
         raise NotImplementedError
 
@@ -89,7 +96,7 @@ def get_adapter(name: str = ""):
         name：适配器名称，若为空，则默认为当前上下文中的适配器，若当前上下文为空，则返回第一个适配器
     '''
     # 异味代码...但是不想改
-    init_ctrl.init_all()
+    init_all()
 
     if not name:
         return current_adapter.get(first_adapter)
