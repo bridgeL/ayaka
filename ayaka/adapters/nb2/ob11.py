@@ -18,8 +18,7 @@ driver = nonebot.get_driver()
 class Nonebot2Onebot11Adapter(AyakaAdapter):
     '''nonebot2 onebot v11 适配器'''
 
-    def first_init(self) -> None:
-        '''在第一次初始化时执行'''
+    def __init__(self) -> None:
         nonebot.on_message(handlers=[self.handle], block=False, priority=5)
 
     async def send_group(self, id: str, msg: str) -> bool:

@@ -8,12 +8,13 @@ from sqlmodel import select, Session
 
 from .trigger import AyakaTrigger
 from ..database import AyakaDB, get_db
-from .context import get_context, set_context
+from .context import ayaka_context
 from .exception import DuplicateCatNameError
 from .session import get_session_cls, AyakaSession, AyakaGroup, AyakaPrivate
 
 from ..helpers import ensure_list
-from ..adapters import AyakaEvent, get_adapter, init_all
+from ..adapters import AyakaEvent, get_adapter
+from ..init_ctrl import init_ctrl
 from ..config import AyakaConfig
 
 
@@ -104,7 +105,7 @@ class AyakaManager:
     async def handle_event(self, event: AyakaEvent):
         '''处理和转发事件'''
         # 设置上下文
-        set_context(event)
+        ayaka_context.event = event
 
         # 查询屏蔽情况
         # 获取碰撞域中的触发器
@@ -218,7 +219,7 @@ class AyakaCat:
             overtime：超时未收到指令则自动关闭，单位：秒，<=0则禁止该特性
         '''
         # 异味代码...但是不想改
-        init_all()
+        init_ctrl.init_all()
 
         self.name = name
         manager.add_cat(self)
@@ -372,7 +373,7 @@ class AyakaCat:
     @property
     def context(self):
         '''当前上下文'''
-        return get_context()
+        return ayaka_context
 
     @property
     def event(self):

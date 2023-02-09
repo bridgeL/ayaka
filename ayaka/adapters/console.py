@@ -19,8 +19,7 @@ at_pt = re.compile(r"@([^ ]+?)(?= |$)")
 class ConsoleAdapter(AyakaAdapter):
     '''console 适配器'''
 
-    def first_init(self) -> None:
-        '''在第一次初始化时执行'''
+    def __init__(self) -> None:
         handler.handle_event = self.handle_event
         self.on_startup(start_loop)
 

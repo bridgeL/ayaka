@@ -2,7 +2,7 @@
 import asyncio
 from typing import Callable, Optional, TypeVar
 from loguru import logger
-from .context import get_context
+from .context import ayaka_context
 from ..helpers import simple_repr
 
 T = TypeVar("T")
@@ -63,7 +63,7 @@ class AyakaPrivate(AyakaSession):
 
     @property
     def name(self):
-        return get_context().event.sender_name
+        return ayaka_context.event.sender_name
 
 
 class AyakaGroupMember(AyakaSession):
@@ -72,7 +72,7 @@ class AyakaGroupMember(AyakaSession):
 
     @property
     def name(self):
-        return get_context().event.sender_name
+        return ayaka_context.event.sender_name
 
 
 class AyakaGroup(AyakaSession):
@@ -88,7 +88,7 @@ class AyakaGroup(AyakaSession):
     @property
     def member(self):
         '''当前群成员'''
-        sid = get_context().event.sender_id
+        sid = ayaka_context.event.sender_id
         for gm in self.members:
             if gm.id == sid:
                 return gm

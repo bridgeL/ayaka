@@ -2,7 +2,7 @@ import re
 import asyncio
 from loguru import logger
 from typing import TYPE_CHECKING, Awaitable, Callable
-from .context import get_context, set_context
+from .context import ayaka_context
 from .exception import BlockException, NotBlockException
 from ..helpers import simple_repr, singleton
 from ..adapters import get_adapter
@@ -53,11 +53,8 @@ class AyakaTrigger:
         return self.func.__module__
 
     def pre_run(self, prefix):
-        context = get_context()
-
-        # 重设一个新的上下文
-        context = set_context(context.event)
-
+        context = ayaka_context
+        
         # 判定范围
         if context.event.session_type not in self.cat.session_types:
             return False
@@ -73,9 +70,8 @@ class AyakaTrigger:
         context.trigger = self
         context.cmd = self.cmd
 
-        # 创建数据库会话
-        context.db_session = self.cat.db.get_session()
-        context.wait_tasks = []
+        # 先不创建数据库会话
+        # context.db_session = self.cat.db.get_session()
 
         # 只有在有命令的情况下才剥离命令
         if self.cmd:
@@ -132,7 +128,7 @@ class AyakaTrigger:
             logger.info("NotBlockException")
             return False
 
-        context = get_context()
+        context = ayaka_context
         while context.wait_tasks:
             ts = context.wait_tasks
             context.wait_tasks = []

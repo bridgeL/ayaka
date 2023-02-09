@@ -4,12 +4,10 @@ from contextvars import ContextVar
 from typing import Awaitable, Callable
 from .model import GroupMemberInfo, AyakaEvent
 from .detect import is_hoshino, is_nb1, is_nb2ob11, is_no_env
-from ..helpers import singleton
-from ..logger import init_error_log
 from ..config import get_root_config
-from ..database import db_dict
+from ..init_ctrl import init_ctrl
 
-adapter_name_ctx: ContextVar[str] = ContextVar("adapter_name_ctx")
+current_adapter: ContextVar["AyakaAdapter"] = ContextVar("current_adapter")
 
 
 class AyakaAdapter:
@@ -21,10 +19,6 @@ class AyakaAdapter:
     '''命令前缀'''
     separate: str = " "
     '''参数分隔符'''
-
-    def first_init(self) -> None:
-        '''在第一次初始化时执行'''
-        raise NotImplementedError
 
     def on_startup(self, async_func: Callable[..., Awaitable]):
         '''asgi服务启动后钩子，注册回调必须是异步函数'''
@@ -56,16 +50,17 @@ class AyakaAdapter:
 
     async def handle_event(self, ayaka_event: AyakaEvent):
         '''处理ayaka事件，并在发生错误时记录'''
-        # ---- 解除循环引用，待优化 ----
-        from ..core import manager
-        adapter_name_ctx.set(self.name)
+        current_adapter.set(get_adapter(self.name))
         try:
+            # ---- 解除循环引用，待优化 ----
+            from ..core import manager
             await manager.handle_event(ayaka_event)
         except:
             logger.exception(f"ayaka 处理事件（{ayaka_event}）时发生错误")
 
 
 adapter_dict: dict[str, AyakaAdapter] = {}
+first_adapter: AyakaAdapter = None
 
 
 def regist(adapter_cls: type[AyakaAdapter]):
@@ -76,16 +71,14 @@ def regist(adapter_cls: type[AyakaAdapter]):
         return adapter_dict[name]
 
     adapter = adapter_cls()
-    adapter.first_init()
+
+    if not adapter_dict:
+        global first_adapter
+        first_adapter = adapter
+
     adapter_dict[name] = adapter
     logger.opt(colors=True).debug(f"ayaka适配器注册成功 <y>{name}</y>")
     return adapter
-
-
-def get_first_adapter():
-    adapters = list(adapter_dict.values())
-    if adapters:
-        return adapters[0]
 
 
 def get_adapter(name: str = ""):
@@ -96,14 +89,10 @@ def get_adapter(name: str = ""):
         name：适配器名称，若为空，则默认为当前上下文中的适配器，若当前上下文为空，则返回第一个适配器
     '''
     # 异味代码...但是不想改
-    init_all()
+    init_ctrl.init_all()
 
     if not name:
-        try:
-            name = adapter_name_ctx.get()
-        except LookupError:
-            return get_first_adapter()
-
+        return current_adapter.get(first_adapter)
     return adapter_dict.get(name)
 
 
@@ -132,24 +121,3 @@ def auto_load_adapter():
     if is_no_env():
         from .console import ConsoleAdapter
         regist(ConsoleAdapter)
-
-
-# 异味代码...但是不想改
-@singleton
-def init_all():
-    '''初始化ayaka，仅执行一次'''
-    # 加载错误日志记录
-    init_error_log()
-    
-    # 初始化根配置
-    get_root_config()
-
-    # 加载适配器
-    auto_load_adapter()
-    
-    # 初始化数据库
-    for db in db_dict.values():
-        db.init()
-
-    # 加载猫猫管理器
-    from .. import master

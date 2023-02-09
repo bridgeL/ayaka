@@ -124,8 +124,7 @@ class GuildMessageEvent(MessageEvent):
 class Nonebot2Onebot11QQguildPatchAdapter(Nonebot2Onebot11Adapter):
     '''nonebot2 onebot v11 qqguild patch 适配器'''
 
-    def first_init(self) -> None:
-        '''在第一次初始化时执行'''
+    def __init__(self) -> None:
         Adapter.add_custom_model(GuildMessageEvent)
         nonebot.on_message(handlers=[self.handle], block=False, priority=5)
 

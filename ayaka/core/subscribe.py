@@ -2,7 +2,7 @@
 import asyncio
 import inspect
 from typing import Awaitable, Callable
-from .context import get_context
+from .context import ayaka_context
 
 ASYNC_FUNC = Callable[..., Awaitable]
 '''异步方法'''
@@ -53,8 +53,7 @@ class AyakaSubscribe:
                 event_name = f"{cls.__name__}.{name}.change"
                 task = asyncio.create_task(
                     self.emit(event_name, old_value, value, c_self))
-                context = get_context()
-                context.wait_tasks.append(task)
+                ayaka_context.wait_tasks.append(task)
 
             func(c_self, name, value)
 

@@ -14,8 +14,7 @@ from ..model import GroupMemberInfo, AyakaEvent
 class Nonebot1Adapter(AyakaAdapter):
     '''nonebot1 适配器'''
 
-    def first_init(self) -> None:
-        '''在第一次初始化时执行'''
+    def __init__(self) -> None:
         bot.on("message")(self.handle)
 
     async def send_group(self, id: str, msg: str) -> bool:
