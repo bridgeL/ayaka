@@ -6,7 +6,7 @@ from loguru import logger
 from pydantic import ValidationError, BaseModel
 from .helpers import ensure_dir_exists, singleton
 
-AYAKA_VERSION = "0.0.4.1b1"
+AYAKA_VERSION = "0.0.4.1b2"
 
 
 class AyakaConfig(BaseModel):

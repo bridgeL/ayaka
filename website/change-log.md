@@ -113,3 +113,5 @@ base_send_group，base_send_private，base_send_group_many
 - 新特性：adapter.on_startup现在可以添加同步函数，请注意，所有程序都将等待其完成
 - 新特性：AyakaEvent新增字段raw_messsage
 - 新特性：新增适配器 gocq
+- 新特性：console适配器新增指令 t
+- 优化了cat.valid的实现方式，避免其使用过多的database.session
