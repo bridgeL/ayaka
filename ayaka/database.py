@@ -3,9 +3,7 @@ from typing import Optional
 from loguru import logger
 from sqlalchemy.orm import declared_attr
 from sqlmodel import MetaData, Session, SQLModel, Field, select, create_engine
-from .context import get_context
-from ..adapters import get_adapter
-from ..helpers import ensure_dir_exists, simple_async_wrap
+from .helpers import ensure_dir_exists
 
 
 class AyakaDB:
@@ -45,6 +43,9 @@ class AyakaDB:
             @classmethod
             def _get_or_create(cls, **kwargs):
                 '''若不存在则根据参数值创建'''
+                # 异味代码...但是不想改
+                from .core import get_context
+                
                 session = get_context().db_session
                 statement = select(cls).filter_by(**kwargs)
                 cursor = session.exec(statement)
@@ -71,8 +72,6 @@ class AyakaDB:
         self.UserDBBase = UserDBBase
         '''自带group_id、user_id'''
 
-        get_adapter().on_startup(simple_async_wrap(self.init))
-
     def init(self):
         '''初始化所有表'''
         self.path = ensure_dir_exists(f"data/{self.name}/data.db")
@@ -86,6 +85,7 @@ class AyakaDB:
 
         kwargs 请参考sqlmodel.Session'''
 
+        kwargs.setdefault("bind", self.engine)
         # 在数据库高频修改的情况下，autoflush可能会导致数据错误，例如多次相加只生效1次
         # 但减少了数据库崩溃报错的可能，并且提高数据库吞吐量
         kwargs.setdefault("autoflush", False)

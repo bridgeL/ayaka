@@ -7,6 +7,7 @@ from .detect import is_hoshino, is_nb1, is_nb2ob11, is_no_env
 from ..helpers import singleton
 from ..logger import init_error_log
 from ..config import get_root_config
+from ..database import db_dict
 
 adapter_name_ctx: ContextVar[str] = ContextVar("adapter_name_ctx")
 
@@ -146,8 +147,9 @@ def init_all():
     # 加载适配器
     auto_load_adapter()
     
-    # 初始化 cat_block
-    from ..core.cat_block import get_db
+    # 初始化数据库
+    for db in db_dict.values():
+        db.init()
 
     # 加载猫猫管理器
     from .. import master

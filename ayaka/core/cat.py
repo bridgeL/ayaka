@@ -4,16 +4,57 @@ import asyncio
 from pathlib import Path
 from loguru import logger
 from typing import Awaitable, Callable, TypeVar
+from sqlmodel import select, Session
 
 from .trigger import AyakaTrigger
-from .database import AyakaDB, get_db
+from ..database import AyakaDB, get_db
 from .context import get_context, set_context
 from .exception import DuplicateCatNameError
 from .session import get_session_cls, AyakaSession, AyakaGroup, AyakaPrivate
 
 from ..helpers import ensure_list
-from ..adapters import AyakaEvent, get_adapter
+from ..adapters import AyakaEvent, get_adapter, init_all
 from ..config import AyakaConfig
+
+
+IDModel = get_db().IDModel
+
+
+class CatBlock(IDModel, table=True):
+    session_mark: str
+    cat_name: str
+
+    @classmethod
+    def _get(cls, session: Session, session_mark: str, cat_name: str):
+        stmt = select(cls).filter_by(
+            session_mark=session_mark,
+            cat_name=cat_name
+        )
+        cursor = session.exec(stmt)
+        return cursor.one_or_none()
+
+    @classmethod
+    def check(cls, session_mark: str, cat_name: str):
+        with cls.get_session() as session:
+            r = cls._get(session, session_mark, cat_name)
+            return not r
+
+    @classmethod
+    def add(cls, session_mark: str, cat_name: str):
+        with cls.get_session() as session:
+            r = cls._get(session, session_mark, cat_name)
+            if not r:
+                r = cls(session_mark=session_mark, cat_name=cat_name)
+                session.add(r)
+                session.commit()
+
+    @classmethod
+    def remove(cls, session_mark: str, cat_name: str):
+        with cls.get_session() as session:
+            r = cls._get(session, session_mark, cat_name)
+            if r:
+                session.delete(r)
+                session.commit()
 
 
 class AyakaFuncHelp:
@@ -177,7 +218,7 @@ class AyakaCat:
             overtime：超时未收到指令则自动关闭，单位：秒，<=0则禁止该特性
         '''
         # 异味代码...但是不想改
-        get_adapter()
+        init_all()
 
         self.name = name
         manager.add_cat(self)
@@ -273,13 +314,11 @@ class AyakaCat:
     @property
     def valid(self):
         '''当前猫猫是否可用'''
-        from .cat_block import CatBlock
         return CatBlock.check(self.session.mark, self.name)
 
     @valid.setter
     def valid(self, value: bool):
         '''设置当前猫猫是否可用'''
-        from .cat_block import CatBlock
         if value:
             CatBlock.remove(self.session.mark, self.name)
         else:
