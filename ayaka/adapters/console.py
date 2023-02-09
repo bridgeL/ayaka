@@ -5,8 +5,7 @@ import asyncio
 from fastapi import FastAPI
 from typing import Awaitable, Callable
 
-from .adapter import AyakaAdapter, regist, get_first_adapter
-from .model import GroupMemberInfo, AyakaEvent
+from .adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist, get_first_adapter
 from ..helpers import ensure_dir_exists
 from ..logger import ayaka_log, ayaka_clog
 

@@ -8,8 +8,7 @@ from nonebot.matcher import current_bot
 from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment
 from nonebot.exception import ActionFailed
 
-from ..adapter import AyakaAdapter, regist
-from ..model import GroupMemberInfo, AyakaEvent
+from ..adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist
 from ...config import get_root_config
 
 

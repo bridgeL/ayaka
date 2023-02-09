@@ -1,6 +1,4 @@
-'''
-    提供各类报错
-'''
+'''提供各类报错'''
 
 
 class NotRegistrationError(Exception):

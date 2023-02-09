@@ -9,23 +9,19 @@ from ..adapters import AyakaEvent
 if TYPE_CHECKING:
     from .trigger import AyakaTrigger
 
-context_dict: dict[str, ContextVar] = {}
-
 
 class UndefinedType:
     pass
 
 
 Undefined = UndefinedType()
+context_dict: dict[str, ContextVar] = {}
 
 
 class AyakaContextProp(property):
 
-    def __init__(self, name: str, default=Undefined, default_factory=None) -> None:
-        if default is Undefined:
-            self.context = ContextVar(name)
-        else:
-            self.context = ContextVar(name, default=default)
+    def __init__(self, context: ContextVar, default_factory) -> None:
+        self.context = context
         self.default_factory = default_factory
         super().__init__(self.fget, self.fset, None, None)
 
@@ -48,8 +44,12 @@ class FieldInfo:
         self.default = default
         self.default_factory = default_factory
 
-    def get_prop(self, name: str):
-        return AyakaContextProp(name, default=self.default, default_factory=self.default_factory)
+    def create_prop(self, name: str):
+        if self.default is Undefined:
+            context = ContextVar(name)
+        else:
+            context = ContextVar(name, default=self.default)
+        return AyakaContextProp(context, self.default_factory)
 
 
 def Field(default=Undefined, default_factory=None):
@@ -68,22 +68,22 @@ class AyakaContext:
 
     trigger: "AyakaTrigger"
     '''当前触发器'''
-    
+
     cmd: str
     '''当前命令'''
-    
+
     arg: str
     '''去掉命令的剩余文字'''
-    
+
     args: list[str]
     '''剩余文字根据separate分割'''
-    
+
     nums: list[int]
     '''数字'''
 
     wait_tasks: list[asyncio.Task] = []
     '''数据库会话关闭前，会等待该队列中的所有任务结束'''
-    
+
     db_session: Session = Field(default_factory=get_db_session)
     '''数据库会话，请在trigger存在的时候使用'''
 
@@ -98,7 +98,7 @@ class AyakaContext:
             else:
                 value = Field()
 
-            setattr(cls, key, value.get_prop(name))
+            setattr(cls, key, value.create_prop(name))
         return super().__new__(cls)
 
     def __repr__(self) -> str:

@@ -11,8 +11,7 @@ from typing import Any, Optional
 from fastapi import FastAPI, WebSocket
 import uvicorn
 
-from .adapter import AyakaAdapter, get_first_adapter, regist
-from .model import GroupMemberInfo, AyakaEvent
+from .adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, get_first_adapter, regist
 from ..config import get_root_config
 
 

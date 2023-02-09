@@ -1,12 +1,64 @@
 '''适配器基类'''
+import sys
 from loguru import logger
 from contextvars import ContextVar
-from typing import Awaitable, Callable
-from .model import GroupMemberInfo, AyakaEvent
-from .detect import is_hoshino, is_nb1, is_nb2ob11
+from pydantic import BaseModel
+from typing import Awaitable, Callable, Optional
 from ..config import get_root_config
 from ..init_ctrl import init_all
 from ..helpers import is_async_callable, simple_async_wrap
+
+
+class GroupMemberInfo(BaseModel):
+    id: str
+    name: str
+    role: Optional[str]
+    '''群主、管理员、普通用户'''
+
+
+class AyakaEvent(BaseModel):
+    '''ayaka消息事件'''
+
+    session_type: str
+    '''消息会话类型'''
+    session_id: str
+    '''消息会话id'''
+    sender_id: str
+    '''消息发送者id'''
+    sender_name: str
+    '''消息发送者名称'''
+    message: str
+    '''当前消息'''
+    reply: Optional[str]
+    '''回复消息，如果gocq获取不到则为空字符串'''
+    at: Optional[str]
+    '''消息中的第一个at对象的uid'''
+    raw_message: str
+    '''从gocq收到的原始消息'''
+
+    private_forward_id: Optional[str]
+    '''私聊转发'''
+
+
+def is_hoshino():
+    if "hoshino" in sys.modules:
+        logger.opt(colors=True).debug("识别到 <y>hoshino</y>")
+        return True
+
+
+def is_nb1():
+    # 防止hoshino重复注册
+    if "hoshino" not in sys.modules and "nonebot" in sys.modules:
+        if hasattr(sys.modules["nonebot"], "NoneBot"):
+            logger.opt(colors=True).debug("识别到 <y>nonebot1</y>")
+            return True
+
+
+def is_nb2ob11():
+    if "nonebot.adapters.onebot.v11" in sys.modules:
+        logger.opt(colors=True).debug("识别到 <y>nonebot2 onebot11</y>")
+        return True
+
 
 current_adapter: ContextVar["AyakaAdapter"] = ContextVar("current_adapter")
 
@@ -122,12 +174,12 @@ def auto_load_adapter():
         from .nb1.hoshino import HoshinoAdapter
 
     # nonebot1
-    if is_nb1():
+    elif is_nb1():
         from .nb1.nb1 import Nonebot1Adapter
 
     # nonebot2 onebot11
-    if is_nb2ob11():
+    elif is_nb2ob11():
         from .nb2.ob11 import Nonebot2Onebot11Adapter
 
-    if not get_first_adapter():
+    else:
         from .console import ConsoleAdapter

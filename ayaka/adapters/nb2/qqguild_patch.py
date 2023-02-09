@@ -10,8 +10,7 @@ from nonebot.adapters.onebot.v11 import Adapter, Message, MessageEvent, MessageS
 from nonebot.exception import ActionFailed
 
 from .ob11 import Nonebot2Onebot11Adapter
-from ..model import GroupMemberInfo, AyakaEvent
-from ..adapter import regist
+from ..adapter import regist, GroupMemberInfo, AyakaEvent
 
 
 class GuildMessageEvent(MessageEvent):

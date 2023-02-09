@@ -12,8 +12,6 @@ if TYPE_CHECKING:
     from .cat import AyakaCat
 
 
-
-
 class AyakaTrigger:
     def __init__(
         self,
@@ -45,7 +43,7 @@ class AyakaTrigger:
 
     def pre_run(self, prefix):
         context = ayaka_context
-        
+
         # 判定范围
         if context.event.session_type not in self.cat.session_types:
             return False

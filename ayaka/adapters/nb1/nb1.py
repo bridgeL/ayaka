@@ -7,8 +7,7 @@ import nonebot
 from aiocqhttp import Event as CQEvent
 from aiocqhttp.exceptions import ActionFailed
 
-from ..adapter import AyakaAdapter, regist
-from ..model import GroupMemberInfo, AyakaEvent
+from ..adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist
 
 
 class Nonebot1Adapter(AyakaAdapter):
