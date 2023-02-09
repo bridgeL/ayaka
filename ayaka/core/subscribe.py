@@ -3,16 +3,17 @@ import asyncio
 import inspect
 from typing import Awaitable, Callable
 from .context import ayaka_context
+from ..helpers import is_async_callable, simple_async_wrap
 
-ASYNC_FUNC = Callable[..., Awaitable]
-'''异步方法'''
+T = tuple[Callable[..., Awaitable], int]
+'''异步方法 + 其参数表的长度'''
 
 
 class AyakaSubscribe:
     '''订阅-观察者'''
 
     def __init__(self) -> None:
-        self.async_funcs: dict[str, list[tuple[ASYNC_FUNC, int]]] = {}
+        self.data: dict[str, list[T]] = {}
         '''必须都是异步方法'''
 
     def on_change(self, cls_attr):
@@ -23,24 +24,25 @@ class AyakaSubscribe:
         '''注册为某事件的处理回调'''
 
         def decorator(async_func):
-            '''必须是异步方法'''
-            if event_name not in self.async_funcs:
-                self.async_funcs[event_name] = []
+            if not is_async_callable(async_func):
+                async_func = simple_async_wrap(async_func)
+
+            if event_name not in self.data:
+                self.data[event_name] = []
 
             s = inspect.signature(async_func)
             n = len(s.parameters)
-            self.async_funcs[event_name].append([async_func, n])
+            self.data[event_name].append([async_func, n])
             return async_func
 
         return decorator
 
     async def emit(self, event_name: str, *args):
         '''发送某事件'''
-        if event_name in self.async_funcs:
-            items = self.async_funcs[event_name]
+        if event_name in self.data:
             await asyncio.gather(*[
                 async_func(*args[:n])
-                for async_func, n in items
+                for async_func, n in self.data[event_name]
             ])
 
     def cls_property_watch(self, cls):

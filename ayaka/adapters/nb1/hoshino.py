@@ -1,5 +1,5 @@
 '''适配 hoshino 机器人'''
-from hoshino import Service, config
+from hoshino import Service
 from .nb1 import Nonebot1Adapter
 
 

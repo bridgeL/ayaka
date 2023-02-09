@@ -43,10 +43,6 @@ class AyakaContextProp(property):
         self.context.set(v)
 
 
-def get_db_session():
-    return ayaka_context.trigger.cat.db.get_session()
-
-
 class FieldInfo:
     def __init__(self, default, default_factory) -> None:
         self.default = default
@@ -58,6 +54,10 @@ class FieldInfo:
 
 def Field(default=Undefined, default_factory=None):
     return FieldInfo(default, default_factory)
+
+
+def get_db_session():
+    return ayaka_context.trigger.cat.db.get_session()
 
 
 class AyakaContext:
