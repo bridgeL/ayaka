@@ -41,7 +41,7 @@ class AyakaTrigger:
     def module_name(self):
         return self.func.__module__
 
-    def pre_run(self, prefix):
+    def pre_check(self, prefix):
         context = ayaka_context
 
         # 判定范围
@@ -58,9 +58,6 @@ class AyakaTrigger:
         # ---- 一些预处理，并保存到上下文中 ----
         context.trigger = self
         context.cmd = self.cmd
-
-        # 先不创建数据库会话
-        # context.db_session = self.cat.db.get_session()
 
         # 只有在有命令的情况下才剥离命令
         if self.cmd:
@@ -79,14 +76,13 @@ class AyakaTrigger:
         # 提取整数（包含负数）
         pt = re.compile(r"^-?\d+$")
         context.nums = [int(arg) for arg in context.args if pt.search(arg)]
-        # ---- 一些预处理，并保存到上下文中 ----
 
         return True
 
     async def run(self):
         # 预检查并做一些预处理
         for prefix in get_root_config().prefixes:
-            if self.pre_run(prefix):
+            if self.pre_check(prefix):
                 break
         else:
             return False
@@ -116,17 +112,18 @@ class AyakaTrigger:
         except NotBlockException:
             logger.info("NotBlockException")
             return False
+        finally:
+            context = ayaka_context
+            while context.wait_tasks:
+                ts = context.wait_tasks
+                context.wait_tasks = []
+                await asyncio.gather(*ts)
 
-        context = ayaka_context
-        while context.wait_tasks:
-            ts = context.wait_tasks
-            context.wait_tasks = []
-            await asyncio.gather(*ts)
-
-        # ---- 待修改
-        context.db_session.commit()
-        # 必须关，否则内存泄漏
-        context.db_session.close()
+            # ---- 待修改
+            # 必须关，否则内存泄漏
+            if context.db_session_flag:
+                context.db_session.commit()
+                context.db_session.close()
 
         # 返回是否阻断
         return self.block

@@ -40,9 +40,10 @@ class AyakaContextProp(property):
 
 
 class FieldInfo:
-    def __init__(self, default, default_factory) -> None:
+    def __init__(self, default, default_factory, exclude) -> None:
         self.default = default
         self.default_factory = default_factory
+        self.exclude = exclude
 
     def create_prop(self, name: str):
         if self.default is Undefined:
@@ -52,11 +53,13 @@ class FieldInfo:
         return AyakaContextProp(context, self.default_factory)
 
 
-def Field(default=Undefined, default_factory=None):
-    return FieldInfo(default, default_factory)
+def Field(default=Undefined, default_factory=None, exclude=False):
+    return FieldInfo(default, default_factory, exclude)
 
 
 def get_db_session():
+    ayaka_context.db_session_flag = True
+    ayaka_context.wait_tasks = []
     return ayaka_context.trigger.cat.db.get_session()
 
 
@@ -87,6 +90,8 @@ class AyakaContext:
     db_session: Session = Field(default_factory=get_db_session)
     '''数据库会话，请在trigger存在的时候使用'''
 
+    db_session_flag: bool = False
+
     def __new__(cls):
         for key in cls.__annotations__.keys():
             name = f"_{key}"
@@ -97,6 +102,9 @@ class AyakaContext:
                     value = Field(default=value)
             else:
                 value = Field()
+
+            if value.exclude:
+                continue
 
             setattr(cls, key, value.create_prop(name))
         return super().__new__(cls)

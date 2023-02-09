@@ -145,7 +145,14 @@ async def show_help(line: str):
     ayaka_clog("<y>p</y> \<uid> \<msg> | 模拟私聊消息")
     ayaka_clog("<y>d</y> \<n> | 延时n秒")
     ayaka_clog("<y>s</y> \<name> | 执行测试脚本 script/\<name>.txt")
+    ayaka_clog("<y>t</y> | 展示当前db_session总数")
     ayaka_clog("<y>h</y> | 查看帮助")
+
+
+@handler.on("t")
+async def test_db_session(msg: str):
+    from sqlalchemy.orm.session import _sessions
+    print(len(_sessions))
 
 
 @handler.on("")

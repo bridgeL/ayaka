@@ -25,38 +25,6 @@ class CatBlock(IDModel, table=True):
     session_mark: str
     cat_name: str
 
-    @classmethod
-    def _get(cls, session: Session, session_mark: str, cat_name: str):
-        stmt = select(cls).filter_by(
-            session_mark=session_mark,
-            cat_name=cat_name
-        )
-        cursor = session.exec(stmt)
-        return cursor.one_or_none()
-
-    @classmethod
-    def check(cls, session_mark: str, cat_name: str):
-        with cls.get_session() as session:
-            r = cls._get(session, session_mark, cat_name)
-            return not r
-
-    @classmethod
-    def add(cls, session_mark: str, cat_name: str):
-        with cls.get_session() as session:
-            r = cls._get(session, session_mark, cat_name)
-            if not r:
-                r = cls(session_mark=session_mark, cat_name=cat_name)
-                session.add(r)
-                session.commit()
-
-    @classmethod
-    def remove(cls, session_mark: str, cat_name: str):
-        with cls.get_session() as session:
-            r = cls._get(session, session_mark, cat_name)
-            if r:
-                session.delete(r)
-                session.commit()
-
 
 class AyakaFuncHelp:
     def __init__(self,  cmds: list[str], states: list[str], sub_states: list[str], func: Callable[[], Awaitable]) -> None:
@@ -90,6 +58,13 @@ class AyakaManager:
         '''所有猫猫'''
         self.private_redirect_dict: dict[str, list[str]] = {}
         '''将私聊消息转发至群聊，dict[private_id: list[group_id]]'''
+        self._session = None
+
+    @property
+    def session(self):
+        if not self._session:
+            self._session = CatBlock.get_session()
+        return self._session
 
     @property
     def wakeup_cats(self):
@@ -101,6 +76,31 @@ class AyakaManager:
         for t in ts:
             if await t.run():
                 return
+
+    def _get(self, session_mark: str, cat_name: str):
+        stmt = select(CatBlock).filter_by(
+            session_mark=session_mark,
+            cat_name=cat_name
+        )
+        cursor = self.session.exec(stmt)
+        return cursor.one_or_none()
+
+    def check_valid(self, session_mark: str, cat_name: str):
+        r = self._get(session_mark, cat_name)
+        return not r
+
+    def add_cat_invalid(self, session_mark: str, cat_name: str):
+        r = self._get(session_mark, cat_name)
+        if not r:
+            r = CatBlock(session_mark=session_mark, cat_name=cat_name)
+            self.session.add(r)
+            self.session.commit()
+
+    def remove_cat_invalid(self, session_mark: str, cat_name: str):
+        r = self._get(session_mark, cat_name)
+        if r:
+            self.session.delete(r)
+            self.session.commit()
 
     async def handle_event(self, event: AyakaEvent):
         '''处理和转发事件'''
@@ -315,15 +315,15 @@ class AyakaCat:
     @property
     def valid(self):
         '''当前猫猫是否可用'''
-        return CatBlock.check(self.session.mark, self.name)
+        return manager.check_valid(self.session.mark, self.name)
 
     @valid.setter
     def valid(self, value: bool):
         '''设置当前猫猫是否可用'''
         if value:
-            CatBlock.remove(self.session.mark, self.name)
+            manager.remove_cat_invalid(self.session.mark, self.name)
         else:
-            CatBlock.add(self.session.mark, self.name)
+            manager.add_cat_invalid(self.session.mark, self.name)
 
     # ---- 会话 ----
     @property
