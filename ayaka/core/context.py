@@ -64,13 +64,28 @@ class AyakaContext:
     '''上下文，保存一些数据便于访问'''
 
     event: AyakaEvent
+    '''消息事件'''
+
     trigger: "AyakaTrigger"
+    '''当前触发器'''
+    
     cmd: str
+    '''当前命令'''
+    
     arg: str
+    '''去掉命令的剩余文字'''
+    
     args: list[str]
+    '''剩余文字根据separate分割'''
+    
     nums: list[int]
+    '''数字'''
+
     wait_tasks: list[asyncio.Task] = []
+    '''数据库会话关闭前，会等待该队列中的所有任务结束'''
+    
     db_session: Session = Field(default_factory=get_db_session)
+    '''数据库会话，请在trigger存在的时候使用'''
 
     def __new__(cls):
         for key in cls.__annotations__.keys():

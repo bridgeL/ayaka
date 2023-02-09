@@ -1,6 +1,5 @@
 '''管理插件配置，提供读写支持'''
 import json
-from typing import Optional
 import inflection
 from loguru import logger
 from pydantic import ValidationError, BaseModel
