@@ -1,6 +1,6 @@
 <div align="center">
 
-# Ayaka - 猫猫，猫猫！ - 0.0.4.1b2
+# Ayaka - 猫猫，猫猫！ - 0.0.4.1
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ayaka)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ayaka)
@@ -17,13 +17,14 @@
 - [hoshino](https://github.com/Ice-Cirno/HoshinoBot)
 - [nonebot1](https://github.com/nonebot/nonebot)
 
-也可将其作为console程序离线运行
+也可将其
+
+- 作为console程序离线运行，便于调试
+- 直接通过反向ws连接到gocq上
 
 ## 文档
 
 https://bridgel.github.io/ayaka/
-
-注意：文档版本与pypi包正式版本一致，因此其内容可能会落后于各个beta版
 
 ## 安装
 
@@ -56,6 +57,23 @@ if __name__ == "__main__":
 
 ```
 python run.py
+```
+
+## 直接连接到gocq上
+
+```py
+# run2.py
+import ayaka.adapters.gocq as cat
+
+# 加载插件
+# do something
+
+if __name__ == "__main__":
+    cat.run()
+```
+
+```
+python run2.py
 ```
 
 ## 其他
