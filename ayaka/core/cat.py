@@ -4,7 +4,7 @@ import asyncio
 from pathlib import Path
 from loguru import logger
 from typing import Awaitable, Callable, TypeVar
-from sqlmodel import select, Session
+from sqlmodel import select
 
 from .trigger import AyakaTrigger
 from ..database import AyakaDB, get_db
@@ -419,7 +419,7 @@ class AyakaCat:
     def on_cmd(
         self,
         *,
-        cmds: str | list[str] = "",
+        cmds: str | list[str],
         states: str | list[str] = "",
         sub_states: str | list[str] = "",
         always: bool = False,
@@ -449,20 +449,29 @@ class AyakaCat:
                 self._helps.append(AyakaFuncHelp(
                     cmds, states, sub_states, func))
 
-            for cmd in cmds:
-                for state in states:
-                    for sub_state in sub_states:
-                        trigger = AyakaTrigger(
-                            func=func,
-                            cat=self,
-                            cmd=cmd,
-                            state=state,
-                            sub_state=sub_state,
-                            block=block,
-                        )
-                        if always:
-                            self.add_always_trigger(trigger)
-                        else:
+            if always:
+                trigger = AyakaTrigger(
+                    func=func,
+                    cat=self,
+                    cmd="",
+                    state="",
+                    sub_state="",
+                    block=block,
+                )
+                self.add_always_trigger(trigger)
+
+            else:
+                for cmd in cmds:
+                    for state in states:
+                        for sub_state in sub_states:
+                            trigger = AyakaTrigger(
+                                func=func,
+                                cat=self,
+                                cmd=cmd,
+                                state=state,
+                                sub_state=sub_state,
+                                block=block,
+                            )
                             self.add_state_trigger(trigger, state, sub_state)
 
             items = [f"<y>猫猫</y> {self.name}"]
@@ -501,7 +510,14 @@ class AyakaCat:
 
             auto_help：不要自动生成猫猫帮助
         '''
-        return self.on_cmd(states=states, always=always, block=block, auto_help=auto_help, sub_states=sub_states)
+        return self.on_cmd(
+            cmds="",
+            states=states,
+            always=always,
+            block=block,
+            auto_help=auto_help,
+            sub_states=sub_states
+        )
 
     # ---- 猫猫帮助 ----
     @property
