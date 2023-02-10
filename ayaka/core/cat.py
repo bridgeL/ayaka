@@ -450,15 +450,16 @@ class AyakaCat:
                     cmds, states, sub_states, func))
 
             if always:
-                trigger = AyakaTrigger(
-                    func=func,
-                    cat=self,
-                    cmd=cmd,
-                    state="",
-                    sub_state="",
-                    block=block,
-                )
-                self.add_always_trigger(trigger)
+                for cmd in cmds:
+                    trigger = AyakaTrigger(
+                        func=func,
+                        cat=self,
+                        cmd=cmd,
+                        state="",
+                        sub_state="",
+                        block=block,
+                    )
+                    self.add_always_trigger(trigger)
 
             else:
                 for cmd in cmds:
