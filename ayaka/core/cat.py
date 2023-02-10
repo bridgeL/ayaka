@@ -453,7 +453,7 @@ class AyakaCat:
                 trigger = AyakaTrigger(
                     func=func,
                     cat=self,
-                    cmd="",
+                    cmd=cmd,
                     state="",
                     sub_state="",
                     block=block,
