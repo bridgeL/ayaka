@@ -225,6 +225,8 @@ ConsoleAdapter.name = "console"
 regist(ConsoleAdapter)
 
 
-def run():
+def run(**kwargs):
     '''运行'''
-    uvicorn.run(app=f"{__name__}:app", reload=True)
+    kwargs.setdefault("app", f"{__name__}:app")
+    kwargs.setdefault("reload", True)
+    uvicorn.run(**kwargs)

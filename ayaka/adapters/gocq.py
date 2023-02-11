@@ -254,6 +254,10 @@ GoCQAdapter.name = "gocq"
 regist(GoCQAdapter)
 
 
-def run():
+def run(**kwargs):
     '''运行'''
-    uvicorn.run(app=f"{__name__}:app", host=host, port=port, reload=True)
+    kwargs.setdefault("app", f"{__name__}:app")
+    kwargs.setdefault("host", host)
+    kwargs.setdefault("port", port)
+    kwargs.setdefault("reload", True)
+    uvicorn.run(**kwargs)

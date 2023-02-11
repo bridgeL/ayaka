@@ -116,3 +116,7 @@ base_send_group，base_send_private，base_send_group_many
 - 新特性：新增适配器 gocq
 - 新特性：console适配器新增指令 t
 - 优化了cat.valid的实现方式，避免其使用过多的database.session
+
+### 0.0.4.2
+
+- 优化代码结构
