@@ -6,4 +6,5 @@ from example import muyu
 from example import input
 
 if __name__ == "__main__":
-    cat.run()
+    cat.run(port=21777)
+    

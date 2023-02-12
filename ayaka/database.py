@@ -13,7 +13,7 @@ class AyakaDB:
         self.name = name
         db_dict[name] = self
 
-        self.metadata = MetaData()
+        self.metadata = MetaData(info={"name": name})
 
         class Model(SQLModel):
             metadata = self.metadata

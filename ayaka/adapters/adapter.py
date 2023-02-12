@@ -161,18 +161,25 @@ def regist(adapter_cls: type[AyakaAdapter]):
     return adapter
 
 
-def get_adapter(name: str = ""):
+def get_adapter(name: str | type[AyakaAdapter] = ""):
     '''获取ayaka适配器
 
     参数：
 
-        name：适配器名称，若为空，则默认为当前上下文中的适配器，若当前上下文为空，则返回第一个适配器
+        name：返回对应名称或类型的适配器
+
+        若为空，则返回当前上下文中的适配器
+        若当前上下文为空，则返回第一个注册的适配器
     '''
     # 异味代码...但是不想改
     init_all()
 
     if not name:
         return current_adapter.get(first_adapter)
+    
+    if isinstance(name, type) and issubclass(name, AyakaAdapter):
+        name = name.name
+
     return adapter_dict.get(name)
 
 
