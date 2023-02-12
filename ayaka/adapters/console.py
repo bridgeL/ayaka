@@ -169,9 +169,11 @@ class ConsoleAdapter(AyakaAdapter):
         if first_adapter:
             self.asgi = first_adapter.asgi
             self.on_startup = first_adapter.on_startup
+            self.on_startup = first_adapter.on_shutdown
         else:
             self.asgi = FastAPI()
-            self.on_startup = self.asgi.on_event("startup")
+            self._on_startup = self.asgi.on_event("startup")
+            self._on_shutdown = self.asgi.on_event("shutdown")
 
         global app
         app = self.asgi

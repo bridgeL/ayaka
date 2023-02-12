@@ -86,8 +86,18 @@ class AyakaAdapter:
             func = simple_async_wrap(func)
         self._on_startup(func)
 
+    def on_shutdown(self, func: Callable):
+        '''asgi服务关闭后钩子'''
+        if not is_async_callable(func):
+            func = simple_async_wrap(func)
+        self._on_shutdown(func)
+
     def _on_startup(self, async_func: Callable[..., Awaitable]):
         '''asgi服务启动后钩子，注册回调必须是异步函数'''
+        raise NotImplementedError
+
+    def _on_shutdown(self, async_func: Callable[..., Awaitable]):
+        '''asgi服务关闭后钩子，注册回调必须是异步函数'''
         raise NotImplementedError
 
     async def send_group(self, id: str, msg: str) -> bool:

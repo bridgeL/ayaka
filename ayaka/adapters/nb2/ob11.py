@@ -141,6 +141,10 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
         '''asgi服务启动后钩子，注册回调必须是异步函数'''
         driver.on_startup(async_func)
 
+    def _on_shutdown(self, async_func: Callable[..., Awaitable]):
+        '''asgi服务关闭后钩子，注册回调必须是异步函数'''
+        driver.on_shutdown(async_func)
+
     @classmethod
     def get_current_bot(cls) -> Bot:
         '''获取当前bot'''
