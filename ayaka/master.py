@@ -44,6 +44,7 @@ async def show_help():
     '''展示猫猫帮助'''
     if cat.cmd == "全部猫猫帮助":
         infos = [c.help for c in manager.cats]
+        infos.sort()
         await cat.send_many(infos)
         return
 
@@ -65,13 +66,14 @@ async def show_help():
     if flag:
         return
 
-    infos = ["已加载的猫猫列表"]
-    manager.cats.sort(key=lambda x: x.name)
+    infos = []
     for c in manager.cats:
         info = f"- [{c.name}]"
         if not c.valid:
             info += " [已被屏蔽]"
         infos.append(info)
+    infos.sort()
+    infos = ["已加载的猫猫列表", *infos]
     await cat.send("\n".join(infos))
 
     infos = [
