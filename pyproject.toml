@@ -28,7 +28,7 @@ nonebot-adapter-onebot = {version = ">=2.2.0", optional = true}
 
 
 [tool.poetry.extras]
-nb12ob11 = ["nonebot2", "nonebot-adapter-onebot"]
+nb2ob11 = ["nonebot2", "nonebot-adapter-onebot"]
 
 [build-system]
 requires = ["poetry-core"]
