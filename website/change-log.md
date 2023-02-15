@@ -127,8 +127,8 @@ base_send_group，base_send_private，base_send_group_many
 - 移除：移除了猫猫管理器的部分命令：强制休息、猫猫状态
 - 新特性：适配器增加on_shutdown钩子
 - 新特性：pip安装时，新增optional选项`nb2ob11`
-- 新特性：ayaka_context新增prefix属性
+- 新特性：ayaka_context新增prefix属性，cat属性
 - 新特性：AyakaSession新增wait_next_msg方法
-- 新特性：ayaka_context新增cat属性
+- 新特性：新增playwright模块
 - 优化猫猫帮助表现
 - 优化代码结构
