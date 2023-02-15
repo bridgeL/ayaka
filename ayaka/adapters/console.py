@@ -46,7 +46,6 @@ class Handler:
             ayaka_clog(f"群聊({gid}) <y>{name}</y>({uid}) 说：")
         else:
             ayaka_clog(f"私聊({uid}) <y>{name}</y> 说：")
-
         ayaka_log(msg)
 
         at = None
@@ -68,9 +67,10 @@ class Handler:
         asyncio.create_task(self.handle_event(ayaka_event))
 
     def print(self, *args, **kwargs):
+        print(*args, **kwargs)
         if self.outpath:
             kwargs["file"] = self.outpath
-        print(*args, **kwargs)
+            print(*args, **kwargs)
 
 
 def safe_split(text: str,  n: int, sep: str = " "):
@@ -221,22 +221,19 @@ class ConsoleAdapter(AyakaAdapter):
 
     async def send_group(self, id: str, msg: str) -> bool:
         '''发送消息到指定群聊'''
-        if not handler.outpath:
-            ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
+        ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
         handler.print(msg)
         return True
 
     async def send_private(self, id: str, msg: str) -> bool:
         '''发送消息到指定私聊'''
-        if not handler.outpath:
-            ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
+        ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
         handler.print(msg)
         return True
 
     async def send_group_many(self, id: str, msgs: list[str]) -> bool:
         '''发送消息组到指定群聊'''
-        if not handler.outpath:
-            ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
+        ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
         handler.print("\n\n".join(msgs))
         return True
 
