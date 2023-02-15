@@ -68,10 +68,9 @@ class Handler:
         asyncio.create_task(self.handle_event(ayaka_event))
 
     def print(self, *args, **kwargs):
-        print(*args, **kwargs)
         if self.outpath:
-            kwargs.setdefault("file", self.outpath)
-            print(*args, **kwargs)
+            kwargs["file"] = self.outpath
+        print(*args, **kwargs)
 
 
 def safe_split(text: str,  n: int, sep: str = " "):
@@ -170,11 +169,16 @@ async def _(line: str):
 async def show_help(line: str):
     if line.strip():
         return await deal_line(f"h{line}")
-    ayaka_clog("<y>g</y> \<gid> \<uid> \<msg> | 模拟群聊消息")
-    ayaka_clog("<y>p</y> \<uid> \<msg> | 模拟私聊消息")
-    ayaka_clog("<y>d</y> 2.3 | 延时2.3秒")
-    ayaka_clog("<y>s</y> a > b | 执行测试脚本 script/a.txt 将结果写入 script/b.txt")
-    ayaka_clog("<y>h</y> | 查看帮助")
+
+    items = [
+        "<y>g</y> \<gid> \<uid> \<msg> | 模拟群聊消息",
+        "<y>p</y> \<uid> \<msg> | 模拟私聊消息",
+        "<y>d</y> 2.3 | 延时2.3秒",
+        "<y>s</y> a > b | 执行测试脚本 script/a.txt 将结果写入 script/b.txt",
+        "<y>h</y> | 查看帮助"
+    ]
+    for item in items:
+        ayaka_clog(item)
 
 
 @handler.on("")
@@ -217,19 +221,22 @@ class ConsoleAdapter(AyakaAdapter):
 
     async def send_group(self, id: str, msg: str) -> bool:
         '''发送消息到指定群聊'''
-        ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
+        if not handler.outpath:
+            ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
         handler.print(msg)
         return True
 
     async def send_private(self, id: str, msg: str) -> bool:
         '''发送消息到指定私聊'''
-        ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
+        if not handler.outpath:
+            ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
         handler.print(msg)
         return True
 
     async def send_group_many(self, id: str, msgs: list[str]) -> bool:
         '''发送消息组到指定群聊'''
-        ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
+        if not handler.outpath:
+            ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
         handler.print("\n\n".join(msgs))
         return True
 
