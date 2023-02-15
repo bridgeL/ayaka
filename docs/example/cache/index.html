@@ -686,10 +686,8 @@
 <p>注意：缓存数据会在bot重启后丢失</p>
 <h2 id="_1">数据缓存<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>ayaka为每个群聊均设置了一份字典</p>
-<p>各个插件中的猫猫均可以通过<code>cat.cache</code>访问到该字典中的一部分空间：</p>
-<div class="highlight"><pre><span></span><code>cat.cache &lt;-&gt; cat._dict[当前消息的group_id]
-</code></pre></div>
-<p>显然，各个群聊所对应的cache是不同的，互不干涉</p>
+<p>各个插件中的猫猫均可以通过<code>cat.cache</code>访问到该字典中的一部分空间</p>
+<p>各个群聊所对应的cache是不同的，互不干涉</p>
 <h2 id="_2">类型提示<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>同时，ayaka还设计了<code>cat.get_data</code>、<code>cat.pop_data</code>方法读写<code>cat.cache</code></p>
 <p>可以将<code>BaseModel</code>放入其中使用，解决了直接读写字典时缺乏类型提示的问题</p>
