@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ayaka"
-version = "0.0.4.2b5"
+version = "0.0.4.2b6"
 description = "猫猫，猫猫！"
 authors = ["Su <wxlxy316@163.com>"]
 license = "MIT"
@@ -25,10 +25,11 @@ ayaka-utils = "^0.0.3"
 
 nonebot2 = {version = ">=2.0.0b5", optional = true}
 nonebot-adapter-onebot = {version = ">=2.2.0", optional = true}
-
+playwright = {version = ">=1.17.2", optional = true}
 
 [tool.poetry.extras]
 nb2ob11 = ["nonebot2", "nonebot-adapter-onebot"]
+playwright = ["playwright"]
 
 [build-system]
 requires = ["poetry-core"]
