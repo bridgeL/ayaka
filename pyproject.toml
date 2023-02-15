@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ayaka"
-version = "0.0.4.2a1"
+version = "0.0.4.2a2"
 description = "猫猫，猫猫！"
 authors = ["Su <wxlxy316@163.com>"]
 license = "MIT"
@@ -23,11 +23,12 @@ httpx = { version = ">=0.20.0,<1.0.0", extras = ["http2"], optional = true }
 uvicorn = { version = ">=0.20.0,<1.0.0", extras = ["standard"], optional = true }
 ayaka-utils = "^0.0.3"
 
+nonebot2 = {version = ">=2.0.0b5", optional = true}
+nonebot-adapter-onebot = {version = ">=2.2.0", optional = true}
 
-[tool.poetry.nb12ob11.dependencies]
-nonebot2 = ">=2.0.0b5"
-nonebot-adapter-onebot = ">=2.2.0"
 
+[tool.poetry.extras]
+nb12ob11 = ["nonebot2", "nonebot-adapter-onebot"]
 
 [build-system]
 requires = ["poetry-core"]
