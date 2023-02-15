@@ -41,36 +41,41 @@ class AyakaTrigger:
     def module_name(self):
         return self.func.__module__
 
-    def pre_check(self, prefix):
+    def pre_check(self):
+        '''一些预处理，并保存到上下文中'''
         context = ayaka_context
 
         # 判定范围
         if context.event.session_type not in self.cat.session_types:
             return False
+        
+        # 命令触发
+        if self.cmd:
+            if context.prefix is None:
+                return False
+        
+            start = context.prefix + self.cmd
+            n = len(start)
 
-        # if 命令触发，命令是否符合
-        if self.cmd and not context.event.message.startswith(prefix + self.cmd):
-            return False
+            # 命令不符合
+            if not context.event.message.startswith(start):
+                return False
+            
+            # 保存命令
+            context.cmd = self.cmd
+            
+        else:
+            n = 0
 
         # 重设超时定时器
         self.cat._refresh_overtime_timer()
 
-        # ---- 一些预处理，并保存到上下文中 ----
+        # 设置触发器
         context.trigger = self
-        context.cmd = self.cmd
-
-        # 只有在有命令的情况下才剥离命令
-        if self.cmd:
-            n = len(prefix+self.cmd)
-        else:
-            n = 0
-
+        
+        # 剥离命令，分割参数
         separate = get_root_config().separate
-
-        # 剥离命令
         context.arg = context.event.message[n:].strip(separate)
-
-        # 分割
         context.args = [arg for arg in context.arg.split(separate) if arg]
 
         # 提取整数（包含负数）
@@ -81,10 +86,7 @@ class AyakaTrigger:
 
     async def run(self):
         # 预检查并做一些预处理
-        for prefix in get_root_config().prefixes:
-            if self.pre_check(prefix):
-                break
-        else:
+        if not self.pre_check():
             return False
 
         # 打印日志

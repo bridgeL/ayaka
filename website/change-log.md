@@ -119,8 +119,11 @@ base_send_group，base_send_private，base_send_group_many
 
 ### 0.0.4.2
 
-- 优化代码结构
+- 破坏性变更：移除了ayaka.core，其内部模块上升为ayaka的子模块
 - 变更：cat.on_cmd取消cmds参数的缺省值
 - 变更：console、gocq适配器的run方法，新增自定义参数
 - 新特性：适配器增加on_shutdown钩子
-- 破坏性变更：移除了ayaka.core，其内部模块上升为ayaka的子模块
+- 新特性：pip安装时，新增optional选项`nb2ob11`
+- 新特性：ayaka_context新增prefix属性
+- 新特性：AyakaSession新增wait_next_msg方法
+- 优化代码结构

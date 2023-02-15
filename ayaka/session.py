@@ -2,8 +2,8 @@
 import asyncio
 from typing import Callable, Optional, TypeVar
 from loguru import logger
-from .context import ayaka_context
 from .helpers import simple_repr
+from .context import ayaka_context
 
 T = TypeVar("T")
 '''任意类型'''
@@ -13,7 +13,7 @@ class AyakaSession:
     '''会话'''
     __session_type__ = ""
 
-    def __init__(self, *, id: str) -> None:
+    def __init__(self, id: str) -> None:
         self.id: str = id
         self.state: str = ""
         '''状态'''
@@ -24,9 +24,33 @@ class AyakaSession:
         self._future: Optional[asyncio.Future] = None
         '''超时控制'''
 
+        self._wait_next_msg_fut: Optional[asyncio.Future] = None
+
     @property
     def mark(self):
         return f"{self.__session_type__}.{self.id}"
+    
+    def has_last_wait_next_msg(self):
+        if not self._wait_next_msg_fut:
+            return False
+        if self._wait_next_msg_fut.done():
+            return False
+        return True
+        
+    async def wait_next_msg(self):
+        if self.has_last_wait_next_msg():
+            self._wait_next_msg_fut.cancel()
+            return
+
+        self._wait_next_msg_fut = asyncio.Future()
+        msg = await self._wait_next_msg_fut
+        return msg
+
+    def set_next_msg(self, msg: str):
+        if not self.has_last_wait_next_msg():
+            return
+        
+        self._wait_next_msg_fut.set_result(msg)
 
     def pop_data(self, factory: Callable[[], T]) -> T:
         '''弹出缓存数据
@@ -79,8 +103,8 @@ class AyakaGroup(AyakaSession):
     '''群聊会话'''
     __session_type__ = "group"
 
-    def __init__(self, *, id: str) -> None:
-        super().__init__(id=id)
+    def __init__(self, id: str) -> None:
+        super().__init__(id)
 
         self.members: list[AyakaGroupMember] = []
         '''群成员'''

@@ -3,7 +3,7 @@ import json
 import inflection
 from loguru import logger
 from typing import Optional
-from pydantic import ValidationError, BaseModel
+from pydantic import ValidationError, BaseModel, validator
 from .helpers import ensure_dir_exists
 
 AYAKA_VERSION = "0.0.4.2a0"
@@ -87,6 +87,12 @@ class RootConfig(AyakaConfig):
     separate: str = " "
 
     ws_reverse: Optional[str]
+
+    @validator('prefixes')
+    def prefixes_must_be_not_empty(cls, v):
+        if not v:
+            raise ValueError('prefixes must be not empty')
+        return v
 
 
 logger.opt(colors=True).info(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")

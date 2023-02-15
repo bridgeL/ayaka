@@ -9,10 +9,10 @@ from sqlmodel import select
 from .trigger import AyakaTrigger
 from .database import AyakaDB, get_db
 from .exception import DuplicateCatNameError
-from .session import get_session_cls, AyakaSession, AyakaGroup, AyakaPrivate
+from .session import AyakaGroup, AyakaPrivate, AyakaSession, get_session_cls
 from .helpers import ensure_list
 from .adapters import AyakaEvent, get_adapter
-from .config import AyakaConfig
+from .config import AyakaConfig, get_root_config
 from .context import ayaka_context
 
 
@@ -69,12 +69,6 @@ class AyakaManager:
         '''所有不处于空状态的猫猫'''
         return [c for c in self.cats if c.state or c.sub_state]
 
-    async def run_triggers(self, ts: list[AyakaTrigger]):
-        # 遍历尝试执行
-        for t in ts:
-            if await t.run():
-                return
-
     def _get(self, session_mark: str, cat_name: str):
         stmt = select(CatBlock).filter_by(
             session_mark=session_mark,
@@ -83,47 +77,47 @@ class AyakaManager:
         cursor = self.session.exec(stmt)
         return cursor.one_or_none()
 
-    def check_valid(self, session_mark: str, cat_name: str):
+    def get_cat_valid(self, session_mark: str, cat_name: str):
         r = self._get(session_mark, cat_name)
         return not r
 
-    def add_cat_invalid(self, session_mark: str, cat_name: str):
+    def set_cat_invalid(self, session_mark: str, cat_name: str):
         r = self._get(session_mark, cat_name)
         if not r:
             r = CatBlock(session_mark=session_mark, cat_name=cat_name)
             self.session.add(r)
             self.session.commit()
 
-    def remove_cat_invalid(self, session_mark: str, cat_name: str):
+    def set_cat_valid(self, session_mark: str, cat_name: str):
         r = self._get(session_mark, cat_name)
         if r:
             self.session.delete(r)
             self.session.commit()
 
-    async def handle_event(self, event: AyakaEvent):
-        '''处理和转发事件'''
+    async def _handle_event(self, event: AyakaEvent):
+        '''处理事件'''
+
         # 设置上下文
         ayaka_context.event = event
 
-        # 查询屏蔽情况
-        # 获取碰撞域中的触发器
-        ts_list = [c.get_triggers() for c in self.cats if c.valid]
-
-        # for ts in ts_list:
-        #     for t in ts:
-        #         print(t)
-        #     print()
+        for prefix in get_root_config().prefixes:
+            if event.message.startswith(prefix):
+                ayaka_context.prefix = prefix
+                break
 
         # 同时执行
-        tasks = [
-            asyncio.create_task(self.run_triggers(ts))
-            for ts in ts_list if ts
+        ts = [
+            asyncio.create_task(c.run())
+            for c in self.cats
         ]
-        await asyncio.gather(*tasks)
+        await asyncio.gather(*ts)
 
-        # 排除已经转发的情况
-        if event.private_forward_id:
-            return
+    async def handle_event(self, event: AyakaEvent):
+        '''处理和转发事件'''
+        ts = []
+
+        # 处理消息
+        ts.append(asyncio.create_task(self._handle_event(event)))
 
         # 转发私聊消息到群聊
         if event.session_type == "private":
@@ -136,8 +130,9 @@ class AyakaManager:
                 _event.session_type = "group"
                 _event.session_id = group_id
                 _event.private_forward_id = private_id
+                ts.append(asyncio.create_task(self._handle_event(_event)))
 
-                await self.handle_event(_event)
+        await asyncio.gather(*ts)
 
     def add_cat(self, cat: "AyakaCat"):
         for c in self.cats:
@@ -227,14 +222,14 @@ class AyakaCat:
         self.module_path = str(path)
         '''模块地址'''
 
-        self.sessions: list[AyakaSession] = []
-        '''所有会话'''
-
         self.always_triggers: list[AyakaTrigger] = []
         '''总是触发'''
 
         self.state_trigger_dict: dict[str, dict[str, list[AyakaTrigger]]] = {}
         '''状态触发'''
+
+        self.sessions: list[AyakaSession] = []
+        '''所有会话'''
 
         items = []
         if group:
@@ -310,15 +305,15 @@ class AyakaCat:
     @property
     def valid(self):
         '''当前猫猫是否可用'''
-        return manager.check_valid(self.session.mark, self.name)
+        return manager.get_cat_valid(self.session.mark, self.name)
 
     @valid.setter
     def valid(self, value: bool):
         '''设置当前猫猫是否可用'''
         if value:
-            manager.remove_cat_invalid(self.session.mark, self.name)
+            manager.set_cat_valid(self.session.mark, self.name)
         else:
-            manager.add_cat_invalid(self.session.mark, self.name)
+            manager.set_cat_invalid(self.session.mark, self.name)
 
     # ---- 会话 ----
     @property
@@ -328,15 +323,17 @@ class AyakaCat:
     @property
     def session(self):
         '''当前会话'''
-        st = self.event.session_type
-        sid = self.event.session_id
+        # 在sessions中查找，不存在则自动新建
+        type = ayaka_context.event.session_type
+        id = ayaka_context.event.session_id
         for s in self.sessions:
-            if s.__session_type__ == st and s.id == sid:
-                return s
-
-        cls = get_session_cls(st)
-        s = cls(id=sid)
-        self.sessions.append(s)
+            if s.__session_type__ == type and s.id == id:
+                break
+        else:
+            cls = get_session_cls(type)
+            s = cls(id)
+            self.sessions.append(s)
+            
         return s
 
     @property
@@ -356,8 +353,9 @@ class AyakaCat:
     @property
     def group_member(self):
         '''当前群聊会话·群成员子会话'''
-        if self.session_type == "group":
-            return self.group.member
+        s = self.session
+        if isinstance(s, AyakaGroup):
+            return s.member
 
     @property
     def user(self):
@@ -690,6 +688,28 @@ class AyakaCat:
     async def handle_event(self, event: AyakaEvent):
         '''处理事件'''
         await manager.handle_event(event)
+
+    async def run(self):
+        '''运行一次'''
+
+        # 处理 wait next msg
+        s = self.session
+        s.set_next_msg(self.message)
+        if self.group_member:
+            self.group_member.set_next_msg(self.message)
+            
+
+        # 查询屏蔽情况
+        if not self.valid:
+            return
+
+        # 获取触发器
+        ts = self.get_triggers()
+
+        # 遍历尝试执行
+        for t in ts:
+            if await t.run():
+                return
 
     def get_triggers(self):
         '''获取触发器'''
