@@ -26,17 +26,22 @@ class AyakaSession:
 
         self._wait_next_msg_fut: Optional[asyncio.Future] = None
 
+        self.last_cat_name: str = ""
+        '''上一猫猫'''
+        self.last_cat_time: int = 0
+        '''上一猫猫访问时间'''
+
     @property
     def mark(self):
         return f"{self.__session_type__}.{self.id}"
-    
+
     def has_last_wait_next_msg(self):
         if not self._wait_next_msg_fut:
             return False
         if self._wait_next_msg_fut.done():
             return False
         return True
-        
+
     async def wait_next_msg(self):
         if self.has_last_wait_next_msg():
             self._wait_next_msg_fut.cancel()
@@ -49,7 +54,7 @@ class AyakaSession:
     def set_next_msg(self, msg: str):
         if not self.has_last_wait_next_msg():
             return
-        
+
         self._wait_next_msg_fut.set_result(msg)
 
     def pop_data(self, factory: Callable[[], T]) -> T:

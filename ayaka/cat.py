@@ -2,6 +2,7 @@
 import inspect
 import asyncio
 from pathlib import Path
+import time
 from loguru import logger
 from typing import Awaitable, Callable, TypeVar
 from sqlmodel import select
@@ -333,7 +334,7 @@ class AyakaCat:
             cls = get_session_cls(type)
             s = cls(id)
             self.sessions.append(s)
-            
+
         return s
 
     @property
@@ -691,7 +692,7 @@ class AyakaCat:
 
     async def run(self):
         '''运行一次'''
-        
+
         # 设置上下文
         ayaka_context.cat = self
 
@@ -704,7 +705,6 @@ class AyakaCat:
         s.set_next_msg(self.message)
         if self.group_member:
             self.group_member.set_next_msg(self.message)
-            
 
         # 查询屏蔽情况
         if not self.valid:
@@ -722,6 +722,10 @@ class AyakaCat:
 
         # 重设超时定时器
         self._refresh_overtime_timer()
+
+        # 记录
+        self.session.last_cat_name = self.name
+        self.session.last_cat_time = int(time.time())
 
     def get_triggers(self):
         '''获取触发器'''
