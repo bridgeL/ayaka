@@ -60,3 +60,7 @@ python app.py
 you: 去睡觉
 bot: 睡了喵
 ```
+
+## 作为nb2插件
+
+以上代码可直接放入`src/plugins`中，让nb加载即可
