@@ -16,6 +16,8 @@ from .adapters import AyakaEvent, get_adapter
 from .config import AyakaConfig, get_root_config
 from .context import ayaka_context
 
+last_cat_name_dict: dict[str, tuple[str, int]] = {}
+'''session_mark : cat_name, time'''
 
 IDModel = get_db().IDModel
 
@@ -723,9 +725,8 @@ class AyakaCat:
         # 重设超时定时器
         self._refresh_overtime_timer()
 
-        # 记录
-        self.session.last_cat_name = self.name
-        self.session.last_cat_time = int(time.time())
+        # 统计上一猫猫
+        last_cat_name_dict[self.session.mark] = [self.name, int(time.time())]
 
     def get_triggers(self):
         '''获取触发器'''

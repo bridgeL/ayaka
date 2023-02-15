@@ -1,6 +1,6 @@
 '''猫猫管理器'''
 import time
-from .cat import AyakaCat, manager
+from .cat import AyakaCat, manager, last_cat_name_dict
 
 cat = AyakaCat("猫猫管理器", overtime=-1)
 '''猫猫管理器'''
@@ -76,10 +76,13 @@ async def show_help():
     infos = ["已加载的猫猫列表", *infos]
     await cat.send("\n".join(infos))
 
-    name = cat.session.last_cat_name
-    t = int(time.time()) - cat.session.last_cat_time
-    if name and t < 60:
-        await cat.send(f"您刚刚使用的功能来自猫猫 {name}\n您可以使用 猫猫帮助 {name} 获取进一步帮助")
+    # 记录
+    name, t = last_cat_name_dict.get(cat.session.mark, ["", 0])
+            
+    t = int(time.time()) - t
+    print(t)
+    if t < 60:
+        await cat.send(f"您刚刚使用的功能来自猫猫 {name}\n如果想获得进一步帮助请使用命令\n- 猫猫帮助 {name}")
     else:
         await cat.send("如果想获得进一步帮助请使用命令\n- 猫猫帮助 <猫猫名>\n- 全部猫猫帮助")
 
