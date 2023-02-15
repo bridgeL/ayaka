@@ -123,4 +123,4 @@ base_send_group，base_send_private，base_send_group_many
 - 变更：cat.on_cmd取消cmds参数的缺省值
 - 变更：console、gocq适配器的run方法，新增自定义参数
 - 新特性：适配器增加on_shutdown钩子
-- 
+- 破坏性变更：移除了ayaka.core，其内部模块上升为ayaka的子模块
