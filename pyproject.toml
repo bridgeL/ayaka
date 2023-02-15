@@ -21,6 +21,7 @@ inflection = ">=0.5.1"
 fastapi = { version = ">=0.87.0,!=0.89.0,<1.0.0", optional = true }
 httpx = { version = ">=0.20.0,<1.0.0", extras = ["http2"], optional = true }
 uvicorn = { version = ">=0.20.0,<1.0.0", extras = ["standard"], optional = true }
+ayaka-utils = "^0.0.3"
 
 
 [build-system]

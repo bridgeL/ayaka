@@ -4,7 +4,7 @@ import uvicorn
 import asyncio
 from fastapi import FastAPI
 from typing import Awaitable, Callable
-
+from sqlalchemy.orm.session import _sessions
 from .adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist, get_first_adapter
 from ..helpers import ensure_dir_exists
 from ..logger import ayaka_log, ayaka_clog
@@ -151,7 +151,6 @@ async def show_help(line: str):
 
 @handler.on("t")
 async def test_db_session(msg: str):
-    from sqlalchemy.orm.session import _sessions
     print(len(_sessions))
 
 

@@ -5,7 +5,6 @@ from contextvars import ContextVar
 from pydantic import BaseModel
 from typing import Awaitable, Callable, Optional
 from ..config import get_root_config
-from ..init_ctrl import init_all
 from ..helpers import is_async_callable, simple_async_wrap
 
 
@@ -129,7 +128,7 @@ class AyakaAdapter:
         current_adapter.set(get_adapter(self.name))
         try:
             # ---- 解除循环引用，待优化 ----
-            from ..core.cat import manager
+            from ..cat import manager
             await manager.handle_event(ayaka_event)
         except:
             logger.exception(f"ayaka 处理事件（{ayaka_event}）时发生错误")
@@ -161,25 +160,18 @@ def regist(adapter_cls: type[AyakaAdapter]):
     return adapter
 
 
-def get_adapter(name: str | type[AyakaAdapter] = ""):
+def get_adapter(name: str = ""):
     '''获取ayaka适配器
 
     参数：
 
-        name：返回对应名称或类型的适配器
+        name：返回对应名称的适配器
 
         若为空，则返回当前上下文中的适配器
         若当前上下文为空，则返回第一个注册的适配器
     '''
-    # 异味代码...但是不想改
-    init_all()
-
     if not name:
         return current_adapter.get(first_adapter)
-    
-    if isinstance(name, type) and issubclass(name, AyakaAdapter):
-        name = name.name
-
     return adapter_dict.get(name)
 
 
@@ -200,3 +192,6 @@ def auto_load_adapter():
 
     else:
         from .console import ConsoleAdapter
+
+
+auto_load_adapter()

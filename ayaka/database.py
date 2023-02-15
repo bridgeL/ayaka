@@ -3,7 +3,9 @@ from typing import Optional
 from loguru import logger
 from sqlalchemy.orm import declared_attr
 from sqlmodel import MetaData, Session, SQLModel, Field, select, create_engine
-from .helpers import ensure_dir_exists
+from .helpers import ensure_dir_exists, simple_async_wrap
+from .adapters import get_adapter
+from .context import ayaka_context
 
 
 class AyakaDB:
@@ -43,9 +45,6 @@ class AyakaDB:
             @classmethod
             def _get_or_create(cls, **kwargs):
                 '''若不存在则根据参数值创建'''
-                # 异味代码...但是不想改
-                from .core.context import ayaka_context
-
                 session = ayaka_context.db_session
                 statement = select(cls).filter_by(**kwargs)
                 cursor = session.exec(statement)
@@ -71,6 +70,9 @@ class AyakaDB:
 
         self.UserDBBase = UserDBBase
         '''自带group_id、user_id'''
+
+        # 服务启动后运行初始化方法
+        get_adapter().on_startup(simple_async_wrap(self.init))
 
     def init(self):
         '''初始化所有表'''

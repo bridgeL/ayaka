@@ -2,11 +2,11 @@ import re
 import asyncio
 from loguru import logger
 from typing import TYPE_CHECKING, Awaitable, Callable
-from .context import ayaka_context
 from .exception import BlockException, NotBlockException
-from ..helpers import simple_repr
-from ..adapters import get_adapter
-from ..config import get_root_config
+from .helpers import simple_repr
+from .adapters import get_adapter
+from .config import get_root_config
+from .context import ayaka_context
 
 if TYPE_CHECKING:
     from .cat import AyakaCat

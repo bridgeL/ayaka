@@ -1,10 +1,10 @@
 '''管理插件配置，提供读写支持'''
 import json
-from typing import Optional
 import inflection
 from loguru import logger
+from typing import Optional
 from pydantic import ValidationError, BaseModel
-from .helpers import ensure_dir_exists, singleton
+from .helpers import ensure_dir_exists
 
 AYAKA_VERSION = "0.0.4.2a0"
 
@@ -89,8 +89,10 @@ class RootConfig(AyakaConfig):
     ws_reverse: Optional[str]
 
 
-@singleton
+logger.opt(colors=True).info(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
+root_config = RootConfig()
+
+
 def get_root_config():
     '''获取ayaka根配置'''
-    logger.opt(colors=True).info(f"<y>ayaka</y> 当前版本 <y>{AYAKA_VERSION}</y>")
-    return RootConfig()
+    return root_config

@@ -3,7 +3,7 @@ import asyncio
 from typing import Callable, Optional, TypeVar
 from loguru import logger
 from .context import ayaka_context
-from ..helpers import simple_repr
+from .helpers import simple_repr
 
 T = TypeVar("T")
 '''任意类型'''

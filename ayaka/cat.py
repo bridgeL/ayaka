@@ -7,15 +7,13 @@ from typing import Awaitable, Callable, TypeVar
 from sqlmodel import select
 
 from .trigger import AyakaTrigger
-from ..database import AyakaDB, get_db
-from .context import ayaka_context
+from .database import AyakaDB, get_db
 from .exception import DuplicateCatNameError
 from .session import get_session_cls, AyakaSession, AyakaGroup, AyakaPrivate
-
-from ..helpers import ensure_list
-from ..adapters import AyakaEvent, get_adapter
-from ..init_ctrl import init_all
-from ..config import AyakaConfig
+from .helpers import ensure_list
+from .adapters import AyakaEvent, get_adapter
+from .config import AyakaConfig
+from .context import ayaka_context
 
 
 IDModel = get_db().IDModel
@@ -218,9 +216,6 @@ class AyakaCat:
 
             overtime：超时未收到指令则自动关闭，单位：秒，<=0则禁止该特性
         '''
-        # 异味代码...但是不想改
-        init_all()
-
         self.name = name
         manager.add_cat(self)
 
