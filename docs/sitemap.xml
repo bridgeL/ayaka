@@ -11,6 +11,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://bridgel.github.io/ayaka/quickstart/</loc>
+         <lastmod>2023-02-15</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://bridgel.github.io/ayaka/dev/cache/</loc>
          <lastmod>2023-02-15</lastmod>
          <changefreq>daily</changefreq>
@@ -56,17 +61,17 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://bridgel.github.io/ayaka/quickstart/cache/</loc>
+         <loc>https://bridgel.github.io/ayaka/example/cache/</loc>
          <lastmod>2023-02-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://bridgel.github.io/ayaka/quickstart/collision/</loc>
+         <loc>https://bridgel.github.io/ayaka/example/collision/</loc>
          <lastmod>2023-02-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://bridgel.github.io/ayaka/quickstart/example/</loc>
+         <loc>https://bridgel.github.io/ayaka/example/example/</loc>
          <lastmod>2023-02-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
