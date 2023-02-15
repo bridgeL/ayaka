@@ -71,6 +71,7 @@ class Handler:
         if self.outpath:
             kwargs["file"] = self.outpath
             print(*args, **kwargs)
+            self.outpath.flush()
 
 
 def safe_split(text: str,  n: int, sep: str = " "):
