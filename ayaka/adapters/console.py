@@ -2,9 +2,9 @@
 import re
 import uvicorn
 import asyncio
+from io import TextIOWrapper
 from fastapi import FastAPI
-from typing import Awaitable, Callable
-from sqlalchemy.orm.session import _sessions
+from typing import Awaitable, Callable, Optional
 from .adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist, get_first_adapter
 from ..helpers import ensure_dir_exists
 from ..logger import ayaka_log, ayaka_clog
@@ -22,6 +22,7 @@ class Handler:
         self.sender_name = "测试1号"
         self.func_dict: dict[str, Callable[[str], Awaitable]] = {}
         self.handle_event = None
+        self.outpath: Optional[TextIOWrapper] = None
 
     async def handle_line(self, line: str):
         for cmd, func in self.func_dict.items():
@@ -65,6 +66,12 @@ class Handler:
         )
 
         asyncio.create_task(self.handle_event(ayaka_event))
+
+    def print(self, *args, **kwargs):
+        print(*args, **kwargs)
+        if self.outpath:
+            kwargs.setdefault("file", self.outpath)
+            print(*args, **kwargs)
 
 
 def safe_split(text: str,  n: int, sep: str = " "):
@@ -112,29 +119,51 @@ async def _(line: str):
     except:
         n = 1
     await asyncio.sleep(n)
-    print()
+    handler.print()
 
 
 @handler.on("s ")
 async def _(line: str):
-    path = ensure_dir_exists(f"script/{line}.txt")
-    if not path.exists():
-        return ayaka_log(f"脚本不存在 {path}")
-    ayaka_log(f"执行脚本 {path}")
+    if ">" in line:
+        in_, out = line.split(">")
+        in_ = in_.strip()
+        out = out.strip()
 
-    name = path.stem
-    lines = path.read_text(encoding="utf8").split("\n")
+        if in_ == out:
+            print("输入输出文件不可相同")
+            return
+
+        if not out:
+            out = f"{in_}_out"
+
+        inpath = ensure_dir_exists(f"script/{in_}.txt")
+        outpath = ensure_dir_exists(f"script/{out}.txt")
+        handler.outpath = outpath.open("w+")
+        flag = True
+    else:
+        inpath = ensure_dir_exists(f"script/{line}.txt")
+        flag = False
+
+    if not inpath.exists():
+        return ayaka_log(f"脚本不存在 {inpath}")
+    ayaka_log(f"执行脚本 {inpath}")
+
+    name = inpath.stem
+    lines = inpath.read_text(encoding="utf8").split("\n")
     lines = [line.strip() for line in lines if line.strip()]
     after = "d 0.1"
 
     for line in lines:
-        print(f"{name}>", line)
+        handler.print(f"{name}>", line)
         if line.startswith("after"):
             after = line[len("after"):].strip()
             continue
 
         await handler.handle_line(line)
         await handler.handle_line(after)
+
+    if flag:
+        handler.outpath = None
 
 
 @handler.on("h")
@@ -143,15 +172,9 @@ async def show_help(line: str):
         return await deal_line(f"h{line}")
     ayaka_clog("<y>g</y> \<gid> \<uid> \<msg> | 模拟群聊消息")
     ayaka_clog("<y>p</y> \<uid> \<msg> | 模拟私聊消息")
-    ayaka_clog("<y>d</y> \<n> | 延时n秒")
-    ayaka_clog("<y>s</y> \<name> | 执行测试脚本 script/\<name>.txt")
-    ayaka_clog("<y>t</y> | 展示当前db_session总数")
+    ayaka_clog("<y>d</y> 2.3 | 延时2.3秒")
+    ayaka_clog("<y>s</y> a > b | 执行测试脚本 script/a.txt 将结果写入 script/b.txt")
     ayaka_clog("<y>h</y> | 查看帮助")
-
-
-@handler.on("t")
-async def test_db_session(msg: str):
-    print(len(_sessions))
 
 
 @handler.on("")
@@ -195,19 +218,19 @@ class ConsoleAdapter(AyakaAdapter):
     async def send_group(self, id: str, msg: str) -> bool:
         '''发送消息到指定群聊'''
         ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
-        print(msg)
+        handler.print(msg)
         return True
 
     async def send_private(self, id: str, msg: str) -> bool:
         '''发送消息到指定私聊'''
         ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
-        print(msg)
+        handler.print(msg)
         return True
 
     async def send_group_many(self, id: str, msgs: list[str]) -> bool:
         '''发送消息组到指定群聊'''
         ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
-        print("\n\n".join(msgs))
+        handler.print("\n\n".join(msgs))
         return True
 
     async def get_group_member(self, gid: str, uid: str) -> GroupMemberInfo | None:

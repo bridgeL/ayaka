@@ -16,12 +16,14 @@ class AyakaTrigger:
     def __init__(
         self,
         func: Callable[[], Awaitable],
-        cat: "AyakaCat",
+        cat_name:str,
         cmd: str,
         state: str,
         sub_state: str,
         block: bool
     ) -> None:
+        self.cat_name = cat_name
+        
         self.cmd = cmd
         '''顺便可以区分命令触发和文本触发'''
 
@@ -31,7 +33,6 @@ class AyakaTrigger:
         self.sub_state = sub_state
         self.block = block
         self.func = func
-        self.cat = cat
 
     @property
     def func_name(self):
@@ -45,10 +46,6 @@ class AyakaTrigger:
         '''一些预处理，并保存到上下文中'''
         context = ayaka_context
 
-        # 判定范围
-        if context.event.session_type not in self.cat.session_types:
-            return False
-        
         # 命令触发
         if self.cmd:
             if context.prefix is None:
@@ -66,9 +63,6 @@ class AyakaTrigger:
             
         else:
             n = 0
-
-        # 重设超时定时器
-        self.cat._refresh_overtime_timer()
 
         # 设置触发器
         context.trigger = self
@@ -92,7 +86,7 @@ class AyakaTrigger:
         # 打印日志
         items = [
             f"<y>适配器</y> {get_adapter().name}",
-            f"<y>猫猫</y> {self.cat.name}"
+            f"<y>猫猫</y> {self.cat_name}"
         ]
         if self.cmd:
             items.append(f"<y>命令</y> {self.cmd}")
@@ -133,7 +127,6 @@ class AyakaTrigger:
     def __repr__(self) -> str:
         return simple_repr(
             self,
-            cat=self.cat.name,
             func=self.func_name,
             module=self.module_name
         )

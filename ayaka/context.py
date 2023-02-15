@@ -7,12 +7,13 @@ from .adapters import AyakaEvent
 
 if TYPE_CHECKING:
     from .trigger import AyakaTrigger
+    from .cat import AyakaCat
 
 
 def get_db_session():
     ayaka_context.db_session_flag = True
     ayaka_context.wait_tasks = []
-    return ayaka_context.trigger.cat.db.get_session()
+    return ayaka_context.cat.db.get_session()
 
 
 class AyakaContext(ContextGroup):
@@ -20,6 +21,9 @@ class AyakaContext(ContextGroup):
 
     event: AyakaEvent
     '''消息事件'''
+
+    cat: "AyakaCat"
+    '''当前猫猫'''
 
     trigger: "AyakaTrigger"
     '''当前触发器'''

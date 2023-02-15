@@ -122,8 +122,11 @@ base_send_group，base_send_private，base_send_group_many
 - 破坏性变更：移除了ayaka.core，其内部模块上升为ayaka的子模块
 - 变更：cat.on_cmd取消cmds参数的缺省值
 - 变更：console、gocq适配器的run方法，新增自定义参数
+- 变更：trigger删除cat属性，新增cat_name属性
+- 变更：初始化Cat时的提示日志从trace等级变更为debug等级
 - 新特性：适配器增加on_shutdown钩子
 - 新特性：pip安装时，新增optional选项`nb2ob11`
 - 新特性：ayaka_context新增prefix属性
 - 新特性：AyakaSession新增wait_next_msg方法
+- 新特性：ayaka_context新增cat属性
 - 优化代码结构

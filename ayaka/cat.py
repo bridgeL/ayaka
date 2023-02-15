@@ -231,14 +231,13 @@ class AyakaCat:
         self.sessions: list[AyakaSession] = []
         '''所有会话'''
 
-        items = []
-        if group:
-            items.append("group")
-        if private:
-            items.append("private")
-
-        self.session_types = items
+        self.session_types = []
         '''可响应的会话范围'''
+
+        if group:
+            self.session_types.append("group")
+        if private:
+            self.session_types.append("private")
 
         self.overtime = overtime
         '''超时限制'''
@@ -318,6 +317,7 @@ class AyakaCat:
     # ---- 会话 ----
     @property
     def session_type(self):
+        '''self.event.session_type'''
         return self.event.session_type
 
     @property
@@ -446,7 +446,7 @@ class AyakaCat:
                 for cmd in cmds:
                     trigger = AyakaTrigger(
                         func=func,
-                        cat=self,
+                        cat_name=self.name,
                         cmd=cmd,
                         state="",
                         sub_state="",
@@ -460,7 +460,7 @@ class AyakaCat:
                         for sub_state in sub_states:
                             trigger = AyakaTrigger(
                                 func=func,
-                                cat=self,
+                                cat_name=self.name,
                                 cmd=cmd,
                                 state=state,
                                 sub_state=sub_state,
@@ -479,7 +479,7 @@ class AyakaCat:
                 items.append(f"<c>子状态</c> {sub_states}")
             items.append(f"<y>回调</y> {func.__name__}")
 
-            logger.opt(colors=True).trace(f" | ".join(items))
+            logger.opt(colors=True).debug(f" | ".join(items))
             return func
         return decorator
 
@@ -691,6 +691,13 @@ class AyakaCat:
 
     async def run(self):
         '''运行一次'''
+        
+        # 设置上下文
+        ayaka_context.cat = self
+
+        # 判定范围
+        if self.session_type not in self.session_types:
+            return
 
         # 处理 wait next msg
         s = self.session
@@ -709,7 +716,12 @@ class AyakaCat:
         # 遍历尝试执行
         for t in ts:
             if await t.run():
-                return
+                break
+        else:
+            return
+
+        # 重设超时定时器
+        self._refresh_overtime_timer()
 
     def get_triggers(self):
         '''获取触发器'''
