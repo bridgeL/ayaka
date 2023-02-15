@@ -36,10 +36,6 @@ theme:
 nav:
 - 主页: index.md
 - 快速开始: quickstart.md
-- 示例插件:
-  - 示例插件: example/example.md
-  - 碰撞域: example/collision.md
-  - 数据缓存: example/cache.md
 - 深入: 
   - 局限: dev/disable.md
   - 插件编写示例: dev/plugin.md
@@ -50,6 +46,10 @@ nav:
   - 数据库: dev/database.md
   - 超时: dev/overtime.md
   - 脚本测试: dev/test.md
+- 更多示例:
+  - 示例插件: example/example.md
+  - 碰撞域: example/collision.md
+  - 数据缓存: example/cache.md
 - 更新记录: change-log.md
 
 markdown_extensions:
