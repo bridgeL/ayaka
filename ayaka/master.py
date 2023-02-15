@@ -80,7 +80,6 @@ async def show_help():
     name, t = last_cat_name_dict.get(cat.session.mark, ["", 0])
             
     t = int(time.time()) - t
-    print(t)
     if t < 60:
         await cat.send(f"您刚刚使用的功能来自猫猫 {name}\n如果想获得进一步帮助请使用命令\n- 猫猫帮助 {name}")
     else:
