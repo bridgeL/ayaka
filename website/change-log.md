@@ -130,4 +130,5 @@ base_send_group，base_send_private，base_send_group_many
 - 新特性：ayaka_context新增prefix属性
 - 新特性：AyakaSession新增wait_next_msg方法
 - 新特性：ayaka_context新增cat属性
+- 优化猫猫帮助表现
 - 优化代码结构
