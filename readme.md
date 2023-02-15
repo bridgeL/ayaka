@@ -7,7 +7,7 @@
 ![PyPI - License](https://img.shields.io/pypi/l/ayaka)
 ![PyPI](https://img.shields.io/pypi/v/ayaka)
 
-专注群聊、多人互动的插件开发
+通过ayaka开发多框架下的、多人互动的群聊插件
 
 </div>
 
@@ -27,16 +27,6 @@
 https://bridgel.github.io/ayaka/
 
 ## 安装
-
-**历史遗留问题**
-
-如果你之前安装过`nonebot_plugin_ayaka`，请先确保它卸载干净
-
-```
-pip uninstall nonebot_plugin_ayaka
-```
-
-**安装**
 
 ```
 pip install ayaka
