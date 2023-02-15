@@ -48,6 +48,7 @@ async def show_help():
         await cat.send_many(infos)
         return
 
+    # 展示指定猫猫的帮助
     if cat.arg:
         name = cat.arg
         c = manager.get_cat(name)
@@ -58,6 +59,7 @@ async def show_help():
             await show_relative_cats(name)
         return
 
+    # 只发送已启动的猫猫的帮助
     flag = False
     for c in manager.wakeup_cats:
         await cat.send(c.help)
@@ -66,24 +68,30 @@ async def show_help():
     if flag:
         return
 
-    infos = []
-    for c in manager.cats:
-        info = f"- [{c.name}]"
-        if not c.valid:
-            info += " [已被屏蔽]"
-        infos.append(info)
-    infos.sort()
-    infos = ["已加载的猫猫列表", *infos]
-    await cat.send("\n".join(infos))
-
-    # 记录
+    # 读取记录
     name, t = last_cat_name_dict.get(cat.session.mark, ["", 0])
-            
+
     t = int(time.time()) - t
-    if t < 60:
+    # 最近猫猫
+    if t < 60 and name != cat.name:
         await cat.send(f"您刚刚使用的功能来自猫猫 {name}\n如果想获得进一步帮助请使用命令\n- 猫猫帮助 {name}")
     else:
-        await cat.send("如果想获得进一步帮助请使用命令\n- 猫猫帮助 <猫猫名>\n- 全部猫猫帮助")
+        # 展示所有猫猫
+        infos = []
+        for c in manager.cats:
+            info = f"- [{c.name}]"
+            if not c.valid:
+                info += " [已被屏蔽]"
+            infos.append(info)
+        infos.sort()
+        infos = [
+            "已加载的猫猫列表",
+            *infos,
+            "如果想获得进一步帮助请使用命令",
+            "- 猫猫帮助 <猫猫名>",
+            "- 全部猫猫帮助"
+        ]
+        await cat.send("\n".join(infos))
 
 
 @cat.on_cmd(cmds=["屏蔽猫猫", "取消屏蔽猫猫"], always=True)
