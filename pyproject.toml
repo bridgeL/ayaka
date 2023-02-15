@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ayaka"
-version = "0.0.4.2a2"
+version = "0.0.4.2a3"
 description = "猫猫，猫猫！"
 authors = ["Su <wxlxy316@163.com>"]
 license = "MIT"
