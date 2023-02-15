@@ -279,10 +279,15 @@ class AyakaCat:
             self._future = loop.create_future()
             loop.create_task(self._overtime_handle())
 
-    def _refresh_overtime_timer(self):
-        '''重置超时定时器'''
+    def _refresh(self):
+        '''刷新猫猫'''
+
+        # 重置超时定时器
         if self._stop_overtime_timer():
             self._start_overtime_timer()
+
+        # 统计上一猫猫
+        last_cat_name_dict[self.session.mark] = [self.name, int(time.time())]
 
     async def _overtime_handle(self):
         try:
@@ -558,7 +563,7 @@ class AyakaCat:
     @state.setter
     def state(self, v):
         self.session.state = v
-        self._refresh_overtime_timer()
+        self._refresh()
 
     @property
     def sub_state(self):
@@ -567,7 +572,7 @@ class AyakaCat:
     @sub_state.setter
     def sub_state(self, v):
         self.user.state = v
-        self._refresh_overtime_timer()
+        self._refresh()
 
     async def wakeup(self, state: str = "idle"):
         '''唤醒猫猫，唤醒后猫猫状态默认为idle
@@ -591,17 +596,17 @@ class AyakaCat:
     # ---- 基本发送 ----
     async def send_group(self, id: str, msg: str):
         '''基本发送方法 发送消息至指定群聊'''
-        self._refresh_overtime_timer()
+        self._refresh()
         return await get_adapter().send_group(id, msg)
 
     async def send_private(self, id: str, msg: str):
         '''基本发送方法 发送消息至指定私聊'''
-        self._refresh_overtime_timer()
+        self._refresh()
         return await get_adapter().send_private(id, msg)
 
     async def send_group_many(self, id: str, msgs: list[str]):
         '''基本发送方法 发送消息组至指定群聊'''
-        self._refresh_overtime_timer()
+        self._refresh()
         return await get_adapter().send_group_many(id, msgs)
 
     # ---- 快捷发送 ----
@@ -722,11 +727,7 @@ class AyakaCat:
         else:
             return
 
-        # 重设超时定时器
-        self._refresh_overtime_timer()
-
-        # 统计上一猫猫
-        last_cat_name_dict[self.session.mark] = [self.name, int(time.time())]
+        self._refresh()
 
     def get_triggers(self):
         '''获取触发器'''
