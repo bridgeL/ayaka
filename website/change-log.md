@@ -124,6 +124,7 @@ base_send_group，base_send_private，base_send_group_many
 - 变更：console、gocq适配器的run方法，新增自定义参数
 - 变更：trigger删除cat属性，新增cat_name属性
 - 变更：初始化Cat时的提示日志从trace等级变更为debug等级
+- 移除：移除了猫猫管理器的部分命令：强制休息、猫猫状态
 - 新特性：适配器增加on_shutdown钩子
 - 新特性：pip安装时，新增optional选项`nb2ob11`
 - 新特性：ayaka_context新增prefix属性

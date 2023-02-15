@@ -134,7 +134,7 @@ async def _(line: str):
             return
 
         if not out:
-            out = f"{in_}_out"
+            out = f"{in_}_output"
 
         inpath = ensure_dir_exists(f"script/{in_}.txt")
         outpath = ensure_dir_exists(f"script/{out}.txt")

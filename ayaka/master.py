@@ -107,31 +107,3 @@ async def block_cat():
     else:
         c.valid = True
         await cat.send(f"已取消屏蔽猫猫 {name}")
-
-
-@cat.on_cmd(cmds="猫猫状态", always=True)
-async def show_state():
-    '''展示猫猫状态'''
-    infos = []
-    for c in manager.wakeup_cats:
-        infos.append(f"猫猫 [{c.name}] 状态 [{c.state}] 子状态 [{c.sub_state}]")
-    if not infos:
-        infos.append("当前没有任何猫猫醒着")
-    await cat.send("\n".join(infos))
-
-
-@cat.on_cmd(cmds="强制休息", always=True)
-async def force_exit():
-    '''<猫猫名>'''
-    if not cat.arg:
-        return await cat.send("请使用 强制休息 <猫猫名>")
-
-    name = cat.arg
-    c = manager.get_cat(name)
-    if not c:
-        await cat.send("没有找到对应猫猫")
-        await show_relative_cats(name)
-        return
-
-    await c.rest()
-    c.remove_private_redirect()
