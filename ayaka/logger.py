@@ -2,7 +2,7 @@
 import sys
 from loguru import logger
 from functools import partial
-from .helpers import ensure_dir_exists
+from ayaka_utils import ensure_dir_exists
 
 logger.level("AYAKA", no=27, icon="⚡", color="<blue>")
 

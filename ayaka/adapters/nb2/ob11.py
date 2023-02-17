@@ -7,6 +7,7 @@ import nonebot
 from nonebot.matcher import current_bot
 from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment
 from nonebot.exception import ActionFailed
+from ayaka_utils import singleton
 
 from ..adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist
 from ...config import get_root_config
@@ -15,6 +16,7 @@ from ...config import get_root_config
 driver = nonebot.get_driver()
 
 
+@singleton
 class Nonebot2Onebot11Adapter(AyakaAdapter):
     '''nonebot2 onebot v11 适配器'''
 

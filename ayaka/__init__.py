@@ -16,4 +16,5 @@ from .cat import AyakaCat
 from .subscribe import AyakaSubscribe
 from .database import AyakaDB, get_db
 from .download import resource_download, resource_download_by_res_info, get_file_hash, ResInfo, ResItem
-from .helpers import load_data_from_file, debug_print, simple_repr, ensure_dir_exists
+
+from ayaka_utils import load_data_from_file, debug_print, simple_repr, ensure_dir_exists

@@ -4,7 +4,7 @@ import hashlib
 from pathlib import Path
 from loguru import logger
 from pydantic import BaseModel
-from .helpers import ensure_dir_exists
+from ayaka_utils import ensure_dir_exists
 
 
 class ResItem(BaseModel):

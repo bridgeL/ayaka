@@ -1,12 +1,12 @@
 '''适配命令行输入输出'''
 import re
-import uvicorn
 import asyncio
 from io import TextIOWrapper
 from fastapi import FastAPI
 from typing import Awaitable, Callable, Optional
+from ayaka_utils import ensure_dir_exists, singleton
+
 from .adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist, get_first_adapter
-from ..helpers import ensure_dir_exists
 from ..logger import ayaka_log, ayaka_clog
 
 
@@ -188,6 +188,7 @@ async def deal_line(msg: str):
         handler.handle_msg(msg)
 
 
+@singleton
 class ConsoleAdapter(AyakaAdapter):
     '''console 适配器'''
 
@@ -256,6 +257,7 @@ regist(ConsoleAdapter)
 
 def run(**kwargs):
     '''运行'''
+    import uvicorn
     kwargs.setdefault("app", f"{__name__}:app")
     kwargs.setdefault("reload", True)
     uvicorn.run(**kwargs)

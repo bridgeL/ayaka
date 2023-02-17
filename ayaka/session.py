@@ -1,8 +1,8 @@
 '''会话模型'''
 import asyncio
-from typing import Callable, Optional, TypeVar
 from loguru import logger
-from .helpers import simple_repr
+from typing import Callable, Optional, TypeVar
+from ayaka_utils import simple_repr
 from .context import ayaka_context
 
 T = TypeVar("T")

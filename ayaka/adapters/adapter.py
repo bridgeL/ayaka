@@ -4,8 +4,8 @@ from loguru import logger
 from contextvars import ContextVar
 from pydantic import BaseModel
 from typing import Awaitable, Callable, Optional
+from ayaka_utils import is_async_callable, simple_async_wrap
 from ..config import get_root_config
-from ..helpers import is_async_callable, simple_async_wrap
 
 
 class GroupMemberInfo(BaseModel):
@@ -60,7 +60,6 @@ def is_nb2ob11():
 
 
 current_adapter: ContextVar["AyakaAdapter"] = ContextVar("current_adapter")
-
 
 class AyakaAdapter:
     '''ayaka适配器，用于实现跨机器人框架和协议的兼容'''
@@ -125,7 +124,7 @@ class AyakaAdapter:
 
     async def handle_event(self, ayaka_event: AyakaEvent):
         '''处理ayaka事件，并在发生错误时记录'''
-        current_adapter.set(get_adapter(self.name))
+        current_adapter.set(self)
         try:
             # ---- 解除循环引用，待优化 ----
             from ..cat import manager
@@ -168,7 +167,7 @@ def get_adapter(name: str = ""):
         name：返回对应名称的适配器
 
         若为空，则返回当前上下文中的适配器
-        
+
         若当前上下文为空，则返回第一个注册的适配器
     '''
     if not name:

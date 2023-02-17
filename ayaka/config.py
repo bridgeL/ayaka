@@ -4,7 +4,7 @@ import inflection
 from loguru import logger
 from typing import Optional
 from pydantic import ValidationError, BaseModel, validator
-from .helpers import ensure_dir_exists
+from ayaka_utils import ensure_dir_exists
 
 AYAKA_VERSION = "0.0.4.2"
 

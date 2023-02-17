@@ -3,7 +3,7 @@ from typing import Optional
 from loguru import logger
 from sqlalchemy.orm import declared_attr
 from sqlmodel import MetaData, Session, SQLModel, Field, select, create_engine
-from .helpers import ensure_dir_exists, simple_async_wrap
+from ayaka_utils import ensure_dir_exists, simple_async_wrap
 from .adapters import get_adapter
 from .context import ayaka_context
 

@@ -8,11 +8,13 @@ from nonebot.utils import escape_tag
 from nonebot.typing import overrides
 from nonebot.adapters.onebot.v11 import Adapter, Message, MessageEvent, MessageSegment, Bot, Event
 from nonebot.exception import ActionFailed
+from ayaka_utils import singleton
 
 from .ob11 import Nonebot2Onebot11Adapter
 from ..adapter import regist, GroupMemberInfo, AyakaEvent
 
 
+@singleton
 class GuildMessageEvent(MessageEvent):
     """频道消息"""
 

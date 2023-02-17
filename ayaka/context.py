@@ -2,7 +2,7 @@
 import asyncio
 from sqlmodel import Session as DBSession
 from typing import TYPE_CHECKING, Optional
-from .helpers import ContextGroup, Field
+from ayaka_utils import ContextGroup, Field
 from .adapters import AyakaEvent
 
 if TYPE_CHECKING:

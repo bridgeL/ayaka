@@ -1,29 +1,26 @@
 import re
 import asyncio
 from loguru import logger
-from typing import TYPE_CHECKING, Awaitable, Callable
+from typing import Awaitable, Callable
+from ayaka_utils import simple_repr
 from .exception import BlockException, NotBlockException
-from .helpers import simple_repr
 from .adapters import get_adapter
 from .config import get_root_config
 from .context import ayaka_context
-
-if TYPE_CHECKING:
-    from .cat import AyakaCat
 
 
 class AyakaTrigger:
     def __init__(
         self,
         func: Callable[[], Awaitable],
-        cat_name:str,
+        cat_name: str,
         cmd: str,
         state: str,
         sub_state: str,
         block: bool
     ) -> None:
         self.cat_name = cat_name
-        
+
         self.cmd = cmd
         '''顺便可以区分命令触发和文本触发'''
 
@@ -50,23 +47,23 @@ class AyakaTrigger:
         if self.cmd:
             if context.prefix is None:
                 return False
-        
+
             start = context.prefix + self.cmd
             n = len(start)
 
             # 命令不符合
             if not context.event.message.startswith(start):
                 return False
-            
+
             # 保存命令
             context.cmd = self.cmd
-            
+
         else:
             n = 0
 
         # 设置触发器
         context.trigger = self
-        
+
         # 剥离命令，分割参数
         separate = get_root_config().separate
         context.arg = context.event.message[n:].strip(separate)

@@ -6,10 +6,12 @@ from typing import Awaitable, Callable
 import nonebot
 from aiocqhttp import Event as CQEvent
 from aiocqhttp.exceptions import ActionFailed
+from ayaka_utils import singleton
 
 from ..adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist
 
 
+@singleton
 class Nonebot1Adapter(AyakaAdapter):
     '''nonebot1 适配器'''
 
