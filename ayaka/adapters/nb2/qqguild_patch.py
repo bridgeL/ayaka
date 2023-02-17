@@ -14,7 +14,6 @@ from .ob11 import Nonebot2Onebot11Adapter
 from ..adapter import regist, GroupMemberInfo, AyakaEvent
 
 
-@singleton
 class GuildMessageEvent(MessageEvent):
     """频道消息"""
 
@@ -123,6 +122,7 @@ class GuildMessageEvent(MessageEvent):
         return message, is_tome
 
 
+@singleton
 class Nonebot2Onebot11QQguildPatchAdapter(Nonebot2Onebot11Adapter):
     '''nonebot2 onebot v11 qqguild patch 适配器'''
 
