@@ -24,9 +24,10 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
         self.asgi = nonebot.get_app()
         nonebot.on_message(handlers=[self.handle], block=False, priority=5)
 
-    async def send_group(self, id: str, msg: str) -> bool:
+    async def send_group(self, id: str, msg: str, bot_id: str | None = None) -> bool:
         '''发送消息到指定群聊'''
-        bot = self.get_current_bot()
+        bot = self.get_current_bot() or self.get_bot(bot_id)
+        
         try:
             await bot.send_group_msg(group_id=int(id), message=msg)
         except ActionFailed:
@@ -34,9 +35,10 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
         else:
             return True
 
-    async def send_private(self, id: str, msg: str) -> bool:
+    async def send_private(self, id: str, msg: str, bot_id: str | None = None) -> bool:
         '''发送消息到指定私聊'''
-        bot = self.get_current_bot()
+        bot = self.get_current_bot() or self.get_bot(bot_id)
+        
         try:
             await bot.send_private_msg(user_id=int(id), message=msg)
         except ActionFailed:
@@ -44,9 +46,10 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
         else:
             return True
 
-    async def send_group_many(self, id: str, msgs: list[str]) -> bool:
+    async def send_group_many(self, id: str, msgs: list[str], bot_id: str | None = None) -> bool:
         '''发送消息组到指定群聊'''
-        bot = self.get_current_bot()
+        bot = self.get_current_bot() or self.get_bot(bot_id)
+        
         # 分割长消息组（不可超过100条
         div_len = 100
         div_cnt = ceil(len(msgs) / div_len)
@@ -150,7 +153,15 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
     @classmethod
     def get_current_bot(cls) -> Bot:
         '''获取当前bot'''
-        return current_bot.get()
+        try:
+            return current_bot.get()
+        except LookupError:
+            return
+
+    @classmethod
+    def get_bot(cls, bot_id: str | None = None) -> Bot:
+        '''获取bot'''
+        return nonebot.get_bot(bot_id)
 
 
 Nonebot2Onebot11Adapter.name = "nb2.ob11"
