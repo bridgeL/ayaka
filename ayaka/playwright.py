@@ -1,8 +1,10 @@
 '''需要先安装ayaka[playwright]'''
 from loguru import logger
-from typing import Optional
-from playwright.async_api import Browser, Playwright, async_playwright, Error
+from contextlib import asynccontextmanager
+from typing import Optional, AsyncIterator
+from playwright.async_api import Browser, Playwright, async_playwright, Error, Page
 from .adapters import get_adapter
+
 
 adapter = get_adapter()
 
@@ -39,7 +41,6 @@ async def install_browser():
         "PLAYWRIGHT_DOWNLOAD_HOST"
     ] = "https://npmmirror.com/mirrors/playwright/"
 
-    # 默认使用 chromium
     sys.argv = ["", "install", "chromium"]
 
     try:
@@ -54,3 +55,13 @@ async def install_browser():
 
 async def get_browser(**kwargs) -> Browser:
     return _browser or await init(**kwargs)
+
+
+@asynccontextmanager
+async def get_new_page(**kwargs) -> AsyncIterator[Page]:
+    browser = await get_browser()
+    page = await browser.new_page(**kwargs)
+    try:
+        yield page
+    finally:
+        await page.close()

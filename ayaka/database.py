@@ -32,12 +32,13 @@ class AyakaDB:
                 return self.get_session(**kwargs)
 
         self.Model = Model
+        '''基本模型'''
 
         class IDModel(Model):
             id: Optional[int] = Field(None, primary_key=True)
 
         self.IDModel = IDModel
-        '''自带id'''
+        '''自带id的基本模型'''
 
         class GroupDBBase(Model):
             group_id: str = Field(primary_key=True)
@@ -59,7 +60,7 @@ class AyakaDB:
                 return cls._get_or_create(group_id=group_id)
 
         self.GroupDBBase = GroupDBBase
-        '''自带group_id'''
+        '''自带group_id的基本模型'''
 
         class UserDBBase(GroupDBBase):
             user_id: str = Field(primary_key=True)
@@ -69,7 +70,7 @@ class AyakaDB:
                 return cls._get_or_create(group_id=group_id, user_id=user_id)
 
         self.UserDBBase = UserDBBase
-        '''自带group_id、user_id'''
+        '''自带group_id、user_id的基本模型'''
 
         # 服务启动后运行初始化方法
         get_adapter().on_startup(simple_async_wrap(self.init))

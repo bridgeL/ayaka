@@ -109,18 +109,15 @@ class AyakaManager:
                 break
 
         # 同时执行
-        ts = [
-            asyncio.create_task(c.run())
-            for c in self.cats
-        ]
-        await asyncio.gather(*ts)
+        coros = [c.run() for c in self.cats]
+        await asyncio.gather(*coros)
 
     async def handle_event(self, event: AyakaEvent):
         '''处理和转发事件'''
-        ts = []
+        coros = []
 
         # 处理消息
-        ts.append(asyncio.create_task(self._handle_event(event)))
+        coros.append(self._handle_event(event))
 
         # 转发私聊消息到群聊
         if event.session_type == "private":
@@ -133,9 +130,9 @@ class AyakaManager:
                 _event.session_type = "group"
                 _event.session_id = group_id
                 _event.private_forward_id = private_id
-                ts.append(asyncio.create_task(self._handle_event(_event)))
+                coros.append(self._handle_event(_event))
 
-        await asyncio.gather(*ts)
+        await asyncio.gather(*coros)
 
     def add_cat(self, cat: "AyakaCat"):
         for c in self.cats:
@@ -256,11 +253,13 @@ class AyakaCat:
             __config_dir__ = name
 
         self.Config = Config
+        '''配置类基类'''
 
         # 数据库类
         if isinstance(db, str):
             db = get_db(db)
         self.db = db
+        '''数据库相关'''
 
     # ---- 超时控制 ----
     @property

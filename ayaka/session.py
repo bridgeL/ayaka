@@ -37,13 +37,13 @@ class AyakaSession:
             return False
         return True
 
-    async def wait_next_msg(self):
+    async def wait_next_msg(self, timeout: int = 120):
         if self.has_last_wait_next_msg():
             self._wait_next_msg_fut.cancel()
             return
 
         self._wait_next_msg_fut = asyncio.Future()
-        msg = await self._wait_next_msg_fut
+        msg = await asyncio.wait_for(self._wait_next_msg_fut, timeout=timeout)
         return msg
 
     def set_next_msg(self, msg: str):
