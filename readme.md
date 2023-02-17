@@ -1,6 +1,6 @@
 <div align="center">
 
-# Ayaka - 猫猫，猫猫！ - 0.0.4.3a1
+# Ayaka - 猫猫，猫猫！ - 0.0.4.3a2
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ayaka)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ayaka)
