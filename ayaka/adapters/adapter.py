@@ -98,15 +98,15 @@ class AyakaAdapter:
         '''asgi服务关闭后钩子，注册回调必须是异步函数'''
         raise NotImplementedError
 
-    async def send_group(self, id: str, msg: str) -> bool:
+    async def send_group(self, id: str, msg: str, bot_id: str | None = None) -> bool:
         '''发送消息到指定群聊'''
         raise NotImplementedError
 
-    async def send_private(self, id: str, msg: str) -> bool:
+    async def send_private(self, id: str, msg: str, bot_id: str | None = None) -> bool:
         '''发送消息到指定私聊'''
         raise NotImplementedError
 
-    async def send_group_many(self, id: str, msgs: list[str]) -> bool:
+    async def send_group_many(self, id: str, msgs: list[str], bot_id: str | None = None) -> bool:
         '''发送消息组到指定群聊'''
         raise NotImplementedError
 

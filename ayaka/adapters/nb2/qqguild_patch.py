@@ -130,9 +130,12 @@ class Nonebot2Onebot11QQguildPatchAdapter(Nonebot2Onebot11Adapter):
         Adapter.add_custom_model(GuildMessageEvent)
         nonebot.on_message(handlers=[self.handle], block=False, priority=5)
 
-    async def send_group(self, id: str, msg: str) -> bool:
+    async def send_group(self, id: str, msg: str, bot_id: str | None = None) -> bool:
         '''发送消息到指定群聊'''
-        bot = self.get_current_bot()
+        if bot_id:
+            bot = nonebot.get_bot(bot_id)
+        else:
+            bot = self.get_current_bot()
 
         guild_id, channel_id = id.split(" ")
 
@@ -153,10 +156,10 @@ class Nonebot2Onebot11QQguildPatchAdapter(Nonebot2Onebot11Adapter):
 
     # ---- 待完成 发送消息到指定私聊 ----
 
-    async def send_group_many(self, id: str, msgs: list[str]) -> bool:
+    async def send_group_many(self, id: str, msgs: list[str], bot_id: str | None = None) -> bool:
         '''发送消息组到指定群聊'''
         for msg in msgs:
-            await self.send_group(id, msg)
+            await self.send_group(id, msg, bot_id)
 
     async def get_group_member(self, gid: str, uid: str) -> GroupMemberInfo | None:
         '''获取群内某用户的信息'''

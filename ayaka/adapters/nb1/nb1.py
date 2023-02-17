@@ -19,7 +19,7 @@ class Nonebot1Adapter(AyakaAdapter):
         self.asgi = nonebot.get_bot().asgi
         bot.on("message")(self.handle)
 
-    async def send_group(self, id: str, msg: str) -> bool:
+    async def send_group(self, id: str, msg: str, bot_id: str | None = None) -> bool:
         '''发送消息到指定群聊'''
         try:
             await bot.send_group_msg(group_id=int(id), message=msg)
@@ -28,7 +28,7 @@ class Nonebot1Adapter(AyakaAdapter):
         else:
             return True
 
-    async def send_private(self, id: str, msg: str) -> bool:
+    async def send_private(self, id: str, msg: str, bot_id: str | None = None) -> bool:
         '''发送消息到指定私聊'''
         try:
             await bot.send_private_msg(user_id=int(id), message=msg)
@@ -37,7 +37,7 @@ class Nonebot1Adapter(AyakaAdapter):
         else:
             return True
 
-    async def send_group_many(self, id: str, msgs: list[str]) -> bool:
+    async def send_group_many(self, id: str, msgs: list[str], bot_id: str | None = None) -> bool:
         '''发送消息组到指定群聊'''
         # 分割长消息组（不可超过100条
         div_len = 100

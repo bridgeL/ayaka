@@ -221,19 +221,19 @@ class ConsoleAdapter(AyakaAdapter):
 
         self.on_startup(start_loop)
 
-    async def send_group(self, id: str, msg: str) -> bool:
+    async def send_group(self, id: str, msg: str, bot_id: str | None = None) -> bool:
         '''发送消息到指定群聊'''
         ayaka_clog(f"群聊({id}) <r>Ayaka Bot</r> 说：")
         handler.print(msg)
         return True
 
-    async def send_private(self, id: str, msg: str) -> bool:
+    async def send_private(self, id: str, msg: str, bot_id: str | None = None) -> bool:
         '''发送消息到指定私聊'''
         ayaka_clog(f"<r>Ayaka Bot</r> 对私聊({id}) 说：")
         handler.print(msg)
         return True
 
-    async def send_group_many(self, id: str, msgs: list[str]) -> bool:
+    async def send_group_many(self, id: str, msgs: list[str], bot_id: str | None = None) -> bool:
         '''发送消息组到指定群聊'''
         ayaka_clog(f"群聊({id}) 收到<y>合并转发</y>消息")
         handler.print("\n\n".join(msgs))

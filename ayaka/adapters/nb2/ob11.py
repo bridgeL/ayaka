@@ -26,7 +26,10 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
 
     async def send_group(self, id: str, msg: str, bot_id: str | None = None) -> bool:
         '''发送消息到指定群聊'''
-        bot = self.get_current_bot() or self.get_bot(bot_id)
+        if bot_id:
+            bot = nonebot.get_bot(bot_id)
+        else:
+            bot = self.get_current_bot()
         
         try:
             await bot.send_group_msg(group_id=int(id), message=msg)
@@ -37,8 +40,11 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
 
     async def send_private(self, id: str, msg: str, bot_id: str | None = None) -> bool:
         '''发送消息到指定私聊'''
-        bot = self.get_current_bot() or self.get_bot(bot_id)
-        
+        if bot_id:
+            bot = nonebot.get_bot(bot_id)
+        else:
+            bot = self.get_current_bot()
+            
         try:
             await bot.send_private_msg(user_id=int(id), message=msg)
         except ActionFailed:
@@ -48,7 +54,10 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
 
     async def send_group_many(self, id: str, msgs: list[str], bot_id: str | None = None) -> bool:
         '''发送消息组到指定群聊'''
-        bot = self.get_current_bot() or self.get_bot(bot_id)
+        if bot_id:
+            bot = nonebot.get_bot(bot_id)
+        else:
+            bot = self.get_current_bot()
         
         # 分割长消息组（不可超过100条
         div_len = 100
@@ -157,11 +166,6 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
             return current_bot.get()
         except LookupError:
             return
-
-    @classmethod
-    def get_bot(cls, bot_id: str | None = None) -> Bot:
-        '''获取bot'''
-        return nonebot.get_bot(bot_id)
 
 
 Nonebot2Onebot11Adapter.name = "nb2.ob11"
