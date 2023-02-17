@@ -1,11 +1,9 @@
 '''适配 hoshino 机器人'''
 from hoshino import Service
-from ayaka_utils import singleton
 from .nb1 import Nonebot1Adapter
 from ..adapter import regist
 
 
-@singleton
 class HoshinoAdapter(Nonebot1Adapter):
     '''hoshino 适配器'''
 

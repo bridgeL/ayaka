@@ -7,7 +7,6 @@ import nonebot
 from nonebot.matcher import current_bot
 from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment
 from nonebot.exception import ActionFailed
-from ayaka_utils import singleton
 
 from ..adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist
 from ...config import get_root_config
@@ -16,7 +15,6 @@ from ...config import get_root_config
 driver = nonebot.get_driver()
 
 
-@singleton
 class Nonebot2Onebot11Adapter(AyakaAdapter):
     '''nonebot2 onebot v11 适配器'''
 
@@ -30,7 +28,7 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
             bot = nonebot.get_bot(bot_id)
         else:
             bot = self.get_current_bot()
-        
+
         try:
             await bot.send_group_msg(group_id=int(id), message=msg)
         except ActionFailed:
@@ -44,7 +42,7 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
             bot = nonebot.get_bot(bot_id)
         else:
             bot = self.get_current_bot()
-            
+
         try:
             await bot.send_private_msg(user_id=int(id), message=msg)
         except ActionFailed:
@@ -58,7 +56,7 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
             bot = nonebot.get_bot(bot_id)
         else:
             bot = self.get_current_bot()
-        
+
         # 分割长消息组（不可超过100条
         div_len = 100
         div_cnt = ceil(len(msgs) / div_len)

@@ -4,7 +4,7 @@ import asyncio
 from io import TextIOWrapper
 from fastapi import FastAPI
 from typing import Awaitable, Callable, Optional
-from ayaka_utils import ensure_dir_exists, singleton
+from ayaka_utils import ensure_dir_exists
 
 from .adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist, get_first_adapter
 from ..logger import ayaka_log, ayaka_clog
@@ -188,7 +188,6 @@ async def deal_line(msg: str):
         handler.handle_msg(msg)
 
 
-@singleton
 class ConsoleAdapter(AyakaAdapter):
     '''console 适配器'''
 

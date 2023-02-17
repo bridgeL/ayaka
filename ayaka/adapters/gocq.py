@@ -9,7 +9,6 @@ from loguru import logger
 from html import unescape
 from typing import Any, Optional
 from fastapi import FastAPI, WebSocket
-from ayaka_utils import singleton
 
 from .adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, get_first_adapter, regist
 from ..config import get_root_config
@@ -69,7 +68,6 @@ host = None
 port = None
 
 
-@singleton
 class GoCQAdapter(AyakaAdapter):
     '''直接连接gocq 适配器'''
 

@@ -6,12 +6,10 @@ from typing import Awaitable, Callable
 import nonebot
 from aiocqhttp import Event as CQEvent
 from aiocqhttp.exceptions import ActionFailed
-from ayaka_utils import singleton
 
 from ..adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist
 
 
-@singleton
 class Nonebot1Adapter(AyakaAdapter):
     '''nonebot1 适配器'''
 
@@ -137,7 +135,7 @@ class Nonebot1Adapter(AyakaAdapter):
     def _on_startup(self, async_func: Callable[..., Awaitable]):
         '''asgi服务启动后钩子，注册回调必须是异步函数'''
         bot.on_startup(async_func)
-        
+
     def _on_shutdown(self, async_func: Callable[..., Awaitable]):
         '''asgi服务关闭后钩子，注册回调必须是异步函数'''
         bot.on_shutdown(async_func)
