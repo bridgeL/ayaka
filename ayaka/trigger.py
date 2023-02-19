@@ -4,7 +4,6 @@ from loguru import logger
 from typing import Awaitable, Callable
 from ayaka_utils import simple_repr
 from .exception import BlockException, NotBlockException
-from .adapters import get_adapter
 from .config import get_root_config
 from .context import ayaka_context
 
@@ -82,7 +81,7 @@ class AyakaTrigger:
 
         # 打印日志
         items = [
-            f"<y>适配器</y> {get_adapter().name}",
+            f"<y>适配器</y> {ayaka_context.adapter.name}",
             f"<y>猫猫</y> {self.cat_name}"
         ]
         if self.cmd:

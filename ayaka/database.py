@@ -1,10 +1,11 @@
 import inflection
+from pathlib import Path
 from typing import Optional
 from loguru import logger
 from sqlalchemy.orm import declared_attr
+from sqlalchemy.future import Engine
 from sqlmodel import MetaData, Session, SQLModel, Field, select, create_engine
-from ayaka_utils import ensure_dir_exists, simple_async_wrap
-from .adapters import get_adapter
+from ayaka_utils import ensure_dir_exists
 from .context import ayaka_context
 
 
@@ -16,6 +17,8 @@ class AyakaDB:
         db_dict[name] = self
 
         self.metadata = MetaData(info={"name": name})
+        self.path: Path = None
+        self.engine: Engine = None
 
         class Model(SQLModel):
             metadata = self.metadata
@@ -31,12 +34,21 @@ class AyakaDB:
                 kwargs 请参考sqlmodel.Session'''
                 return self.get_session(**kwargs)
 
+            @classmethod
+            def _get_or_create(cls, session: Session, **kwargs):
+                '''若不存在则根据参数值创建'''
+                statement = select(cls).filter_by(**kwargs)
+                cursor = session.exec(statement)
+                data = cursor.one_or_none()
+                if not data:
+                    data = cls(**kwargs)
+                    session.add(data)
+                return data
         self.Model = Model
         '''基本模型'''
 
         class IDModel(Model):
             id: Optional[int] = Field(None, primary_key=True)
-
         self.IDModel = IDModel
         '''自带id的基本模型'''
 
@@ -44,39 +56,34 @@ class AyakaDB:
             group_id: str = Field(primary_key=True)
 
             @classmethod
-            def _get_or_create(cls, **kwargs):
-                '''若不存在则根据参数值创建'''
-                session = ayaka_context.db_session
-                statement = select(cls).filter_by(**kwargs)
-                cursor = session.exec(statement)
-                instance = cursor.one_or_none()
-                if not instance:
-                    instance = cls(**kwargs)
-                    session.add(instance)
-                return instance
-
-            @classmethod
             def get_or_create(cls, group_id: str):
-                return cls._get_or_create(group_id=group_id)
-
+                return cls._get_or_create(
+                    ayaka_context.db_session,
+                    group_id=group_id
+                )
         self.GroupDBBase = GroupDBBase
         '''自带group_id的基本模型'''
 
-        class UserDBBase(GroupDBBase):
+        class UserDBBase(Model):
+            group_id: str = Field(primary_key=True)
             user_id: str = Field(primary_key=True)
 
             @classmethod
             def get_or_create(cls, group_id: str, user_id: str):
-                return cls._get_or_create(group_id=group_id, user_id=user_id)
-
+                return cls._get_or_create(
+                    ayaka_context.db_session,
+                    group_id=group_id,
+                    user_id=user_id
+                )
         self.UserDBBase = UserDBBase
         '''自带group_id、user_id的基本模型'''
 
-        # 服务启动后运行初始化方法
-        get_adapter().on_startup(simple_async_wrap(self.init))
-
     def init(self):
         '''初始化所有表'''
+        if self.path:
+            logger.opt(colors=True).warning(
+                f"你正试图重复初始化数据库 <g>{self.path}</g>，已取消该操作，请确保你的代码符合预期")
+            return
         self.path = ensure_dir_exists(f"data/{self.name}/data.db")
         self.engine = create_engine(f"sqlite:///{self.path}")
         self.metadata.bind = self.engine

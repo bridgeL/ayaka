@@ -12,7 +12,7 @@ from .trigger import AyakaTrigger
 from .database import AyakaDB, get_db
 from .exception import DuplicateCatNameError
 from .session import AyakaGroup, AyakaPrivate, AyakaSession, get_session_cls
-from .adapters import AyakaEvent, get_adapter
+from .adapters import AyakaEvent
 from .config import AyakaConfig, get_root_config
 from .context import ayaka_context
 
@@ -376,6 +376,11 @@ class AyakaCat:
         return ayaka_context
 
     @property
+    def adapter(self):
+        '''当前适配器'''
+        return self.context.adapter
+
+    @property
     def event(self):
         '''当前事件'''
         return self.context.event
@@ -596,17 +601,17 @@ class AyakaCat:
     async def send_group(self, id: str, msg: str):
         '''基本发送方法 发送消息至指定群聊'''
         self._refresh()
-        return await get_adapter().send_group(id, msg)
+        return await self.adapter.send_group(id, msg)
 
     async def send_private(self, id: str, msg: str):
         '''基本发送方法 发送消息至指定私聊'''
         self._refresh()
-        return await get_adapter().send_private(id, msg)
+        return await self.adapter.send_private(id, msg)
 
     async def send_group_many(self, id: str, msgs: list[str]):
         '''基本发送方法 发送消息组至指定群聊'''
         self._refresh()
-        return await get_adapter().send_group_many(id, msgs)
+        return await self.adapter.send_group_many(id, msgs)
 
     # ---- 快捷发送 ----
     async def send(self, msg: str):
@@ -753,9 +758,9 @@ class AyakaCat:
     async def get_user(self, uid: str):
         '''获取当前群组中指定uid的成员信息'''
         if uid and self.session_type == "group":
-            return await get_adapter().get_group_member(self.group.id, uid)
+            return await self.adapter.get_group_member(self.group.id, uid)
 
     async def get_users(self):
         '''获取当前群组中所有成员信息'''
         if self.session_type == "group":
-            return await get_adapter().get_group_members(self.group.id)
+            return await self.adapter.get_group_members(self.group.id)

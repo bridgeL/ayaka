@@ -1,29 +1,37 @@
 '''上下文'''
 import asyncio
-from sqlmodel import Session as DBSession
 from typing import TYPE_CHECKING, Optional
 from ayaka_utils import ContextGroup, Field
-from .adapters import AyakaEvent
 
 if TYPE_CHECKING:
+    from sqlmodel import Session as DBSession
     from .trigger import AyakaTrigger
     from .cat import AyakaCat
+    from .adapters import AyakaEvent, AyakaAdapter
 
 
-def get_db_session():
+def _get_db_session():
     ayaka_context.db_session_flag = True
     ayaka_context.wait_tasks = []
     return ayaka_context.cat.db.get_session()
 
 
+def _get_adapter():
+    from .adapters import get_adapter
+    return get_adapter()
+
+
 class AyakaContext(ContextGroup):
     '''上下文，保存一些数据便于访问'''
 
-    event: AyakaEvent
+    event: "AyakaEvent"
     '''消息事件'''
 
     cat: "AyakaCat"
     '''当前猫猫'''
+
+    adapter: "AyakaAdapter" = Field(default_factory=_get_adapter)
+    '''当前适配器'''
 
     trigger: "AyakaTrigger"
     '''当前触发器'''
@@ -46,7 +54,7 @@ class AyakaContext(ContextGroup):
     wait_tasks: list[asyncio.Task] = []
     '''数据库会话关闭前，会等待该队列中的所有任务结束'''
 
-    db_session: DBSession = Field(default_factory=get_db_session)
+    db_session: "DBSession" = Field(default_factory=_get_db_session)
     '''数据库会话，请在trigger存在的时候使用'''
 
     db_session_flag: bool = False

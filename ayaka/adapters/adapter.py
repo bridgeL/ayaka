@@ -61,6 +61,7 @@ def is_nb2ob11():
 
 current_adapter: ContextVar["AyakaAdapter"] = ContextVar("current_adapter")
 
+
 class AyakaAdapter:
     '''ayaka适配器，用于实现跨机器人框架和协议的兼容'''
     asgi = None
@@ -195,3 +196,11 @@ def auto_load_adapter():
 
 
 auto_load_adapter()
+
+
+@first_adapter.on_startup
+async def _():
+    '''初始化所有数据库'''
+    from ..database import db_dict
+    for db in db_dict.values():
+        db.init()
