@@ -6,7 +6,7 @@ from typing import Optional
 from pydantic import ValidationError, BaseModel, validator
 from ayaka_utils import ensure_dir_exists
 
-AYAKA_VERSION = "0.0.4.3a4"
+AYAKA_VERSION = "0.0.4.3a5"
 
 
 class AyakaConfig(BaseModel):
