@@ -132,3 +132,12 @@ base_send_group，base_send_private，base_send_group_many
 - 新特性：新增playwright模块
 - 优化猫猫帮助表现
 - 优化代码结构
+
+### 0.0.4.3
+
+- 变更：抽离部分数据库逻辑到外部包ayaka_db中
+- 变更：AyakaSubscribe被抽离至外部包ayaka_utils中
+- 新特性：session.wait_next_msg方法新增超时参数
+- 新特性：playwright模块增加get_new_page方法
+- 新特性：新增上下文 adapter
+- 优化代码结构

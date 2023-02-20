@@ -1,4 +1,4 @@
-# Ayaka 猫猫，猫猫 😸 0.0.4.2
+# Ayaka 猫猫，猫猫 😸 0.0.4.3
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ayaka)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ayaka)
@@ -6,6 +6,8 @@
 ![PyPI](https://img.shields.io/pypi/v/ayaka)
 
 通过ayaka开发多框架下的、多人互动的群聊插件
+
+**个人能力有限，测试不周，若出现实际表现与文档不符，欢迎issue**
 
 根据py包的导入情况，猜测当前插件工作在哪个机器人框架下，已支持
 
