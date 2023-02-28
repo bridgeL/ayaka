@@ -6,8 +6,9 @@ from fastapi import FastAPI
 from typing import Awaitable, Callable, Optional
 from ayaka_utils import ensure_dir_exists
 
-from .adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist, get_first_adapter
+from .adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist
 from ..logger import ayaka_log, ayaka_clog
+from ..context import ayaka_context
 
 
 at_pt = re.compile(r"@([^ ]+?)(?= |$)")
@@ -192,7 +193,7 @@ class ConsoleAdapter(AyakaAdapter):
     '''console 适配器'''
 
     def __init__(self) -> None:
-        first_adapter = get_first_adapter()
+        first_adapter = ayaka_context.adapter
         if first_adapter:
             self.asgi = first_adapter.asgi
             self.on_startup = first_adapter.on_startup

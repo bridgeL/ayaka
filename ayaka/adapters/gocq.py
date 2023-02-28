@@ -10,8 +10,9 @@ from html import unescape
 from typing import Any, Optional
 from fastapi import FastAPI, WebSocket
 
-from .adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, get_first_adapter, regist
+from .adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist
 from ..config import get_root_config
+from ..context import ayaka_context
 
 
 class DataclassEncoder(json.JSONEncoder):
@@ -86,7 +87,7 @@ class GoCQAdapter(AyakaAdapter):
         port = int(r.group(3))
         path = r.group(4)
 
-        first_adapter = get_first_adapter()
+        first_adapter = ayaka_context.adapter
         if first_adapter:
             self.asgi = first_adapter.asgi
             self.on_startup = first_adapter.on_startup

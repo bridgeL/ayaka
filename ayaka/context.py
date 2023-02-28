@@ -16,11 +16,6 @@ def _get_db_session():
     return ayaka_context.cat.db.get_session()
 
 
-def _get_adapter():
-    from .adapters import get_adapter
-    return get_adapter()
-
-
 class AyakaContext(ContextGroup):
     '''上下文，保存一些数据便于访问'''
 
@@ -30,7 +25,7 @@ class AyakaContext(ContextGroup):
     cat: "AyakaCat"
     '''当前猫猫'''
 
-    adapter: "AyakaAdapter" = Field(default_factory=_get_adapter)
+    adapter: Optional["AyakaAdapter"] = None
     '''当前适配器'''
 
     trigger: "AyakaTrigger"

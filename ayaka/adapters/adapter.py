@@ -1,11 +1,11 @@
 '''适配器基类'''
 import sys
 from loguru import logger
-from contextvars import ContextVar
 from pydantic import BaseModel
 from typing import Awaitable, Callable, Optional
 from ayaka_utils import is_async_callable, simple_async_wrap
 from ..config import get_root_config
+from ..context import ayaka_context
 
 
 class GroupMemberInfo(BaseModel):
@@ -57,9 +57,6 @@ def is_nb2ob11():
     if "nonebot.adapters.onebot.v11" in sys.modules:
         logger.opt(colors=True).debug("识别到 <y>nonebot2 onebot11</y>")
         return True
-
-
-current_adapter: ContextVar["AyakaAdapter"] = ContextVar("current_adapter")
 
 
 class AyakaAdapter:
@@ -125,7 +122,7 @@ class AyakaAdapter:
 
     async def handle_event(self, ayaka_event: AyakaEvent):
         '''处理ayaka事件，并在发生错误时记录'''
-        current_adapter.set(self)
+        ayaka_context.adapter = self
         try:
             # ---- 解除循环引用，待优化 ----
             from ..cat import manager
@@ -135,11 +132,6 @@ class AyakaAdapter:
 
 
 adapter_dict: dict[str, AyakaAdapter] = {}
-first_adapter: AyakaAdapter = None
-
-
-def get_first_adapter():
-    return first_adapter
 
 
 def regist(adapter_cls: type[AyakaAdapter]):
@@ -152,8 +144,7 @@ def regist(adapter_cls: type[AyakaAdapter]):
     adapter = adapter_cls()
 
     if not adapter_dict:
-        global first_adapter
-        first_adapter = adapter
+        ayaka_context.adapter = adapter
 
     adapter_dict[name] = adapter
     logger.opt(colors=True).debug(f"ayaka适配器注册成功 <y>{name}</y>")
@@ -172,11 +163,11 @@ def get_adapter(name: str = ""):
         若当前上下文为空，则返回第一个注册的适配器
     '''
     if not name:
-        return current_adapter.get(first_adapter)
+        return ayaka_context.adapter
     return adapter_dict.get(name)
 
 
-def auto_load_adapter():
+def init():
     '''自动加载适配器'''
 
     # hoshino
@@ -194,13 +185,12 @@ def auto_load_adapter():
     else:
         from .console import ConsoleAdapter
 
+    # 初始化所有数据库
+    @ayaka_context.adapter.on_startup
+    async def _():
+        from ..database import db_dict
+        for db in db_dict.values():
+            db.init()
 
-auto_load_adapter()
 
-
-@first_adapter.on_startup
-async def _():
-    '''初始化所有数据库'''
-    from ..database import db_dict
-    for db in db_dict.values():
-        db.init()
+init()
