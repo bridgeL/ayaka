@@ -141,3 +141,9 @@ base_send_group，base_send_private，base_send_group_many
 - 新特性：playwright模块增加get_new_page方法
 - 新特性：新增上下文 adapter
 - 优化代码结构
+
+### 0.0.4.4
+
+- 变更：删除方法get_first_adapter，auto_load_adapter
+- 修复BUG：特定的adapter访问顺序可能导致ayaka_context.adapter无法正常使用
+- 优化ayaka_context结构
