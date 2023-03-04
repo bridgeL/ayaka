@@ -147,3 +147,8 @@ base_send_group，base_send_private，base_send_group_many
 - 变更：删除方法get_first_adapter，auto_load_adapter
 - 修复BUG：特定的adapter访问顺序可能导致ayaka_context.adapter无法正常使用
 - 优化ayaka_context结构
+
+### 0.0.4.5
+
+- 修复BUG：adapter.on_startup、adapter.on_shutdown不返回原函数
+
