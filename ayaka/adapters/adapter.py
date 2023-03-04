@@ -81,12 +81,14 @@ class AyakaAdapter:
         if not is_async_callable(func):
             func = simple_async_wrap(func)
         self._on_startup(func)
+        return func
 
     def on_shutdown(self, func: Callable):
         '''asgi服务关闭后钩子'''
         if not is_async_callable(func):
             func = simple_async_wrap(func)
         self._on_shutdown(func)
+        return func
 
     def _on_startup(self, async_func: Callable[..., Awaitable]):
         '''asgi服务启动后钩子，注册回调必须是异步函数'''
