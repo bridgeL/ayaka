@@ -8,9 +8,7 @@ from nonebot.matcher import current_bot
 from nonebot.adapters.onebot.v11 import MessageEvent, Bot, MessageSegment
 from nonebot.exception import ActionFailed
 
-from ..adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter, regist
-from ...config import get_root_config
-
+from ..adapter import GroupMemberInfo, AyakaEvent, AyakaAdapter
 
 driver = nonebot.get_driver()
 
@@ -167,7 +165,3 @@ class Nonebot2Onebot11Adapter(AyakaAdapter):
 
 
 Nonebot2Onebot11Adapter.name = "nb2.ob11"
-regist(Nonebot2Onebot11Adapter)
-
-if get_root_config().auto_ob11_qqguild_patch:
-    from .qqguild_patch import Nonebot2Onebot11QQguildPatchAdapter

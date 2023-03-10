@@ -1,6 +1,6 @@
 <div align="center">
 
-# Ayaka - 猫猫，猫猫！ - 0.0.4.6
+# Ayaka - 猫猫，猫猫！ - 0.0.4.7
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ayaka)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ayaka)
@@ -34,6 +34,10 @@ pip install ayaka
 
 ## 作为console程序离线运行
 
+```
+pip install ayaka[fastapi]
+```
+
 ```py
 # run.py
 import ayaka.adapters.console as cat
@@ -50,6 +54,10 @@ python run.py
 ```
 
 ## 直接连接到gocq上
+
+```
+pip install ayaka[fastapi]
+```
 
 ```py
 # run2.py

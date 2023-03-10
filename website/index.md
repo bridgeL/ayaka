@@ -1,4 +1,4 @@
-# Ayaka 猫猫，猫猫 😸 0.0.4.6
+# Ayaka 猫猫，猫猫 😸 0.0.4.7
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ayaka)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ayaka)

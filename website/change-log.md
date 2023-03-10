@@ -156,3 +156,6 @@ base_send_group，base_send_private，base_send_group_many
 
 - 修复BUG：在hoshino框架下，raw_message解析发生报错
 
+### 0.0.4.7
+
+- 优化依赖：fastapi和uvicorn变为可选依赖

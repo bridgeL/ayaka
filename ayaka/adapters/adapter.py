@@ -175,14 +175,21 @@ def init():
     # hoshino
     if is_hoshino():
         from .nb1.hoshino import HoshinoAdapter
+        regist(HoshinoAdapter)
 
     # nonebot1
     elif is_nb1():
         from .nb1.nb1 import Nonebot1Adapter
+        regist(Nonebot1Adapter)
 
     # nonebot2 onebot11
     elif is_nb2ob11():
         from .nb2.ob11 import Nonebot2Onebot11Adapter
+        regist(Nonebot2Onebot11Adapter)
+
+        if get_root_config().auto_ob11_qqguild_patch:
+            from .nb2.qqguild_patch import Nonebot2Onebot11QQguildPatchAdapter
+            regist(Nonebot2Onebot11QQguildPatchAdapter)
 
     else:
         from .console import ConsoleAdapter

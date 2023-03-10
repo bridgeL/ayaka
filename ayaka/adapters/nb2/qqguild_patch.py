@@ -10,7 +10,7 @@ from nonebot.adapters.onebot.v11 import Adapter, Message, MessageEvent, MessageS
 from nonebot.exception import ActionFailed
 
 from .ob11 import Nonebot2Onebot11Adapter
-from ..adapter import regist, GroupMemberInfo, AyakaEvent
+from ..adapter import GroupMemberInfo, AyakaEvent
 
 
 class GuildMessageEvent(MessageEvent):
@@ -226,4 +226,3 @@ class Nonebot2Onebot11QQguildPatchAdapter(Nonebot2Onebot11Adapter):
 
 
 Nonebot2Onebot11QQguildPatchAdapter.name = "nb2.ob11.qqguild_patch"
-regist(Nonebot2Onebot11QQguildPatchAdapter)
