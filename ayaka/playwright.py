@@ -22,6 +22,7 @@ async def init(**kwargs) -> Browser:
     except Error:
         await install_browser()
         _browser = await _playwright.chromium.launch(**kwargs)
+    return _browser
 
 
 @adapter.on_shutdown

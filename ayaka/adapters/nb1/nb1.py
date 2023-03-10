@@ -85,7 +85,7 @@ class Nonebot1Adapter(AyakaAdapter):
 
         # 处理消息，保留text、at、reply
         ms = ev.message
-        raw_msg = ms
+        raw_msg = str(ms)
 
         at = None
         reply = None
