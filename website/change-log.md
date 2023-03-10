@@ -152,3 +152,7 @@ base_send_group，base_send_private，base_send_group_many
 
 - 修复BUG：adapter.on_startup、adapter.on_shutdown不返回原函数
 
+### 0.0.4.6
+
+- 修复BUG：在hoshino框架下，raw_message解析发生报错
+
